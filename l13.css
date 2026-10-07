@@ -210,3 +210,6 @@
 .toples-hal strong { font-family: var(--font-px); font-weight: 500; font-size: .8rem; }
 .hal-kecil-form { display: flex; gap: 8px; align-items: flex-end; }
 .hal-kecil-form input { flex: 1; }
+.kejut-pot { position: relative; }
+.kejut-mata-satpam { position: absolute; left: 28%; top: 18%; width: 44%; aspect-ratio: 1; animation: intip .25s steps(3) both; filter: drop-shadow(0 0 0 #111); }
+@keyframes intip { from { transform: translateY(30%); opacity: 0; } }
