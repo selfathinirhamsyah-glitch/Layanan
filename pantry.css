@@ -1,0 +1,88 @@
+/* =========================================================
+   Kantor Layanan Perasaan · Pantry & obrolan
+   ========================================================= */
+
+/* titik "ada yang baru" di tombol lift */
+.lift-btn { position: relative; }
+.lift-btn.ada-baru b::after {
+  content: ""; position: absolute; top: 2px; right: calc(50% - 22px); width: 10px; height: 10px;
+  background: #B5443A; border: 2px solid #23272B;
+}
+
+/* ---------- Meja pantry ---------- */
+.meja-pantry { display: grid; gap: 10px; margin-bottom: 20px; }
+.kursi {
+  display: grid; grid-template-columns: 50px 1fr auto; gap: 12px; align-items: center; width: 100%; text-align: left; cursor: pointer;
+  font: inherit; color: inherit; background: var(--paper); padding: 8px 12px;
+  border: 2px solid var(--ink); border-radius: var(--wobble-sm); box-shadow: 4px 4px 0 color-mix(in srgb, var(--ink) 14%, transparent);
+  transition: transform .12s, box-shadow .12s;
+}
+.kursi:hover, .kursi:focus-visible { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--accent); }
+.kursi:active { transform: translate(1px, 1px); box-shadow: 2px 2px 0 var(--accent); }
+.kursi-foto { width: 50px; height: 50px; padding: 3px; background: #FFFDF6; border: 2px solid var(--ink); }
+.kursi-isi { display: flex; flex-direction: column; line-height: 1.2; }
+.kursi-isi strong { font-family: var(--font-px); font-weight: 600; }
+.kursi-isi small { color: var(--ink-soft); }
+.kursi-topik { font-size: .95rem; color: var(--accent); }
+.kursi-aksi {
+  font-family: var(--font-px); font-size: .8rem; background: var(--accent); color: var(--paper); padding: 6px 10px;
+  box-shadow: 0 -2px 0 var(--ink), 0 2px 0 var(--ink), -2px 0 0 var(--ink), 2px 0 0 var(--ink);
+}
+
+/* ---------- Papan gosip ---------- */
+.papan-gosip {
+  padding: 14px; background: #3E4A3F; color: #EDE7D6; border: 6px solid #8A5E3B; border-radius: 4px;
+  box-shadow: inset 0 0 0 2px #2B2A26, 4px 5px 0 color-mix(in srgb, var(--ink) 18%, transparent);
+}
+.papan-gosip .papan-judul { color: #F2C14E; text-align: center; }
+.papan-gosip .muted { color: #C9C2AE; text-align: center; }
+.gosip-list { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 10px; }
+.gosip { background: #FFF4B8; color: #2B2A26; border: 2px solid #2B2A26; transform: rotate(-.6deg); box-shadow: 2px 3px 0 rgba(0,0,0,.3); }
+.gosip:nth-child(even) { transform: rotate(.7deg); background: #F4EFE3; }
+.gosip details { padding: 8px 12px; }
+.gosip summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.gosip summary::-webkit-details-marker { display: none; }
+.gosip summary::after { content: "baca ▸"; font-family: var(--font-px); font-size: .7rem; color: #5D5A50; flex-shrink: 0; }
+.gosip details[open] summary::after { content: "tutup ▾"; }
+.gosip summary strong { font-weight: 400; font-size: 1.05rem; }
+.gosip.baru summary strong::before { content: "BARU "; font-family: var(--font-px); font-size: .62rem; background: #B5443A; color: #FFFDF6; padding: 1px 4px; margin-right: 4px; vertical-align: 2px; }
+.gosip details p { margin: 8px 0 0; }
+.gosip-sumber { font-size: .9rem; color: #5D5A50; font-style: italic; }
+.gosip.terkunci { display: flex; gap: 10px; align-items: center; padding: 8px 12px; background: rgba(255,255,255,.12); color: #EDE7D6; border-style: dashed; border-color: #C9C2AE; box-shadow: none; }
+.gosip.terkunci span:last-child { display: flex; flex-direction: column; line-height: 1.2; }
+.gosip.terkunci small { color: #C9C2AE; }
+.gembok { font-family: var(--font-num); font-size: 1.6rem; color: #F2C14E; }
+.gosip-hitung { text-align: center; margin: 10px 0 0; color: #F2C14E; }
+
+/* ---------- Obrolan ---------- */
+.chat-paper { display: flex; flex-direction: column; min-height: 70vh; }
+.chat-kepala { display: flex; align-items: center; gap: 10px; border-bottom: 2px dashed var(--line); padding-bottom: 10px; margin-bottom: 10px; }
+.chat-kepala .btn.ghost { margin-right: 0; }
+.chat-id { display: flex; flex-direction: column; min-width: 0; }
+h2.chat-nama { font-size: 1.15rem; margin: 0; padding-bottom: 0; }
+h2.chat-nama::after { display: none; }
+.chat-status { margin: 0; font-size: .95rem; color: var(--ink-soft); }
+.chat-log { flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 4px 0 12px; min-height: 260px; }
+.gel { display: flex; gap: 8px; align-items: flex-end; max-width: 88%; animation: masuk .25s ease both; }
+.gel > span:last-child {
+  padding: 8px 12px; line-height: 1.35; border: 2px solid var(--ink); background: var(--paper); border-radius: 14px 14px 14px 3px;
+  white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.gel-foto { flex-shrink: 0; width: 30px; height: 30px; padding: 2px; background: #FFFDF6; border: 2px solid var(--ink); }
+.gel-mira { align-self: flex-end; }
+.gel-mira > span:last-child { background: var(--accent); color: var(--paper); border-radius: 14px 14px 3px 14px; }
+.gel-ketik > span:last-child { color: var(--ink-soft); letter-spacing: .2em; animation: kedip 1s steps(2) infinite; }
+.gel-sistem { align-self: center; max-width: 100%; }
+.gel-sistem .gel-foto { display: none; }
+.gel-sistem > span:last-child { background: #FFF4B8; color: #2B2A26; border-style: dashed; border-radius: 4px; font-size: .95rem; text-align: center; }
+.chat-pilihan { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; padding-top: 10px; border-top: 2px dashed var(--line); min-height: 52px; }
+.chip {
+  font: inherit; font-size: 1rem; line-height: 1.2; cursor: pointer; text-align: left;
+  background: var(--paper); color: var(--ink); border: 2px solid var(--accent); border-radius: 16px; padding: 8px 14px; min-height: 42px;
+}
+.chip:hover, .chip:focus-visible { background: var(--accent-wash); }
+.chip:active { transform: translateY(1px); }
+.dengar-form { width: 100%; }
+.dengar-form textarea { min-height: 76px; line-height: 26px; background-image: none; }
+.dengar-tombol { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; align-items: center; margin-top: 8px; }
+.chat-paper .privasi { margin-top: 12px; }

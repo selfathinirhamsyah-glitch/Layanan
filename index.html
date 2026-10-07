@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="kantor.css">
   <link rel="stylesheet" href="skala.css">
   <link rel="stylesheet" href="games.css">
+  <link rel="stylesheet" href="pantry.css">
 </head>
 <body data-loket="umum">
 
@@ -453,6 +454,18 @@
         <p class="renovasi">Pantry sedang dibersihkan. Gulanya juga hilang, tapi itu urusan lain.</p>
       </div>
     </section>
+    <section class="screen" id="s-obrolan" data-loket="C" data-lantai="3" aria-labelledby="chatNama">
+      <div class="paper chat-paper">
+        <div class="chat-kepala">
+          <button class="btn ghost small" id="chatKembali" type="button">← Pantry</button>
+          <span class="avatar" id="chatFoto"></span>
+          <div class="chat-id"><h2 id="chatNama" class="chat-nama">Pantry</h2><p id="chatStatus" class="chat-status mono"></p></div>
+        </div>
+        <div class="chat-log" id="chatLog" aria-live="polite"></div>
+        <div class="chat-pilihan" id="chatPilihan"></div>
+        <p class="privasi">Obrolan ini tidak disimpan. Begitu keluar dari pantry, gelembungnya ikut dicuci.</p>
+      </div>
+    </section>
     <section class="screen" id="s-koperasi" data-loket="B" data-lantai="4" aria-labelledby="h-koperasi">
       <div class="paper" id="ruangKoperasi">
         <div class="form-head"><span class="loket-badge">Lantai 4</span><span class="mono small">Poin Sabar: <b class="poin-angka">0</b></span></div>
@@ -609,5 +622,7 @@
 <script src="skala.js" defer></script>
 <script src="pasang-skala.js" defer></script>
 <script src="games.js" defer></script>
+<script src="pantry-data.js" defer></script>
+<script src="pantry.js" defer></script>
 </body>
 </html>
