@@ -21,4 +21,7 @@ Tidak ada proses build.
 - **Netlify**: drag-and-drop folder ini ke app.netlify.com/drop, atau hubungkan repo (publish directory: root).
 - **Vercel**: import repo, framework preset "Other", tanpa build command.
 
-Pakai Google Fonts (Special Elite, IBM Plex Sans/Mono) dan html2canvas dari cdnjs.
+## Tampilan
+Campuran pixel art dan doodle: pegawai hewan digambar sebagai sprite pixel (`sprites.js`, grid 12×12), tombol gaya game retro, kertas buku kotak-kotak dengan garis tangan, klip kertas, dan catatan pensil.
+
+Pakai Google Fonts (Pixelify Sans, VT323, Patrick Hand) dan html2canvas dari cdnjs.

@@ -37,6 +37,32 @@ const NAMA_DEFAULT = "Mira";
   const nomorSurat = (kode) => `${pad(Math.floor(Math.random() * 900) + 100, 3)}/${kode}/KLP/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
 
   $$(".nama").forEach((el) => (el.textContent = NAMA));
+
+  /* ---------- Sprite pixel ---------- */
+  const px = (nama) => window.SPRITE?.svg(nama) || "";
+  // Avatar untuk dokumen unduhan: pakai background PNG karena html2canvas tidak menggambar <img> di sini
+  const avatarDok = (nama) => `<span class="cert-avatar" style="background-image:url(${window.SPRITE?.png(nama) || ""})"></span>`;
+  function pasangSprite(root = document) {
+    $$("[data-sprite]", root).forEach((el) => {
+      if (el.classList.contains("petugas")) {
+        if (el.querySelector(":scope > .avatar")) return;
+        const balon = document.createElement("div");
+        balon.className = "petugas-bubble";
+        balon.append(...el.childNodes);
+        el.append(balon);
+        el.insertAdjacentHTML("afterbegin", `<span class="avatar">${px(el.dataset.sprite)}</span>`);
+      } else {
+        el.innerHTML = px(el.dataset.sprite);
+      }
+    });
+  }
+  pasangSprite();
+  // Siapa pengirim memo → sprite
+  const SPRITE_PENGIRIM = [
+    ["Kura", "kura"], ["Kapibara", "kapibara"], ["Resepsionis", "kapibara"], ["Berang", "berang"], ["Singa", "singa"],
+    ["Badak", "badak"], ["Burung Hantu", "hantu"], ["Kukang", "kukang"], ["Beruang", "beruang"], ["Gajah", "gajah"],
+    ["Rakun", "rakun"], ["Mesin Kopi", "kopi"], ["Kotak Saran", "saran"], ["Tanaman", "tanaman2"],
+  ];
   $("#noTiket").textContent = TIKET;
   $("#tglHariIni").textContent = tanggalPanjang(now);
   $("#noAntrean").textContent = ANTREAN;
@@ -74,6 +100,9 @@ const NAMA_DEFAULT = "Mira";
   let timerToast;
   function memo(dari, teks, ms = 4800) {
     $("#toastFrom").textContent = dari;
+    const sp = SPRITE_PENGIRIM.find(([kata]) => dari.includes(kata));
+    $("#toastAvatar").innerHTML = sp ? px(sp[1]) : "";
+    $("#toastAvatar").hidden = !sp;
     $("#toastText").textContent = teks;
     const t = $("#toast");
     t.hidden = true; void t.offsetWidth; t.hidden = false;
@@ -395,7 +424,7 @@ const NAMA_DEFAULT = "Mira";
       <div class="cert-foot">
         <div>
           <svg class="ttd-coret" viewBox="0 0 160 50" aria-hidden="true"><path d="M8 34c14-22 22-24 24-8s6 18 14 0 12-16 16 2 10 12 20-4 16-10 22 6 12 8 22-2 14-6 26-4"/></svg>
-          <p><strong>Bu Kapibara</strong><br>Petugas Loket A · ${esc(tanggalPanjang(now))}</p>
+          <p>${avatarDok("kapibara")}<strong>Bu Kapibara</strong><br>Petugas Loket A · ${esc(tanggalPanjang(now))}</p>
         </div>
         <div class="stamp">Sah &amp;<br>berlaku</div>
       </div>`;
@@ -415,10 +444,10 @@ const NAMA_DEFAULT = "Mira";
     seneng: { nama: "Pokoknya lagi seneng aja", umum: "Perhatian. ${N} sedang senang tanpa alasan. Ini jenis senang paling langka. Seluruh pegawai dimohon berdiri. ...Silakan duduk kembali." },
   };
   const PESERTA = [
-    "Bang Berang-berang (pemimpin rapat, sudah rapi)",
-    "Pak Singa (bagian pengumuman, suaranya memang begitu)",
-    "Mas Kukang (masih di jalan menuju kursi)",
-    "Pak Lidah Mertua (hadir sebagai tanaman)",
+    ["berang", "Bang Berang-berang (pemimpin rapat, sudah rapi)"],
+    ["singa", "Pak Singa (bagian pengumuman, suaranya memang begitu)"],
+    ["kukang", "Mas Kukang (masih di jalan menuju kursi)"],
+    ["tanaman2", "Pak Lidah Mertua (hadir sebagai tanaman)"],
   ];
   const kabar = { kat: [], adaCerita: false };
 
@@ -442,9 +471,11 @@ const NAMA_DEFAULT = "Mira";
 
     await tunggu(400); if (!ok()) return;
     $("#rapatB").hidden = false;
-    for (const p of PESERTA) {
+    for (const [sp, teks] of PESERTA) {
       await tunggu(550); if (!ok()) return;
-      const li = document.createElement("li"); li.textContent = p; $("#pesertaB").appendChild(li);
+      const li = document.createElement("li");
+      li.innerHTML = `<span class="avatar avatar-sm">${px(sp)}</span><span>${esc(teks)}</span>`;
+      $("#pesertaB").appendChild(li);
     }
     await tunggu(900); if (!ok()) return;
 
@@ -494,7 +525,7 @@ const NAMA_DEFAULT = "Mira";
       <div class="cert-foot">
         <div>
           <svg class="ttd-coret" viewBox="0 0 160 50" aria-hidden="true"><path d="M10 30c10-16 18-20 22-6s10 10 16-6 14-8 18 6 12 4 20-10 16 2 22 8 16-4 24-2"/></svg>
-          <p><strong>Bang Berang-berang</strong><br>Petugas Loket B · diumumkan oleh Pak Singa</p>
+          <p>${avatarDok("berang")}${avatarDok("singa")}<strong>Bang Berang-berang</strong><br>Petugas Loket B · diumumkan oleh Pak Singa</p>
         </div>
         <div class="stamp">Hari<br>baik</div>
       </div>`;
@@ -581,7 +612,7 @@ const NAMA_DEFAULT = "Mira";
       <div class="cert-foot">
         <div>
           <svg class="ttd-coret" viewBox="0 0 160 50" aria-hidden="true"><path d="M6 36l18-26 6 26 14-22 4 22 20-18c6-4 10 14 22 4s14-10 30-6"/></svg>
-          <p><strong>Kak Badak</strong><br>Petugas Izin Semangat</p>
+          <p>${avatarDok("badak")}<strong>Kak Badak</strong><br>Petugas Izin Semangat</p>
         </div>
         <div class="stamp">Berlaku</div>
       </div>`;
@@ -750,8 +781,7 @@ const NAMA_DEFAULT = "Mira";
   ];
   $("#fasTanaman").addEventListener("click", (e) => {
     siram++;
-    const svg = $(".tanaman");
-    svg.style.setProperty("--segar", Math.min(siram, 5));
+    $("#fasTanaman .fas-sprite").innerHTML = px(siram >= 5 ? "tanaman2" : siram >= 2 ? "tanaman1" : "tanaman0");
     goyang(e.currentTarget);
     if (siram < 5) memo("Ruang Tunggu · Tanaman", PESAN_TANAMAN[siram - 1]);
     else if (siram === 5) memo("Pak Lidah Mertua · Tanaman Kantor", "Terima kasih. Ternyata disiram sedikit-sedikit juga cukup.", 6000);
