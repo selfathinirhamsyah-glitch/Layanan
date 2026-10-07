@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="games.css">
   <link rel="stylesheet" href="pantry.css">
   <link rel="stylesheet" href="koperasi.css">
+  <link rel="stylesheet" href="l13.css">
 </head>
 <body data-loket="umum">
 
@@ -414,6 +415,8 @@
           <ul id="papanPengumuman" class="papan-list"></ul>
         </section>
 
+        <div id="misteriSlot"></div>
+
         <div id="absenSlot"></div>
 
         <h3 class="sub-judul">Denah Gedung</h3>
@@ -425,6 +428,14 @@
           <button class="btn primary" type="button" data-ke="s-pilih">Ke Loket Layanan →</button>
         </div>
       </div>
+    </section>
+
+    <!-- ============ BERKAS MISTERI LANTAI 13 ============ -->
+    <section class="screen" id="s-misteri" data-loket="D" data-lantai="L" aria-labelledby="h-misteri">
+      <div class="paper" id="ruangMisteri"><h2 id="h-misteri">Misteri Lantai 13</h2></div>
+    </section>
+    <section class="screen" id="s-lantai13" data-loket="B" data-lantai="13" aria-labelledby="h-lantai13">
+      <div class="paper" id="ruangRahasia"><h2 id="h-lantai13">Lantai 13</h2></div>
     </section>
 
     <!-- ============ PAPAN PEGAWAI ============ -->
@@ -540,6 +551,33 @@
   <div class="arena-kontrol" id="arenaKontrol"></div>
 </div>
 
+<!-- Misteri Lantai 13 (layar penuh) -->
+<div class="l13" id="l13" hidden role="dialog" aria-modal="true" aria-labelledby="l13Bab">
+  <div class="l13-atas">
+    <button class="btn small" id="l13Keluar" type="button">✕ Keluar</button>
+    <div class="l13-judul"><strong id="l13Bab">Bab</strong><small id="l13Ruang"></small></div>
+    <button class="btn small l13-petunjuk" id="l13Petunjuk" type="button"><span class="avatar avatar-sm" data-sprite="kapibara"></span>Petunjuk</button>
+  </div>
+  <div class="l13-panggung" id="l13Panggung">
+    <div class="l13-adegan" id="l13Adegan">
+      <div class="l13-latar" id="l13Latar"></div>
+      <div class="l13-titik" id="l13Titik"></div>
+      <div class="l13-gelap" id="l13Gelap" hidden></div>
+    </div>
+    <div class="l13-dialog" id="l13Dialog" hidden aria-live="polite">
+      <span class="avatar" id="l13DAvatar"></span>
+      <div class="l13-dteks"><strong id="l13DNama"></strong><p id="l13DTeks"></p><div class="l13-dpilih" id="l13DPilih"></div></div>
+      <span class="l13-dlanjut" aria-hidden="true">▼</span>
+    </div>
+  </div>
+  <div class="l13-laci">
+    <div class="l13-laci-kepala"><span class="l13-laci-label">Laci</span><small id="l13LaciKet">Ketuk barang untuk memilih</small></div>
+    <div id="l13Laci" class="l13-laci-isi"></div>
+  </div>
+  <div class="l13-modal" id="l13Modal" hidden><div class="l13-modal-isi" id="l13ModalIsi"></div></div>
+  <div class="l13-kejut" id="l13Kejut" hidden></div>
+</div>
+
 <div class="pintu-lift" id="pintuLift" hidden aria-hidden="true">
   <div class="daun kiri"></div><div class="daun kanan"></div>
   <div class="pintu-lantai mono" id="pintuLantai">▲ 1</div>
@@ -626,5 +664,7 @@
 <script src="pantry-data.js" defer></script>
 <script src="pantry.js" defer></script>
 <script src="koperasi.js" defer></script>
+<script src="l13-mesin.js" defer></script>
+<script src="l13-bab.js" defer></script>
 </body>
 </html>
