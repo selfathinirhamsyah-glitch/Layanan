@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="kantor.css">
   <link rel="stylesheet" href="skala.css">
+  <link rel="stylesheet" href="games.css">
 </head>
 <body data-loket="umum">
 
@@ -508,6 +509,23 @@
   <button class="lift-btn" type="button" data-lantai="5" data-layar="s-meja"><b>5</b><small>Meja</small></button>
   <button class="lift-btn lift-kosong" type="button" id="liftKosong" aria-label="Tombol tanpa angka"><b>▒</b><small>&nbsp;</small></button>
 </nav>
+<!-- Arena game (layar penuh) -->
+<div class="arena" id="arena" hidden role="dialog" aria-modal="true" aria-labelledby="arenaJudul">
+  <div class="arena-hud">
+    <button class="btn small" id="arenaKeluar" type="button">✕ Keluar</button>
+    <strong id="arenaJudul">Game</strong>
+    <span class="hud-angka"><span class="mono" id="hudWaktu"></span> <span class="hud-skor">Skor <b class="mono" id="hudSkor">0</b></span></span>
+  </div>
+  <p class="arena-info" id="hudInfo" aria-live="polite"></p>
+  <div class="arena-panggung" id="arenaPanggung">
+    <canvas id="arenaKanvas" hidden></canvas>
+    <div id="arenaDom" class="arena-dom" hidden></div>
+    <div class="arena-panel" id="arenaPanel"></div>
+    <div class="hitung-mundur mono" id="hitungMundur" hidden>3</div>
+  </div>
+  <div class="arena-kontrol" id="arenaKontrol"></div>
+</div>
+
 <div class="pintu-lift" id="pintuLift" hidden aria-hidden="true">
   <div class="daun kiri"></div><div class="daun kanan"></div>
   <div class="pintu-lantai mono" id="pintuLantai">▲ 1</div>
@@ -590,5 +608,6 @@
 <script src="kantor.js" defer></script>
 <script src="skala.js" defer></script>
 <script src="pasang-skala.js" defer></script>
+<script src="games.js" defer></script>
 </body>
 </html>

@@ -283,6 +283,33 @@
         "......k.....",
       ],
     },
+    oyenBelakang: { // Oyen dilihat dari belakang (sedang presentasi)
+      p: { k: K, o: "#E39B4A", O: "#B8692A" },
+      g: [
+        ".k........k.",
+        ".kk......kk.",
+        ".kok....kok.",
+        ".kookkkkook.",
+        "kooooOOooook",
+        "koooOooOoook",
+        "kooOooooOook",
+        "kooooooooook",
+        ".kooooooook.",
+        "..kkkkkkkk..",
+      ],
+    },
+    gorengan: {
+      p: { k: K, y: "#D9A441", Y: "#B07A2A" },
+      g: [
+        "............",
+        "............",
+        "...kkkkkk...",
+        "..kyyYyyyk..",
+        ".kyYyyyYyyk.",
+        ".kyyyYyyyyk.",
+        "..kkkkkkkk..",
+      ],
+    },
     tanaman0: { // layu
       p: { k: K, g: "#A3A060", p: "#B0714F" },
       g: [
