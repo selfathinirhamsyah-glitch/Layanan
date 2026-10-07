@@ -45,15 +45,16 @@ window.KLP = window.KLP || {};
     if (mentah) data = gabung(AWAL(), JSON.parse(mentah));
   } catch { bisaSimpan = false; }
 
-  let timerSimpan;
+  let timerSimpan, beku = false;
   function simpan() {
+    if (beku) return;
     clearTimeout(timerSimpan);
     timerSimpan = setTimeout(() => {
       try { localStorage.setItem(KUNCI, JSON.stringify(data)); bisaSimpan = true; }
       catch { bisaSimpan = false; }
     }, 120);
   }
-  addEventListener("pagehide", () => { try { localStorage.setItem(KUNCI, JSON.stringify(data)); } catch { /* tetap jalan */ } });
+  addEventListener("pagehide", () => { if (beku) return; try { localStorage.setItem(KUNCI, JSON.stringify(data)); } catch { /* tetap jalan */ } });
 
   /* ---------- Kejadian ---------- */
   const pendengar = {};
@@ -172,6 +173,9 @@ window.KLP = window.KLP || {};
   Object.assign(KLP, {
     data, simpan, on, emit, catat, pernah, tambahPoin, pakaiPoin, hariIni, sfx, aturVolume,
     get bisaSimpan() { return bisaSimpan; },
-    reset() { data = AWAL(); KLP.data = data; simpan(); },
+    hapusSemua() {
+      beku = true; clearTimeout(timerSimpan);
+      try { localStorage.removeItem(KUNCI); localStorage.removeItem("klp-semangat"); } catch { /* tidak apa-apa */ }
+    },
   });
 })();
