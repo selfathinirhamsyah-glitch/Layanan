@@ -23,17 +23,22 @@ window.KLP = window.KLP || {};
     barang: {},        // koperasi: { id: jumlah }
     absen: null,       // { tgl, level } absen perasaan harian (gelas teh)
     setelan: { volume: 2, kaget: true, tanyaKaget: false },
-    l13: { bab: 0, selesai: [], inv: [], flag: {}, mulai: null, bukaSemua: false, langka: [] },
+    sudahMasuk: false,
+    semangatTerakhir: 0,
+    l13: { selesai: [], inv: [], flag: {}, mulai: null, bukaSemua: false, langka: [], posisi: null, halKecil: [], tglDiangkat: null },
   });
 
+  // Gabungkan data tersimpan ke bentuk awal: kunci baru dari versi lama tetap ikut,
+  // tipe yang tidak cocok dikembalikan ke nilai awal.
+  const objekBiasa = (v) => v && typeof v === "object" && !Array.isArray(v);
   function gabung(dasar, isi) {
-    if (!isi || typeof isi !== "object") return dasar;
-    for (const k of Object.keys(dasar)) {
+    if (!objekBiasa(isi)) return dasar;
+    for (const k of Object.keys(isi)) {
       const d = dasar[k], v = isi[k];
       if (v === undefined) continue;
-      if (d && typeof d === "object" && !Array.isArray(d)) dasar[k] = gabung(d, v);
+      if (objekBiasa(d) && objekBiasa(v)) dasar[k] = gabung(d, v);
       else if (Array.isArray(d)) dasar[k] = Array.isArray(v) ? v : d;
-      else dasar[k] = typeof v === typeof d || d === null ? v : d;
+      else if (d === undefined || d === null || typeof v === typeof d) dasar[k] = v;
     }
     return dasar;
   }

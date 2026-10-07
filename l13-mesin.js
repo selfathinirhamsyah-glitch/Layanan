@@ -129,7 +129,7 @@
     segarkan: () => gambarRuang(),
     bilang, tanya, kejut, lihat, sfx,
     gembok: tekaGembok, urutan: tekaUrutan, susun: tekaSusun, jam: tekaJam,
-    gelap(nyala) { gelap.hidden = !nyala; adegan.classList.toggle("dalam-gelap", nyala); },
+    gelap(nyala, total = false) { gelap.hidden = !nyala; gelap.classList.toggle("total", !!total); adegan.classList.toggle("dalam-gelap", nyala); },
     async selesaiBab() {
       const n = babAktif;
       if (!S().selesai.includes(n)) S().selesai.push(n);
@@ -187,6 +187,7 @@
     S().posisi = { bab: babAktif, ruang: id };
     K.simpan();
     api.gelap(false);
+    gelap.style.setProperty("--x", "50%"); gelap.style.setProperty("--y", "45%");
     if (!langsung && !K.kurangiGerak) { adegan.classList.remove("ganti"); void adegan.offsetWidth; adegan.classList.add("ganti"); }
     gambarRuang();
     b.ruang[id].masuk && jalankan(() => b.ruang[id].masuk(api));

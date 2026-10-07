@@ -9,6 +9,31 @@ Website satu halaman (HTML/CSS/JS murni) untuk Mira: kantor layanan fiktif yang 
 - **Loket D (tersembunyi)**: muncul setelah 10 detik ragu di ruang tunggu (atau bolak-balik menyorot loket). Tiga pertanyaan absurd dari Mbak Burung Hantu.
 - **Easter egg**: siram tanaman, mesin kopi rusak (klik ke-7), kotak saran, "Bicara dengan Manajer" (klik 5x), dan cap kantor di halaman depan (ketuk 5x).
 
+## Gedung (versi 2)
+Navigasi utama berupa **panel lift** di bawah layar dan denah gedung di Lobi.
+
+| Lantai | Isi |
+|---|---|
+| L · Lobi | Pengumuman kantor, absen perasaan harian (Gelas Teh), denah, Papan Pegawai, berkas Misteri Lantai 13 |
+| 1 · Loket | Loket A–D (versi pertama) dengan skala interaktif: Tarik Senyum (A), Timbangan (B), Pukul Kok (C) |
+| 2 · Rehat | 4 mini game: Rally vs Pak Satpam, Stempel Kilat, Tangkap Kertas Terbang, Ngemil Diam-diam di Rapat. Poin Sabar, rekor, papan Pegawai Teladan |
+| 3 · Pantry | Obrolan bercabang dengan Bu Ratna, Pak Satpam, Dimas, Oyen, Mas Kukang (termasuk mode "dengerin aja") dan 16 gosip kantor |
+| 4 · Koperasi | Belanja barang absurd pakai Poin Sabar, ditemani satu karakter, struk bisa diunduh |
+| 5 · Meja | Koleksi barang, rak barang langka, buku rekor, hapus data |
+| 13 · Rahasia | Terbuka setelah Misteri Lantai 13 selesai: SK Penjaga Lantai 13, toples koleksi, simpan hal kecil |
+
+**Radio Kantor** (pojok kanan atas): kenop volume 5 tingkat dan Tuas Mode Kaget.
+
+### Misteri Lantai 13
+Adventure point-and-click 6 bab. Satu bab terbuka per hari (tanggal di perangkat).
+Untuk mengetes semua bab sekaligus: buka Meja Kerja (Lantai 5) dan **ketuk kalender meja 7 kali** (ketuk 7 kali lagi untuk mematikan).
+
+### Penyimpanan
+Semua progres (poin, skor, barang, gosip, misteri) disimpan di `localStorage` perangkat itu sendiri dengan kunci `klp-v2`. Kalau penyimpanan diblokir, semua tetap bisa dimainkan; progresnya saja yang hilang saat halaman ditutup. Isi curhat dan obrolan "dengerin aja" tidak pernah disimpan.
+
+### Struktur file
+`core.js` (data, suara) → `sprites.js` → `script.js` (loket) → `kantor.js` (lobi, lift, radio) → `skala.js` + `pasang-skala.js` → `games.js` → `pantry-data.js` + `pantry.js` → `koperasi.js` → `l13-mesin.js` + `l13-bab*.js`.
+
 ## Ganti nama
 - Ubah `NAMA_DEFAULT` di baris atas `script.js`, atau
 - Tambahkan di URL: `https://situsmu.netlify.app/?nama=Mira`

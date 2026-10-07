@@ -213,3 +213,9 @@
 .kejut-pot { position: relative; }
 .kejut-mata-satpam { position: absolute; left: 28%; top: 18%; width: 44%; aspect-ratio: 1; animation: intip .25s steps(3) both; filter: drop-shadow(0 0 0 #111); }
 @keyframes intip { from { transform: translateY(30%); opacity: 0; } }
+.l13-gelap.total { background: rgba(10, 8, 14, .985); }
+.tulisan-cakar { font-family: var(--font-hand); font-size: 1.1rem; transform: rotate(-1.2deg); color: #3D3A33; }
+.tulisan-cakar:nth-child(odd) { transform: rotate(.8deg); }
+.kedip-antena { animation: kedip 1.4s steps(2) infinite; }
+#ruangRahasia .poster-piket th { width: auto; font-family: var(--font-hand); font-size: 1rem; }
+#ruangRahasia .poster-piket td { text-align: right; font-size: 1.2rem; color: var(--accent); }
