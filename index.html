@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=VT323&family=Patrick+Hand&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="kantor.css">
 </head>
 <body data-loket="umum">
 
@@ -25,13 +26,17 @@
       <h1 class="kop-title">Kantor Layanan Perasaan</h1>
       <p class="kop-small">Cabang Khusus <span class="nama"></span> · Jl. Pelan-Pelan No. 3</p>
     </div>
+    <button class="btn-radio" id="btnSetelan" type="button" aria-label="Radio Kantor: pengaturan suara dan mode kaget">
+      <span class="ikon-radio" id="ikonRadio" data-sprite="radio"></span>
+      <span class="btn-radio-ket">Radio</span>
+    </button>
   </header>
   <div class="kop-rule" aria-hidden="true"></div>
 
   <main id="app">
 
     <!-- ============ 0. HALAMAN DEPAN ============ -->
-    <section class="screen active" id="s-depan" data-loket="umum" aria-labelledby="h-depan">
+    <section class="screen active" id="s-depan" data-loket="umum" data-lantai="L" aria-labelledby="h-depan">
       <div class="paper">
         <button class="cap-kantor" id="capKantor" type="button" aria-label="Cap kantor">
           <span>KLP</span><small>RESMI</small>
@@ -46,7 +51,7 @@
         <p>Kantor ini melayani segala urusan perasaan: yang berat, yang menyenangkan, dan yang belum ketahuan apa. Semua berkas diproses dengan serius, kecuali bagian yang memang lucu.</p>
 
         <div class="petugas" data-sprite="kura">
-          <div class="petugas-tag">Pak Kura-kura <small>Satpam</small></div>
+          <div class="petugas-tag">Pak Satpam <small>Kura-kura, keamanan</small></div>
           <p>"Silakan ambil nomor antrean. Tidak usah buru-buru, saya juga tidak."</p>
         </div>
 
@@ -68,17 +73,18 @@
         <div class="actions">
           <span class="doodle-note note-gratis" aria-hidden="true">gratis, beneran →</span>
           <button class="btn primary" id="btnAmbil" type="button">Ambil Nomor Antrean</button>
-          <button class="btn primary" id="btnMasuk" type="button" hidden>Masuk ke Ruang Tunggu →</button>
+          <button class="btn primary" id="btnMasuk" type="button" hidden>Masuk ke Lobi →</button>
+          <button class="btn" id="btnLewatiDepan" type="button" hidden>Langsung ke Lobi</button>
         </div>
       </div>
     </section>
 
     <!-- ============ 1. RUANG TUNGGU / PILIH LOKET ============ -->
-    <section class="screen" id="s-pilih" data-loket="umum" aria-labelledby="h-pilih">
+    <section class="screen" id="s-pilih" data-loket="umum" data-lantai="1" aria-labelledby="h-pilih">
       <div class="paper">
         <p class="panggilan mono">Nomor antrean <span id="noAntrean2">001</span>, silakan.</p>
         <div class="petugas" data-sprite="kapibara">
-          <div class="petugas-tag">Bu Kapibara <small>Resepsionis merangkap Petugas Loket A</small></div>
+          <div class="petugas-tag">Bu Ratna <small>Resepsionis merangkap Petugas Loket A</small></div>
           <p id="h-pilih">"Ada keperluan apa hari ini, <span class="nama"></span>?"</p>
         </div>
 
@@ -109,7 +115,7 @@
     </section>
 
     <!-- ============ LOKET A: FORMULIR KELUHAN ============ -->
-    <section class="screen" id="s-a-form" data-loket="A" aria-labelledby="h-a-form">
+    <section class="screen" id="s-a-form" data-loket="A" data-lantai="1" aria-labelledby="h-a-form">
       <form class="paper" id="formKeluhan" novalidate>
         <div class="form-head">
           <span class="loket-badge">Loket A</span>
@@ -160,7 +166,7 @@
     </section>
 
     <!-- ============ LOKET A: PROSES ============ -->
-    <section class="screen" id="s-a-proses" data-loket="A" aria-labelledby="h-a-proses">
+    <section class="screen" id="s-a-proses" data-loket="A" data-lantai="1" aria-labelledby="h-a-proses">
       <div class="paper">
         <div class="form-head"><span class="loket-badge">Loket A</span><span class="mono small">Status: diproses</span></div>
         <h2 id="h-a-proses">Keluhan sedang diproses</h2>
@@ -178,7 +184,7 @@
     </section>
 
     <!-- ============ LOKET A: BALASAN ============ -->
-    <section class="screen" id="s-a-balasan" data-loket="A" aria-labelledby="h-a-balasan">
+    <section class="screen" id="s-a-balasan" data-loket="A" data-lantai="1" aria-labelledby="h-a-balasan">
       <div class="paper surat">
         <div class="form-head"><span class="loket-badge">Loket A</span><span class="mono small" id="noSuratA">—</span></div>
         <div class="stamp-zone" id="stampTanpaSyarat" hidden><div class="stamp big">Disetujui<br>tanpa syarat</div></div>
@@ -188,7 +194,7 @@
         <div class="ttd">
           <p>Hormat kami,</p>
           <svg class="ttd-coret" viewBox="0 0 160 50" aria-hidden="true"><path d="M8 34c14-22 22-24 24-8s6 18 14 0 12-16 16 2 10 12 20-4 16-10 22 6 12 8 22-2 14-6 26-4"/></svg>
-          <p><strong>Bu Kapibara</strong><br><small>Petugas Loket A · Bidang Keluhan</small></p>
+          <p><strong>Bu Ratna</strong><br><small>Petugas Loket A · Bidang Keluhan</small></p>
         </div>
         <div class="actions">
           <button class="btn primary" data-go="s-a-kompen" type="button">Ambil Kompensasi Resmi →</button>
@@ -197,7 +203,7 @@
     </section>
 
     <!-- ============ LOKET A: KOMPENSASI ============ -->
-    <section class="screen" id="s-a-kompen" data-loket="A" aria-labelledby="h-a-kompen">
+    <section class="screen" id="s-a-kompen" data-loket="A" data-lantai="1" aria-labelledby="h-a-kompen">
       <div class="paper">
         <div class="form-head"><span class="loket-badge">Loket A</span><span class="mono small">Formulir K-02 / Kompensasi</span></div>
         <h2 id="h-a-kompen">Kompensasi Resmi</h2>
@@ -225,7 +231,7 @@
     </section>
 
     <!-- ============ LOKET B: FORMULIR KABAR BAIK ============ -->
-    <section class="screen" id="s-b-form" data-loket="B" aria-labelledby="h-b-form">
+    <section class="screen" id="s-b-form" data-loket="B" data-lantai="1" aria-labelledby="h-b-form">
       <form class="paper" id="formKabar" novalidate>
         <div class="form-head"><span class="loket-badge">Loket B</span><span class="mono small">Formulir KB-01 / Laporan Kabar Baik</span></div>
         <div class="petugas" data-sprite="berang">
@@ -261,7 +267,7 @@
     </section>
 
     <!-- ============ LOKET B: PERAYAAN ============ -->
-    <section class="screen" id="s-b-proses" data-loket="B" aria-labelledby="h-b-proses">
+    <section class="screen" id="s-b-proses" data-loket="B" data-lantai="1" aria-labelledby="h-b-proses">
       <div class="paper">
         <div class="form-head"><span class="loket-badge">Loket B</span><span class="mono small">Status: darurat (yang baik)</span></div>
         <h2 id="h-b-proses">Laporan diterima</h2>
@@ -287,7 +293,7 @@
     </section>
 
     <!-- ============ LOKET B: PIAGAM ============ -->
-    <section class="screen" id="s-b-piagam" data-loket="B" aria-labelledby="h-b-piagam">
+    <section class="screen" id="s-b-piagam" data-loket="B" data-lantai="1" aria-labelledby="h-b-piagam">
       <div class="paper">
         <div class="form-head"><span class="loket-badge">Loket B</span><span class="mono small">Dokumen resmi</span></div>
         <h2 id="h-b-piagam">Piagam Hari Baik</h2>
@@ -302,7 +308,7 @@
     </section>
 
     <!-- ============ LOKET C: DAFTAR SEMANGAT ============ -->
-    <section class="screen" id="s-c-form" data-loket="C" aria-labelledby="h-c-form">
+    <section class="screen" id="s-c-form" data-loket="C" data-lantai="1" aria-labelledby="h-c-form">
       <form class="paper" id="formSemangat" novalidate>
         <div class="form-head"><span class="loket-badge">Loket C</span><span class="mono small">Formulir S-01 / Pendaftaran Semangat</span></div>
         <div class="petugas" data-sprite="badak">
@@ -334,7 +340,7 @@
     </section>
 
     <!-- ============ LOKET C: IZIN ============ -->
-    <section class="screen" id="s-c-izin" data-loket="C" aria-labelledby="h-c-izin">
+    <section class="screen" id="s-c-izin" data-loket="C" data-lantai="1" aria-labelledby="h-c-izin">
       <div class="paper">
         <div class="form-head"><span class="loket-badge">Loket C</span><span class="mono small">Dokumen resmi</span></div>
         <h2 id="h-c-izin">Izin telah dikeluarkan</h2>
@@ -355,7 +361,7 @@
     </section>
 
     <!-- ============ LOKET D: DIAGNOSIS ============ -->
-    <section class="screen" id="s-d" data-loket="D" aria-labelledby="h-d">
+    <section class="screen" id="s-d" data-loket="D" data-lantai="1" aria-labelledby="h-d">
       <div class="paper">
         <div class="form-head"><span class="loket-badge">Loket D</span><span class="mono small">Bagian Diagnosis Perasaan</span></div>
         <div class="petugas" data-sprite="hantu">
@@ -370,7 +376,7 @@
     </section>
 
     <!-- ============ PENUTUP ============ -->
-    <section class="screen" id="s-penutup" data-loket="umum" aria-labelledby="h-penutup">
+    <section class="screen" id="s-penutup" data-loket="umum" data-lantai="1" aria-labelledby="h-penutup">
       <div class="paper surat">
         <div class="form-head"><span class="loket-badge" id="penutupBadge">Kantor</span><span class="mono small">Memo internal</span></div>
         <p class="perihal mono small">Dari: Kepala Kantor · Untuk: <span class="nama"></span></p>
@@ -380,6 +386,74 @@
         <div class="actions">
           <button class="btn primary" id="btnRuangTunggu" type="button">Kembali ke ruang tunggu</button>
         </div>
+      </div>
+    </section>
+
+    <!-- ============ LOBI & DENAH (menu utama) ============ -->
+    <section class="screen" id="s-lobi" data-loket="umum" data-lantai="L" aria-labelledby="h-lobi">
+      <div class="paper">
+        <div class="form-head"><span class="loket-badge">Lantai L</span><span class="mono small">Poin Sabar: <b class="poin-angka">0</b></span></div>
+        <h2 id="h-lobi">Lobi &amp; Ruang Tunggu</h2>
+        <div id="lobiSapa"></div>
+
+        <section class="papan-umum" aria-labelledby="h-pengumuman">
+          <h3 id="h-pengumuman" class="papan-judul">Pengumuman Kantor</h3>
+          <ul id="papanPengumuman" class="papan-list"></ul>
+        </section>
+
+        <div id="absenSlot"></div>
+
+        <h3 class="sub-judul">Denah Gedung</h3>
+        <p class="muted small denah-ket">Ketuk lantai untuk naik lift. Atau pakai tombol lift di bawah layar.</p>
+        <div class="gedung" id="denah"></div>
+
+        <div class="actions">
+          <button class="btn" type="button" data-go="s-pegawai">Papan Pegawai</button>
+          <button class="btn primary" type="button" data-ke="s-pilih">Ke Loket Layanan →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PAPAN PEGAWAI ============ -->
+    <section class="screen" id="s-pegawai" data-loket="umum" data-lantai="L" aria-labelledby="h-pegawai">
+      <div class="paper">
+        <div class="form-head"><span class="loket-badge">Lantai L</span><span class="mono small">Dipajang di samping lift</span></div>
+        <h2 id="h-pegawai">Papan Pegawai</h2>
+        <p class="muted">Pegawai tetap yang paling sering Anda temui. Foto diambil oleh Mas Kukang, jadi agak lama.</p>
+        <div id="daftarPegawai" class="daftar-pegawai"></div>
+        <h3 class="sub-judul">Pegawai lainnya</h3>
+        <ul id="pegawaiLain" class="pegawai-lain"></ul>
+        <div class="actions"><button class="btn ghost" type="button" data-go="s-lobi">← Lobi</button></div>
+      </div>
+    </section>
+
+    <!-- ============ RUANGAN LAIN (diisi modul masing-masing) ============ -->
+    <section class="screen" id="s-istirahat" data-loket="B" data-lantai="2" aria-labelledby="h-istirahat">
+      <div class="paper" id="ruangIstirahat">
+        <div class="form-head"><span class="loket-badge">Lantai 2</span><span class="mono small">Poin Sabar: <b class="poin-angka">0</b></span></div>
+        <h2 id="h-istirahat">Ruang Istirahat Pegawai</h2>
+        <p class="renovasi">Ruangan sedang dicat. Mohon maaf atas bau catnya.</p>
+      </div>
+    </section>
+    <section class="screen" id="s-pantry" data-loket="C" data-lantai="3" aria-labelledby="h-pantry">
+      <div class="paper" id="ruangPantry">
+        <div class="form-head"><span class="loket-badge">Lantai 3</span><span class="mono small">Galon: kosong (lagi)</span></div>
+        <h2 id="h-pantry">Pantry</h2>
+        <p class="renovasi">Pantry sedang dibersihkan. Gulanya juga hilang, tapi itu urusan lain.</p>
+      </div>
+    </section>
+    <section class="screen" id="s-koperasi" data-loket="B" data-lantai="4" aria-labelledby="h-koperasi">
+      <div class="paper" id="ruangKoperasi">
+        <div class="form-head"><span class="loket-badge">Lantai 4</span><span class="mono small">Poin Sabar: <b class="poin-angka">0</b></span></div>
+        <h2 id="h-koperasi">Koperasi Kantor</h2>
+        <p class="renovasi">Koperasi sedang stok opname. Bang Berang-berang menghitung kaus kaki satu per satu.</p>
+      </div>
+    </section>
+    <section class="screen" id="s-meja" data-loket="A" data-lantai="5" aria-labelledby="h-meja">
+      <div class="paper" id="ruangMeja">
+        <div class="form-head"><span class="loket-badge">Lantai 5</span><span class="mono small">Poin Sabar: <b class="poin-angka">0</b></span></div>
+        <h2 id="h-meja">Meja Kerja <span class="nama"></span></h2>
+        <p class="renovasi">Mejanya baru dirakit. Sekrupnya kelebihan dua, tapi sepertinya tidak apa-apa.</p>
       </div>
     </section>
 
@@ -411,6 +485,62 @@
   <footer class="footer">
     <p>Kantor Layanan Perasaan tidak menyimpan isi formulir apa pun. Tidak ada server, tidak ada pelacak, tidak ada arsip rahasia. Lemari arsip kami cuma pajangan.</p>
   </footer>
+</div>
+
+<!-- Panel lift (navigasi utama) -->
+<nav class="lift" id="lift" aria-label="Lift kantor" hidden>
+  <div class="lift-layar mono" aria-hidden="true"><span id="liftLayar">L</span></div>
+  <button class="lift-btn" type="button" data-lantai="L" data-layar="s-lobi"><b>L</b><small>Lobi</small></button>
+  <button class="lift-btn" type="button" data-lantai="1" data-layar="s-pilih"><b>1</b><small>Loket</small></button>
+  <button class="lift-btn" type="button" data-lantai="2" data-layar="s-istirahat"><b>2</b><small>Rehat</small></button>
+  <button class="lift-btn" type="button" data-lantai="3" data-layar="s-pantry"><b>3</b><small>Pantry</small></button>
+  <button class="lift-btn" type="button" data-lantai="4" data-layar="s-koperasi"><b>4</b><small>Kopkar</small></button>
+  <button class="lift-btn" type="button" data-lantai="5" data-layar="s-meja"><b>5</b><small>Meja</small></button>
+  <button class="lift-btn lift-kosong" type="button" id="liftKosong" aria-label="Tombol tanpa angka"><b>▒</b><small>&nbsp;</small></button>
+</nav>
+<div class="pintu-lift" id="pintuLift" hidden aria-hidden="true">
+  <div class="daun kiri"></div><div class="daun kanan"></div>
+  <div class="pintu-lantai mono" id="pintuLantai">▲ 1</div>
+</div>
+
+<!-- Radio Kantor: pengaturan suara & mode kaget -->
+<div class="overlay" id="panelSetelan" hidden role="dialog" aria-modal="true" aria-labelledby="h-setelan">
+  <div class="overlay-inner panel-radio">
+    <h2 id="h-setelan">Radio Kantor</h2>
+    <p class="muted small">Diletakkan di meja resepsionis. Kenopnya agak seret, mohon maklum.</p>
+    <div class="radio-badan">
+      <div class="radio-lcd" id="radioLcd">
+        <span class="mono" id="radioFrek">FM 91.3</span>
+        <strong id="radioNama">Volume Rapat</strong>
+      </div>
+      <div class="radio-kontrol">
+        <div class="kenop-wrap">
+          <div class="kenop" id="kenop" role="slider" tabindex="0" aria-label="Kenop volume" aria-valuemin="0" aria-valuemax="4" aria-valuenow="2"><span class="kenop-tanda"></span></div>
+        </div>
+        <ol class="stasiun-list">
+          <li><button class="stasiun" type="button">Mode Perpustakaan</button></li>
+          <li><button class="stasiun" type="button">Bisik-bisik</button></li>
+          <li><button class="stasiun" type="button">Volume Rapat</button></li>
+          <li><button class="stasiun" type="button">Volume Kantin</button></li>
+          <li><button class="stasiun" type="button">Volume Pak Singa</button></li>
+        </ol>
+      </div>
+      <p class="radio-ket" id="radioKet"></p>
+      <button class="btn small" id="tesSuara" type="button">Tes: Ting-Tong</button>
+    </div>
+
+    <div class="kaget-box">
+      <button class="tuas" id="tuasKaget" type="button" role="switch" aria-checked="true" aria-labelledby="tuasJudul">
+        <span class="tuas-rel"><span class="tuas-gagang"></span></span>
+        <span class="tuas-label"><span>NYALA</span><span>MATI</span></span>
+      </button>
+      <div>
+        <p class="tuas-judul" id="tuasJudul">Tuas Mode Kaget</p>
+        <p class="muted small" id="tuasKet"></p>
+      </div>
+    </div>
+    <button class="btn primary" id="tutupSetelan" type="button">Tutup radio</button>
+  </div>
 </div>
 
 <!-- Memo melayang (toast) -->
@@ -445,6 +575,8 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script src="sprites.js" defer></script>
+<script src="core.js" defer></script>
 <script src="script.js" defer></script>
+<script src="kantor.js" defer></script>
 </body>
 </html>

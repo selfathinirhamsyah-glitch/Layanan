@@ -59,7 +59,7 @@ const NAMA_DEFAULT = "Mira";
   pasangSprite();
   // Siapa pengirim memo → sprite
   const SPRITE_PENGIRIM = [
-    ["Kura", "kura"], ["Kapibara", "kapibara"], ["Resepsionis", "kapibara"], ["Berang", "berang"], ["Singa", "singa"],
+    ["Satpam", "kura"], ["Ratna", "kapibara"], ["Dimas", "marmut"], ["Oyen", "oyen"], ["Resepsionis", "kapibara"], ["Berang", "berang"], ["Singa", "singa"],
     ["Badak", "badak"], ["Burung Hantu", "hantu"], ["Kukang", "kukang"], ["Beruang", "beruang"], ["Gajah", "gajah"],
     ["Rakun", "rakun"], ["Mesin Kopi", "kopi"], ["Kotak Saran", "saran"], ["Tanaman", "tanaman2"],
   ];
@@ -80,11 +80,14 @@ const NAMA_DEFAULT = "Mira";
     saatKeluar[layarAktif]?.();
     $$(".screen").forEach((s) => s.classList.toggle("active", s === tujuan));
     document.body.dataset.loket = tujuan.dataset.loket || "umum";
+    document.body.dataset.lantai = tujuan.dataset.lantai || "";
+    document.body.dataset.layar = id;
     layarAktif = id;
     window.scrollTo({ top: 0, behavior: kurangiGerak ? "auto" : "smooth" });
     const judul = tujuan.querySelector("h2");
     if (judul) { judul.setAttribute("tabindex", "-1"); judul.focus({ preventScroll: true }); }
     saatMasuk[id]?.();
+    window.KLP.emit?.("layar", id);
   }
 
   document.addEventListener("click", (e) => {
@@ -120,7 +123,11 @@ const NAMA_DEFAULT = "Mira";
     $("#btnMasuk").hidden = false;
     $("#btnMasuk").focus();
   });
-  $("#btnMasuk").addEventListener("click", () => ke("s-pilih"));
+  $("#btnMasuk").addEventListener("click", () => {
+    window.KLP.data.sudahMasuk = true;
+    window.KLP.simpan();
+    ke("s-lobi");
+  });
 
   // Easter egg: cap kantor diketuk 5x
   let ketukCap = 0;
@@ -128,7 +135,7 @@ const NAMA_DEFAULT = "Mira";
     ketukCap++;
     const kertas = e.currentTarget.closest(".paper");
     if (ketukCap < 5) {
-      if (ketukCap === 1) memo("Pak Kura-kura · Satpam", "Itu cap resmi. Dilihat saja, ya.");
+      if (ketukCap === 1) memo("Pak Satpam · Keamanan", "Itu cap resmi. Dilihat saja, ya.");
       return;
     }
     const jumlah = ketukCap === 5 ? 7 : 1;
@@ -142,8 +149,8 @@ const NAMA_DEFAULT = "Mira";
       c.style.animationDelay = `${i * 90}ms`;
       kertas.appendChild(c);
     }
-    if (ketukCap === 5) memo("Pak Kura-kura · Satpam", "Mohon jangan main cap, itu inventaris negara. ...Ya sudah, satu lagi boleh.");
-    if (ketukCap === 9) memo("Pak Kura-kura · Satpam", "Saya pura-pura tidak lihat. Tapi besok tintanya Anda yang beli.");
+    if (ketukCap === 5) memo("Pak Satpam · Keamanan", "Mohon jangan main cap, itu inventaris negara. ...Ya sudah, satu lagi boleh.");
+    if (ketukCap === 9) memo("Pak Satpam · Keamanan", "Saya pura-pura tidak lihat. Tapi besok tintanya Anda yang beli.");
   });
 
   // Arsip semangat dari kunjungan sebelumnya
@@ -292,7 +299,7 @@ const NAMA_DEFAULT = "Mira";
     if (keluhan.kat.includes("nggaktahu")) {
       // Jalur prioritas: langsung disetujui tanpa antre.
       ke("s-a-balasan");
-      memo("Bu Kapibara · Loket A", "Berkas ini tidak perlu antre. Saya sudah berdiri dari kursi, itu artinya serius.");
+      memo("Bu Ratna · Loket A", "Berkas ini tidak perlu antre. Saya sudah berdiri dari kursi, itu artinya serius.");
     } else {
       ke("s-a-proses");
     }
@@ -307,7 +314,7 @@ const NAMA_DEFAULT = "Mira";
     stage.className = "stage";
     log.innerHTML = "";
     const langkah = [
-      ["s1", "Berkas diterima oleh Bu Kapibara.", 1300],
+      ["s1", "Berkas diterima oleh Bu Ratna.", 1300],
       ["s2", "Berkas dicap. Tok.", 1300],
       ["s3", "Difotokopi rangkap tiga oleh Mas Kukang. Mohon maklum, beliau kukang.", 2200],
       ["s4", "Fotokopian dibawa ke ruang rapat.", 1500],
@@ -424,7 +431,7 @@ const NAMA_DEFAULT = "Mira";
       <div class="cert-foot">
         <div>
           <svg class="ttd-coret" viewBox="0 0 160 50" aria-hidden="true"><path d="M8 34c14-22 22-24 24-8s6 18 14 0 12-16 16 2 10 12 20-4 16-10 22 6 12 8 22-2 14-6 26-4"/></svg>
-          <p>${avatarDok("kapibara")}<strong>Bu Kapibara</strong><br>Petugas Loket A · ${esc(tanggalPanjang(now))}</p>
+          <p>${avatarDok("kapibara")}<strong>Bu Ratna</strong><br>Petugas Loket A · ${esc(tanggalPanjang(now))}</p>
         </div>
         <div class="stamp">Sah &amp;<br>berlaku</div>
       </div>`;
@@ -652,7 +659,7 @@ const NAMA_DEFAULT = "Mira";
     },
     {
       t: "Kalau kamu salah satu pegawai kantor ini, kamu siapa?",
-      o: [["Mas Kukang: pelan, tapi sampai", "a"], ["Bang Berang-berang: lagi main air", "b"], ["Kak Badak: minggir, saya lewat", "c"], ["Pak Kura-kura: masuk cangkang dulu", "a"]],
+      o: [["Mas Kukang: pelan, tapi sampai", "a"], ["Bang Berang-berang: lagi main air", "b"], ["Kak Badak: minggir, saya lewat", "c"], ["Pak Satpam: masuk cangkang dulu", "a"]],
     },
   ];
   const HASIL = {
@@ -712,6 +719,7 @@ const NAMA_DEFAULT = "Mira";
     "C-tuntas": `Selamat, ${NAMA}. Itu bukan hal kecil, jadi jangan dikecilkan. Sekarang istirahat dulu, kamu sudah dapat izinnya.`,
   };
   function penutup(jenis) {
+    window.KLP.catat(jenis.startsWith("C") ? "loketC" : `loket${jenis}`);
     $("#memoKepala").textContent = MEMO[jenis] || MEMO.A;
     $("#penutupBadge").textContent = jenis.startsWith("C") ? "Loket C" : `Loket ${jenis}`;
     ke("s-penutup");
@@ -784,7 +792,10 @@ const NAMA_DEFAULT = "Mira";
     $("#fasTanaman .fas-sprite").innerHTML = px(siram >= 5 ? "tanaman2" : siram >= 2 ? "tanaman1" : "tanaman0");
     goyang(e.currentTarget);
     if (siram < 5) memo("Ruang Tunggu · Tanaman", PESAN_TANAMAN[siram - 1]);
-    else if (siram === 5) memo("Pak Lidah Mertua · Tanaman Kantor", "Terima kasih. Ternyata disiram sedikit-sedikit juga cukup.", 6000);
+    else if (siram === 5) {
+      window.KLP.catat("tanamanSegar");
+      memo("Pak Lidah Mertua · Tanaman Kantor", "Terima kasih. Ternyata disiram sedikit-sedikit juga cukup.", 6000);
+    }
     else memo("Pak Lidah Mertua · Tanaman Kantor", acak(["Sudah cukup, nanti saya kembung.", "Saya sudah segar. Giliran Anda minum air.", "Terima kasih, tapi saya bukan ikan."]));
   });
 
@@ -830,4 +841,12 @@ const NAMA_DEFAULT = "Mira";
     else if (manajer === 5) memo("Pak Beruang Madu · Manajer", `Halo, ${NAMA}. Maaf lama, saya juga capek. Tapi urusan kamu tetap yang paling penting di gedung ini hari ini.`, 7500);
     else memo("Resepsionis", "Manajer kembali tidur siang. Itu haknya, dan hak Anda juga.");
   });
+
+  /* ---------- Dibagikan ke modul lain ---------- */
+  Object.assign(window.KLP, {
+    $, $$, esc, acak, tunggu, NAMA, N, kurangiGerak, tanggalPanjang, nomorSurat, TIKET,
+    ke, memo, px, avatarDok, pasangSprite, unduhGambar, konfetiKertas, penutup,
+    saatMasuk, saatKeluar, layarAktif: () => layarAktif,
+  });
+  document.dispatchEvent(new Event("klp:siap"));
 })();
