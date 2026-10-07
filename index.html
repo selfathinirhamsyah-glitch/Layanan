@@ -13,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=VT323&family=Patrick+Hand&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="kantor.css">
+  <link rel="stylesheet" href="skala.css">
 </head>
 <body data-loket="umum">
 
@@ -143,9 +144,9 @@
         <fieldset>
           <legend><span class="num">2.</span> Tingkat capek</legend>
           <div class="slider-wrap">
-            <span class="doodle-note note-slider" aria-hidden="true">geser pelan-pelan, jujur aja ↓</span>
-            <input type="range" id="capek" min="1" max="5" step="1" value="3" aria-describedby="capekLabel capekNote">
-            <div class="slider-ticks" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+            <span class="doodle-note note-slider" aria-hidden="true">tarik mulutnya, jujur aja ↓</span>
+            <div id="skalaSenyum"></div>
+            <input type="range" id="capek" class="sr-only" min="1" max="5" step="1" value="3" tabindex="-1" aria-hidden="true">
             <p class="slider-label" id="capekLabel">Mode hemat baterai</p>
             <p class="slider-note" id="capekNote">Tercatat. Lampu-lampu yang tidak perlu sudah kami matikan.</p>
           </div>
@@ -253,7 +254,12 @@
         </fieldset>
 
         <fieldset>
-          <legend><span class="num">2.</span> Cerita singkat <small>(opsional)</small></legend>
+          <legend><span class="num">2.</span> Seberapa ringan hari ini? <small>(opsional, pakai timbangan kantor)</small></legend>
+          <div id="skalaTimbang"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend><span class="num">3.</span> Cerita singkat <small>(opsional)</small></legend>
           <label class="sr-only" for="ceritaB">Cerita</label>
           <textarea id="ceritaB" rows="4" placeholder="Ceritakan seperlunya. Boleh pakai huruf kapital semua kalau sesenang itu."></textarea>
           <p class="privasi">Cerita ini juga <strong>tidak disimpan dan tidak dikirim ke mana pun</strong>. Kabar baiknya tetap milik Anda.</p>
@@ -329,6 +335,10 @@
             </div>
           </div>
           <p class="error" id="errTarget" hidden>Pilih satu target dulu. Kak Badak butuh tahu harus menyeruduk ke arah mana.</p>
+        </fieldset>
+        <fieldset>
+          <legend><span class="num">2.</span> Tingkat semangat <small>(pukul koknya, Pak Satpam yang jaga net)</small></legend>
+          <div id="skalaKok"></div>
         </fieldset>
         <p class="privasi">Target ini disimpan <strong>hanya di perangkat ini</strong> (bukan di server mana pun) supaya bisa dicap TUNTAS kalau Anda membuka halaman ini lagi nanti.</p>
 
@@ -578,5 +588,7 @@
 <script src="core.js" defer></script>
 <script src="script.js" defer></script>
 <script src="kantor.js" defer></script>
+<script src="skala.js" defer></script>
+<script src="pasang-skala.js" defer></script>
 </body>
 </html>

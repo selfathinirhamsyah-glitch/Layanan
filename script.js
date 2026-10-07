@@ -379,7 +379,9 @@ const NAMA_DEFAULT = "Mira";
     $("#sertifikatAWrap").hidden = true;
     $("#kompenBack").hidden = false;
     $("#undianWindow").textContent = "— — —";
-    $$(".kompen").forEach((b) => b.classList.remove("terpilih"));
+    $$(".kompen").forEach((b) => b.classList.remove("terpilih", "saran"));
+    const REKOM = { 5: 0, 4: 6, 3: 7, 2: 4, 1: 5 };
+    $(`.kompen[data-i="${REKOM[keluhan.capek]}"]`)?.classList.add("saran");
   }
 
   // Kompensasi
@@ -464,6 +466,8 @@ const NAMA_DEFAULT = "Mira";
     kabar.kat = $$('input[name="kb"]:checked').map((i) => i.value);
     if (!kabar.kat.length) { $("#errKb").hidden = false; return; }
     kabar.adaCerita = $("#ceritaB").value.trim().length > 0;
+    const tb = window.KLP.skalaNilai.B;
+    kabar.ringan = tb && tb.dipakai ? tb.level : 0;
     ke("s-b-proses");
   });
 
@@ -488,7 +492,13 @@ const NAMA_DEFAULT = "Mira";
 
     $("#paB").hidden = false;
     $("#paB").classList.add("bunyi");
-    const kalimat = ["TING-TONG.", ...kabar.kat.map((k) => KABAR[k].umum.replaceAll("${N}", NAMA)), "Demikian pengumuman ini. Harap ikut senang."];
+    const TIMBANG = [null,
+      "Perhatian. Timbangan perasaan agak berat, tapi kabar baik tetap datang. Nilainya dihitung dobel.",
+      "Perhatian. Timbangan perasaan agak berat, tapi kabar baik tetap datang. Nilainya dihitung dobel.",
+      "Perhatian. Timbangan perasaan seimbang. Kabar baik tetap kabar baik.",
+      "Perhatian. Timbangan perasaan menunjukkan: ringan. Seluruh kantor ikut merasa enteng.",
+      "Perhatian. Timbangan perasaan menunjukkan: melayang. Mohon semua jendela ditutup."];
+    const kalimat = ["TING-TONG.", ...kabar.kat.map((k) => KABAR[k].umum.replaceAll("${N}", NAMA)), ...(kabar.ringan ? [TIMBANG[kabar.ringan]] : []), "Demikian pengumuman ini. Harap ikut senang."];
     await ketik($("#paText"), kalimat.join("\n"), ok);
     if (!ok()) return;
     $("#paText").classList.add("selesai");
@@ -496,7 +506,7 @@ const NAMA_DEFAULT = "Mira";
 
     await tunggu(500); if (!ok()) return;
     $("#stampHariBaik").hidden = false;
-    konfetiKertas();
+    konfetiKertas([1, 0.8, 0.9, 1, 1.4, 2][kabar.ringan || 0]);
     await tunggu(900); if (!ok()) return;
     $("#btnPiagam").hidden = false;
   };
@@ -526,6 +536,7 @@ const NAMA_DEFAULT = "Mira";
       <p class="cert-big">${esc(kat)}</p>
       <dl>
         <div class="cert-row"><dt>Isi cerita</dt><dd>${kabar.adaCerita ? `Dirahasiakan, karena itu milik ${N}.` : "Tidak dilampirkan. Kantor tetap percaya sepenuhnya."}</dd></div>
+        ${kabar.ringan ? `<div class="cert-row"><dt>Berat hati</dt><dd>${["", "Berat, tapi tetap datang", "Agak berat", "Seimbang", "Ringan", "Melayang"][kabar.ringan]}</dd></div>` : ""}
         <div class="cert-row"><dt>Disimpan di</dt><dd>Lemari arsip "Jangan Dibuang", rak paling atas.</dd></div>
         <div class="cert-row"><dt>Catatan</dt><dd>Hari ini boleh diingat-ingat lagi kapan saja dibutuhkan.</dd></div>
       </dl>
@@ -539,10 +550,10 @@ const NAMA_DEFAULT = "Mira";
     ke("s-b-piagam");
   });
 
-  function konfetiKertas() {
+  function konfetiKertas(kali = 1) {
     if (kurangiGerak) return;
     const wadah = $("#confetti");
-    const jumlah = innerWidth < 500 ? 32 : 48;
+    const jumlah = Math.round((innerWidth < 500 ? 32 : 48) * kali);
     const jenis = ["", "", "polos", "kotak"];
     for (let i = 0; i < jumlah; i++) {
       const s = document.createElement("span");
@@ -600,7 +611,15 @@ const NAMA_DEFAULT = "Mira";
       semangat.target = r.value === "tugas" ? "Tugas" : "Latihan";
     }
 
-    const tips = acak([...TIPS.umum, ...(TIPS[semangat.kode] || []), ...(TIPS[semangat.kode] || [])]);
+    semangat.level = window.KLP.skalaNilai.C || 0;
+    window.KLP.data.semangatTerakhir = semangat.level;
+    window.KLP.simpan();
+    const TIPS_PELAN = ["Mulai dari lima menit pertama saja. Sisanya biasanya ikut sendiri.", "Setengah semangat tetap semangat. Kerjakan setengahnya dulu, sisanya nanti dinegosiasikan.", "Minum air dulu. Ini bukan saran, ini peraturan."];
+    const TIPS_GAS = ["Semangat Anda tinggi. Kak Badak hanya berpesan: jangan lupa berhenti untuk makan.", "Taruh HP agak jauh. HP tidak akan tersinggung.", "Kerjakan bagian yang paling susah dulu, mumpung tenaganya masih sampai parkiran."];
+    const tips = semangat.level && semangat.level <= 2 ? acak(TIPS_PELAN)
+      : semangat.level >= 4 ? acak(TIPS_GAS)
+        : acak([...TIPS.umum, ...(TIPS[semangat.kode] || []), ...(TIPS[semangat.kode] || [])]);
+    const LABEL_SEMANGAT = ["", "Kok jatuh di depan net (tetap sah)", "Lewat net, tipis", "Tengah lapangan", "Pukulan dalam", "Sampai parkiran"];
     $("#tipsC").textContent = `"${tips}"`;
     $("#izinC").dataset.accent = "C";
     $("#izinC").innerHTML = `
@@ -613,6 +632,7 @@ const NAMA_DEFAULT = "Mira";
         <div class="cert-row"><dt>Pemegang izin</dt><dd><strong>${N}</strong></dd></div>
         <div class="cert-row"><dt>Target</dt><dd class="cert-big">${esc(semangat.target)}</dd></div>
         <div class="cert-row"><dt>Berlaku</dt><dd>${esc(tanggalPanjang(now))}, dengan jeda istirahat yang wajib diambil.</dd></div>
+        ${semangat.level ? `<div class="cert-row"><dt>Tingkat semangat</dt><dd>${LABEL_SEMANGAT[semangat.level]}</dd></div>` : ""}
         <div class="cert-row"><dt>Wewenang</dt><dd>Pemegang izin boleh fokus, boleh menolak gangguan, dan boleh bangga sedikit setelahnya.</dd></div>
         <div class="cert-row"><dt>Peraturan</dt><dd>${esc(tips)}</dd></div>
       </dl>

@@ -111,7 +111,7 @@
     gambarDenah();
   }
   K.saatMasuk["s-lobi"] = isiLobi;
-  K.segarkanLobi = () => { if (K.layarAktif() === "s-lobi") isiLobi(); };
+  K.segarkanLobi = () => { if (K.layarAktif() === "s-lobi") K.saatMasuk["s-lobi"](); };
 
   document.addEventListener("click", (e) => {
     const t = e.target.closest("[data-ke]");
