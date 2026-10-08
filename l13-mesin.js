@@ -161,7 +161,7 @@
       K.simpan(); sfx("pilih"); kilasBukti(judul);
     },
     punyaBukti: (id) => (S().bukti || []).some((b) => b.id === id),
-    deduksi, bisik, papanBukti,
+    deduksi, bisik, papanBukti, pilihBukti,
     async selesaiBab() {
       const n = babAktif;
       hentikanSuasana();
@@ -201,9 +201,12 @@
     S().flag[`b${n}:mulai`] = true;
     K.simpan();
     const posisi = S().posisi && S().posisi.bab === n ? S().posisi.ruang : b.ruangAwal;
-    pindahRuang(posisi, true);
+    if (pertama && b.pembuka) {
+      // pembuka dulu, baru skrip "masuk" ruangan pertama (diantrekan)
+      sibuk = true; pindahRuang(posisi, true); sibuk = false;
+      jalankan(() => b.pembuka(api));
+    } else pindahRuang(posisi, true);
     sesuaikanUkuran();
-    if (pertama && b.pembuka) jalankan(() => b.pembuka(api));
   }
   function keluar() {
     hentikanSuasana();
@@ -368,6 +371,7 @@
     ratna: { nama: "Bu Ratna", sprite: "kapibara" }, satpam: { nama: "Pak Satpam", sprite: "kura" },
     dimas: { nama: "Dimas", sprite: "marmut" }, oyen: { nama: "Oyen", sprite: "oyen" }, kukang: { nama: "Mas Kukang", sprite: "kukang" },
     singa: { nama: "Pak Singa", sprite: "singa" }, gajah: { nama: "Bu Gajah", sprite: "gajah" },
+    rakun: { nama: "Bang Rakun", sprite: "rakun" }, badak: { nama: "Kak Badak", sprite: "badak" },
   };
   const dlg = $("#l13Dialog");
   let lanjutkan = null;
@@ -623,6 +627,8 @@
   function kilasBukti(judul) {
     const el = document.createElement("div");
     el.className = "kilas-barang kilas-bukti";
+    const ada = lapis.querySelectorAll(".kilas-bukti").length;
+    if (ada) el.style.top = `${120 + ada * 64}px`;
     el.innerHTML = `<span class="kb-foto kb-pin" aria-hidden="true"></span><span><small>Bukti baru di papan</small><strong>${esc(judul)}</strong></span>`;
     lapis.appendChild(el);
     setTimeout(() => el.remove(), 2600);
@@ -647,6 +653,24 @@
     jalankan(() => lihat(html, "Tutup papan"));
   }
   $("#l13Laci").closest(".l13-laci").addEventListener("click", (e) => { if (e.target.closest("[data-papan-sini]")) { sfx("kertas"); papanBukti(); } });
+
+  // minta pemain menunjukkan satu bukti (untuk interogasi); hasil: id bukti atau null
+  function pilihBukti(teks = "Tunjukkan bukti yang mana?") {
+    const kasus = kasusDari(babAktif);
+    const bukti = (S().bukti || []).filter((b) => b.kasus === kasus.id);
+    bukaModal(`
+      <p class="mono small deduksi-cap">TUNJUKKAN BUKTI</p>
+      <p class="teka-ket"><strong>${esc(teks)}</strong></p>
+      <div class="deduksi-bukti">${bukti.map((b) => `<button type="button" class="catatan-bukti kecil" data-bukti="${b.id}"><strong>${esc(b.judul)}</strong><p>${esc(b.isi)}</p></button>`).join("") || `<p class="muted">Belum ada bukti.</p>`}</div>
+      <div class="actions"><button class="btn ghost" type="button" data-batal>Nggak jadi</button></div>`);
+    return new Promise((res) => {
+      modalIsi.onclick = (e) => {
+        const bk = e.target.closest("[data-bukti]");
+        if (bk) { modalIsi.onclick = null; sfx("kertas"); tutupModal(); res(bk.dataset.bukti); return; }
+        if (e.target.closest("[data-batal]")) { modalIsi.onclick = null; tutupModal(); res(null); }
+      };
+    });
+  }
 
   async function deduksi({ judul = "Deduksi", pertanyaan, opsi, benar, buktiBenar, salah = [], benarTeks, siapaBenar = "narasi" }) {
     const kasus = kasusDari(babAktif);

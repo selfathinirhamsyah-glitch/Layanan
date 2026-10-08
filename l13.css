@@ -280,3 +280,13 @@
 .kb-pin { background: #B5443A !important; border-radius: 50%; width: 22px !important; height: 22px !important; }
 .kilas-bukti { background: #FFFDF6; top: 120px; }
 @media (max-width: 360px) { .papan-gabus, .deduksi-bukti { grid-template-columns: 1fr; } }
+
+/* kasus lift: layar CCTV */
+.cctv-layar {
+  position: relative; height: 150px; margin: 6px 0 10px; border: 4px solid #2B2A26; overflow: hidden;
+  background: repeating-linear-gradient(#17241C 0 3px, #12201A 3px 6px);
+}
+.cctv-sosok { position: absolute; left: 8%; bottom: 4px; width: 120px; height: 130px; filter: blur(1.4px) grayscale(.6) brightness(1.2); opacity: .8; }
+.cctv-sosok svg { width: 100%; height: 100%; }
+.cctv-jam { position: absolute; right: 8px; top: 6px; color: #8FD19E; font-size: 1.1rem; }
+.cctv-layar::after { content: "REC ●"; position: absolute; left: 8px; top: 6px; color: #E05A4E; font-family: var(--font-num); animation: kedip 1s steps(2) infinite; }

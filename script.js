@@ -829,9 +829,27 @@ const NAMA_DEFAULT = "Mira";
     "Gelas keluar. Isinya tidak.",
     "Mesin minta istirahat. Permintaannya disetujui, sesuai prosedur kantor.",
   ];
+  // Setelah Kasus Lift Tengah Malam selesai, mesinnya akhirnya jalan
+  const kopiJalan = () => !!window.KLP.data?.l13?.flag?.kopiJalan;
+  const PESAN_KOPI_JALAN = [
+    "Kopi keluar. Betulan. Bang Rakun menangis sedikit di pojok.",
+    "Mesin berbunyi \"hhhh\" lalu \"blup\". Kopi panas. Ini bukan latihan.",
+    "Kopi siap. Di gelasnya ada tulisan spidol: \"malam ke-62\".",
+    "Keluar kopi, lengkap dengan busa berbentuk... kucing berdasi? Bang Rakun bilang itu kebetulan.",
+    "Kopi hangat. Untuk yang lembur, yang capek, atau yang cuma butuh sesuatu yang hangat.",
+  ];
+  function segarkanKopi() {
+    const s = $("#fasKopi .fas-sprite");
+    if (!s || !kopiJalan() || s.dataset.sprite === "kopiNyala") return;
+    s.dataset.sprite = "kopiNyala";
+    s.innerHTML = px("kopiNyala");
+  }
+  window.KLP.on?.("layar", segarkanKopi);
   $("#fasKopi").addEventListener("click", (e) => {
     kopi++;
     goyang(e.currentTarget);
+    segarkanKopi();
+    if (kopiJalan()) { memo("Mesin Kopi · Lantai 1", PESAN_KOPI_JALAN[kopiPesan++ % PESAN_KOPI_JALAN.length], 5500); return; }
     if (kopi % 7 === 0) memo("Bang Rakun · Teknisi Mesin Kopi", "Keluar segelas teh hangat. Ini bukan kopi, tapi lumayan.", 6000);
     else memo("Mesin Kopi · Lantai 1", PESAN_KOPI[kopiPesan++ % PESAN_KOPI.length]);
   });

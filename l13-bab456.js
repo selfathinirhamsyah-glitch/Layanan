@@ -557,7 +557,7 @@
   /* ---------- ringkasan misteri di Meja Kerja ---------- */
   K.isiMejaL13 = (el) => {
     if (!el) return;
-    const n = S().selesai.length;
+    const n = S().selesai.filter((x) => x <= 6).length;
     el.innerHTML = `
       <h3 class="sub-judul">Misteri Lantai 13</h3>
       <p>${n >= 6 ? `Kasus ditutup. ${N} adalah Penjaga Lantai 13. SK-nya tersimpan di Ruang Rahasia (tombol 13 di lift).` : `${n} dari 6 bab selesai. Berkasnya ada di lobi.`}</p>
