@@ -210,7 +210,14 @@
       ? "Kejutan di Misteri Lantai 13 akan muncul tiba-tiba. Semuanya lucu, tidak ada yang seram."
       : "Kejutan diganti versi lembut. Bendanya muncul pelan-pelan, disertai permintaan maaf.";
     $("#ikonRadio").classList.toggle("bisu", v === 0);
+    const seram = K.data.setelan.seram || "lucu";
+    $$(".seram-btn").forEach((b) => { const ya = b.dataset.seram === seram; b.classList.toggle("aktif", ya); b.setAttribute("aria-checked", ya); });
   }
+  $$(".seram-btn").forEach((b) => b.addEventListener("click", () => {
+    K.data.setelan.seram = b.dataset.seram; K.simpan(); tampilSetelan();
+    sfx(b.dataset.seram === "tegang" ? "detak" : "klik");
+    memo("Pak Satpam · Keamanan", b.dataset.seram === "tegang" ? "Siap. Lampu lorong diredupkan. Saya tetap berjaga. Saya juga sedikit takut." : "Siap. Lampu lorong dinyalakan normal. Seramnya secukupnya saja.");
+  }));
   function setVolume(v) {
     if (v === K.data.setelan.volume) return;
     K.aturVolume(v);

@@ -22,10 +22,10 @@ window.KLP = window.KLP || {};
     gosipDibaca: [],
     barang: {},        // koperasi: { id: jumlah }
     absen: null,       // { tgl, level } absen perasaan harian (gelas teh)
-    setelan: { volume: 2, kaget: true, tanyaKaget: false },
+    setelan: { volume: 2, kaget: true, tanyaKaget: false, seram: "lucu" },
     sudahMasuk: false,
     semangatTerakhir: 0,
-    l13: { selesai: [], inv: [], flag: {}, mulai: null, bukaSemua: false, langka: [], posisi: null, halKecil: [], tglDiangkat: null },
+    l13: { selesai: [], inv: [], flag: {}, mulai: null, mulaiKasus: {}, bukaSemua: false, langka: [], posisi: null, halKecil: [], tglDiangkat: null, bukti: [] },
   });
 
   // Gabungkan data tersimpan ke bentuk awal: kunci baru dari versi lama tetap ikut,
@@ -159,6 +159,14 @@ window.KLP = window.KLP || {};
     meong: (t) => { nada(700, t, 0.12, { tipe: "triangle", vol: 0.35, ke: 950 }); nada(950, t + 0.12, 0.22, { tipe: "triangle", vol: 0.35, ke: 520 }); },
     menang: (t) => [523, 659, 784, 659, 1046].forEach((f, i) => nada(f, t + i * 0.1, 0.14, { vol: 0.3 })),
     radio: (t) => desis(t, 0.18, 0.25, 1800),
+    // suasana seram (pelan, tidak melengking)
+    langkah: (t) => { nada(70, t, 0.12, { tipe: "sine", vol: 0.7 }); desis(t, 0.06, 0.3, 400); nada(66, t + 0.42, 0.12, { tipe: "sine", vol: 0.6 }); desis(t + 0.42, 0.06, 0.25, 400); },
+    derit: (t) => { nada(330, t, 0.9, { tipe: "sawtooth", vol: 0.08, ke: 180, attack: 0.2 }); },
+    detak: (t) => { nada(60, t, 0.14, { tipe: "sine", vol: 0.8, ke: 45 }); nada(55, t + 0.22, 0.16, { tipe: "sine", vol: 0.65, ke: 40 }); },
+    bisik: (t) => { desis(t, 0.7, 0.18, 2600); desis(t + 0.35, 0.5, 0.12, 3200); },
+    tetes: (t) => nada(1200, t, 0.12, { tipe: "sine", vol: 0.25, ke: 600 }),
+    angin: (t) => desis(t, 1.4, 0.12, 500),
+    mesin: (t) => { nada(90, t, 0.6, { tipe: "square", vol: 0.12 }); nada(92, t + 0.05, 0.55, { tipe: "square", vol: 0.1 }); },
   };
 
   function sfx(nama) {

@@ -224,6 +224,8 @@ window.KLP.PANTRY = {
       isi: "Setiap rapat, gorengan dipesan sesuai jumlah peserta. Setiap rapat, gorengan kurang satu. Oyen selalu duduk paling dekat piring. Oyen juga selalu bilang tidak makan gorengan. Kasus ditutup karena kurang bukti dan banyak remah." },
     { id: "surat", syarat: "suratPrinter", petunjuk: "tangkap surat rahasia di Tangkap Kertas Terbang", judul: "Isi surat untuk printer bocor", sumber: "Kertas terbang (sumber tidak resmi)",
       isi: "Surat dari mesin fotokopi untuk printer akhirnya terbaca sebagian. Isinya: \"Kamu selalu panas duluan, aku selalu menyalin perasaanku dua kali.\" Sisanya buram karena tintanya hampir habis. Printer membalas dengan error \"PAPER JAM\". Belum jelas artinya." },
+    { id: "troli", syarat: "game:troli", petunjuk: "main Balap Troli Arsip", judul: "Troli arsip punya SIM", sumber: "Pak Satpam",
+      isi: "Troli arsip nomor 3 ternyata punya SIM, dibuat sendiri dari karton dan dilaminasi Mas Kukang. Fotonya buram karena trolinya tidak mau diam. Pak Satpam mengizinkan, asal tidak melebihi 40 km/jam di parkiran B2." },
     { id: "gelas", syarat: "absen", petunjuk: "isi absen perasaan di Lobi", judul: "Gelas teh Bu Ratna punya nama", sumber: "Dimas",
       isi: "Semua gelas di pantry ternyata dinamai Bu Ratna. Gelas yang biasa dipakai untuk absen perasaan namanya \"Pak Sabar\". Gelas yang retak sedikit namanya \"Tetap Dipakai\". Bu Ratna bilang itu bukan nama, itu doa." },
     { id: "lift", syarat: "l13:bab1", petunjuk: "selesaikan Bab 1 Misteri Lantai 13", judul: "Ada lantai yang tidak dihitung lift", sumber: "Pak Satpam (sambil berbisik)",

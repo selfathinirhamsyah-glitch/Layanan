@@ -234,3 +234,19 @@ h3.sub-judul { font-size: 1.05rem; color: var(--accent); margin: 22px 0 6px; }
 
 .panel-radio p { margin: 0 0 8px; }
 .panel-radio .radio-ket { margin: 4px 0 10px; }
+
+/* ---------- Saklar lampu lorong (tingkat seram) ---------- */
+.seram-box { border: 2px dashed var(--line); border-radius: var(--wobble-sm); padding: 12px; margin-bottom: 16px; }
+.seram-box .tuas-judul small { font-family: var(--font-hand); font-weight: 400; color: var(--ink-soft); }
+.seram-pilih { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.seram-btn {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left; cursor: pointer; font: inherit; line-height: 1.2;
+  padding: 10px; background: var(--paper); color: var(--ink); border: 2px solid var(--line); border-radius: var(--wobble-sm);
+}
+.seram-btn strong { font-family: var(--font-px); font-weight: 600; font-size: .85rem; }
+.seram-btn small { color: var(--ink-soft); font-size: .85rem; }
+.seram-btn.aktif { border-color: var(--plum); background: color-mix(in srgb, var(--plum) 12%, var(--paper)); box-shadow: 3px 3px 0 var(--plum); }
+.lampu { width: 18px; height: 18px; border: 2px solid var(--ink); border-radius: 50%; }
+.lampu.terang { background: #F2C14E; box-shadow: 0 0 8px #F2C14E; }
+.lampu.redup { background: #5A4A1E; animation: kedipLampu 2.6s steps(1) infinite; }
+@keyframes kedipLampu { 0%, 70%, 76%, 100% { background: #5A4A1E; } 72% { background: #F2C14E; } }

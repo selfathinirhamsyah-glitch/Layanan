@@ -45,6 +45,11 @@
       cara: "Tahan layar untuk ngemil gorengan. Lepas saat Oyen menoleh. Kalau ketahuan tiga kali, rapat dibubarkan.",
       poin: (s) => Math.ceil(Math.max(0, s) / 2),
     },
+    troli: {
+      nama: "Balap Troli Arsip", sprite: "berkas", durasi: "±1 menit, 4 pembalap",
+      cara: "Meluncur menuruni parkiran pakai troli arsip. Geser jari ke kiri-kanan untuk menyetir. Ambil teh untuk turbo, berkas emas untuk poin. Hindari tumpukan berkas, pel basah, kardus, dan Oyen yang menyeberang.",
+      poin: (s) => Math.round(Math.max(0, s) / 4),
+    },
   };
   K.GAMES = GAMES;
 
@@ -230,7 +235,7 @@
   }
   function buatApi(semangat) {
     const api = {
-      ctx, W: () => W, H: () => H, dom: domGame, kontrol, semangat,
+      ctx, W: () => W, H: () => H, dom: domGame, kontrol, semangat, nama: NAMA.toUpperCase().slice(0, 8),
       skor(n) { $("#hudSkor").textContent = n; },
       info(t) { $("#hudInfo").textContent = t; },
       titik(e) { const r = kanvas.getBoundingClientRect(); return { x: (e.clientX - r.left) / skala, y: (e.clientY - r.top) / skala }; },
@@ -608,6 +613,168 @@
       kanvas.removeEventListener("pointerdown", tekan); kanvas.removeEventListener("pointerup", lepas);
       kanvas.removeEventListener("pointerleave", lepas); kanvas.removeEventListener("pointercancel", lepas);
     };
+    return stop2;
+  };
+
+  /* ---------- 5. Balap Troli Arsip ---------- */
+  MAIN.troli = (api) => {
+    const PANJANG = 16000;                     // jarak lintasan (px dunia)
+    const PEMAIN_Y = () => H * 0.74;
+    const tengah = (d) => W / 2 + Math.sin(d / 260) * 70 + Math.sin(d / 113 + 1.3) * 26;
+    const lebar = (d) => 168 - Math.min(40, d / PANJANG * 40);
+    let d = 0, x = W / 2, targetX = W / 2, laju = 0, turbo = 0, licin = 0, lambat = 0, waktu = 0, emas = 0, tabrak = 0;
+    let selesai = false, finis = null, jedaGesek = 0;
+    const efek = [];
+    const benda = [];                          // { d, off, jenis, kena, vx }
+    const LAWAN = [
+      { nama: "Pak Satpam", sprite: "kura", d: 0, laju: 0, maks: 300, off: -40, warna: "#2F4A6B" },
+      { nama: "Dimas", sprite: "marmut", d: 0, laju: 0, maks: 312, off: 0, warna: "#B5443A" },
+      { nama: "Kak Badak", sprite: "badak", d: 0, laju: 0, maks: 326, off: 40, warna: "#4F6E5E" },
+    ];
+    LAWAN.forEach((l) => { l.goyang = Math.random() * 6; });
+    // isi lintasan dengan rintangan & bonus
+    for (let jarak = 700; jarak < PANJANG - 400; jarak += acak(150, 260)) {
+      const r = Math.random();
+      const jenis = r < 0.24 ? "berkas" : r < 0.4 ? "pel" : r < 0.55 ? "kardus" : r < 0.62 ? "oyen" : r < 0.82 ? "teh" : "emas";
+      benda.push({ d: jarak, off: acak(-0.38, 0.38), jenis, kena: false, vx: jenis === "oyen" ? (Math.random() < 0.5 ? -38 : 38) : 0 });
+    }
+    function gerak(e) { targetX = api.titik(e).x; }
+    kanvas.addEventListener("pointerdown", gerak);
+    kanvas.addEventListener("pointermove", gerak);
+    api.info("Pak Satpam: Siap. Rem troli tidak berfungsi. Itu fitur.");
+
+    function posisi() {
+      const urut = [{ pemain: true, d }, ...LAWAN.map((l) => ({ pemain: false, d: l.d }))].sort((a, b) => b.d - a.d);
+      return urut.findIndex((u) => u.pemain) + 1;
+    }
+    function gambarTroli(cx, cy, warna, sprite, tulisan) {
+      ctx.save(); ctx.translate(Math.round(cx), Math.round(cy));
+      ctx.fillStyle = "rgba(0,0,0,.25)"; ctx.fillRect(-17, -20, 38, 46);
+      ctx.fillStyle = "#2B2A26"; [[-19, -16], [13, -16], [-19, 12], [13, 12]].forEach(([a, b]) => ctx.fillRect(a, b, 6, 9));
+      ctx.fillStyle = warna; ctx.fillRect(-15, -22, 30, 44);
+      ctx.strokeStyle = "#2B2A26"; ctx.lineWidth = 2.5; ctx.strokeRect(-15, -22, 30, 44);
+      ctx.fillStyle = "#FFFDF6"; ctx.fillRect(-10, 4, 20, 14); ctx.fillStyle = "#E0B84A"; ctx.fillRect(-10, 8, 20, 3);
+      if (sprite) gambarSprite(ctx, sprite, 0, -8, 28);
+      else { ctx.fillStyle = "#F2C14E"; ctx.fillRect(-8, -16, 16, 16); ctx.strokeRect(-8, -16, 16, 16); }
+      if (tulisan) teksTengah(tulisan, 0, -32, 10, "#FFFDF6");
+      ctx.restore();
+    }
+
+    const stop = api.loop((dt) => {
+      waktu += dt;
+      if (!selesai) {
+        // laju
+        const lebarJalan = lebar(d), c = tengah(d), luar = Math.abs(x - c) > lebarJalan / 2 - 16;
+        const maks = 330 + (turbo > 0 ? 170 : 0) - (lambat > 0 ? 150 : 0) - (luar ? 170 : 0);
+        laju += (maks - laju) * Math.min(1, dt * (laju < maks ? 1.4 : 4));
+        if (turbo > 0) turbo -= dt;
+        if (lambat > 0) lambat -= dt;
+        jedaGesek -= dt;
+        if (luar && jedaGesek <= 0) { jedaGesek = 0.9; efek.push(kilat("gesek tembok", x, PEMAIN_Y() - 34, "#FFFDF6")); sfx("salah"); }
+        d += laju * dt;
+        // setir
+        let sasaran = targetX;
+        if (licin > 0) { licin -= dt; sasaran += Math.sin(waktu * 14) * 60; }
+        x += Math.max(-340 * dt, Math.min(340 * dt, sasaran - x));
+        x = batas(x, 18, W - 18);
+        // lawan (sedikit karet supaya tetap seru)
+        LAWAN.forEach((l, i) => {
+          const selisih = l.d - d;
+          const karet = selisih > 500 ? -40 : selisih < -500 ? 45 : 0;
+          const target = l.maks + karet + Math.sin(waktu * 0.7 + l.goyang) * 25;
+          l.laju += (target - l.laju) * dt * 1.2;
+          l.d += l.laju * dt;
+          if (l.d >= PANJANG && !l.finis) l.finis = waktu;
+          void i;
+        });
+        // tabrakan & ambil
+        for (const b of benda) {
+          if (b.kena) continue;
+          if (b.jenis === "oyen") b.off += (b.vx / lebar(b.d)) * dt;
+          const by = PEMAIN_Y() - (b.d - d);
+          if (by < PEMAIN_Y() - 30 || by > PEMAIN_Y() + 26) continue;
+          const bx = tengah(b.d) + b.off * lebar(b.d);
+          if (Math.abs(bx - x) > 26) continue;
+          b.kena = true;
+          if (b.jenis === "teh") { turbo = 2.2; sfx("poin"); efek.push(kilat("TURBO TEH!", x, PEMAIN_Y() - 40, "#F2C14E")); api.info("Bu Ratna: Diminum pelan-pelan ya. Eh, sudah habis."); }
+          else if (b.jenis === "emas") { emas++; sfx("pilih"); efek.push(kilat("+berkas emas", x, PEMAIN_Y() - 40, "#F2C14E")); }
+          else if (b.jenis === "pel") { licin = 1.1; sfx("boing"); efek.push(kilat("LICIN", x, PEMAIN_Y() - 40, "#9FC3E0")); api.info("Dimas: ITU BARU DIPEL— eh, maaf, saya yang ngepel."); }
+          else if (b.jenis === "oyen") { lambat = 1.2; tabrak++; sfx("meong"); efek.push(kilat("Ditolak.", x, PEMAIN_Y() - 40, "#E39B4A")); api.info("Oyen: Ini wilayah saya. Silakan memutar."); }
+          else { lambat = 0.9; tabrak++; sfx("kertas"); efek.push(kilat(b.jenis === "berkas" ? "berkas berhamburan" : "kardus penyok", x, PEMAIN_Y() - 40, "#FFFDF6")); }
+        }
+        $("#hudWaktu").textContent = `Posisi ${posisi()}/4`;
+        if (d >= PANJANG) {
+          selesai = true; finis = posisi();
+          sfx(finis === 1 ? "menang" : "tingtong");
+          const skor = [0, 160, 110, 80, 60][finis] + emas * 12 + Math.max(0, 40 - tabrak * 8);
+          const KOMENTAR = [null,
+            ["badak", "JUARA. Saya kalah, dan saya menerima dengan lapang dada. Dada saya lapang. Saya badak."],
+            ["kura", "Siap. Juara dua. Saya juara satu antar-RT, jadi ini masih terhormat. Untuk Anda."],
+            ["marmut", "Juara tiga! Eh, itu bagus kok. Saya biasanya juara 'paling sering nabrak'."],
+            ["kapibara", "Yang penting sampai bawah ya. Troli juga butuh istirahat."]];
+          const [sp, kata] = KOMENTAR[finis];
+          setTimeout(() => api.selesai(skor, [sp, `Finis posisi ${finis} dari 4, ${emas} berkas emas. ${kata}`]), 900);
+        }
+      }
+
+      // ===== gambar =====
+      ctx.fillStyle = "#8D8A84"; ctx.fillRect(0, 0, W, H);
+      const langkahY = 8;
+      for (let y = 0; y <= H + langkahY; y += langkahY) {
+        const dd = d + (PEMAIN_Y() - y);
+        const c = tengah(dd), l = lebar(dd);
+        ctx.fillStyle = "#5C5A57"; ctx.fillRect(c - l / 2, y, l, langkahY + 1);
+        ctx.fillStyle = "#F2C14E"; ctx.fillRect(c - l / 2 - 6, y, 6, langkahY + 1); ctx.fillRect(c + l / 2, y, 6, langkahY + 1);
+        if (Math.floor(dd / 40) % 2 === 0) { ctx.fillStyle = "#E9E2D0"; ctx.fillRect(c - 2, y, 4, langkahY + 1); }
+      }
+      // pilar parkiran & tanda lantai
+      for (let k = Math.floor((d - 200) / 400); k < (d + H) / 400 + 1; k++) {
+        const dd = k * 400, y = PEMAIN_Y() - (dd - d);
+        if (y < -40 || y > H + 40) continue;
+        const c = tengah(dd), l = lebar(dd);
+        ctx.fillStyle = "#B9B4AA"; ctx.fillRect(c - l / 2 - 30, y - 12, 18, 24); ctx.fillRect(c + l / 2 + 12, y - 12, 18, 24);
+        ctx.strokeStyle = "#2B2A26"; ctx.lineWidth = 2; ctx.strokeRect(c - l / 2 - 30, y - 12, 18, 24); ctx.strokeRect(c + l / 2 + 12, y - 12, 18, 24);
+        if (k % 4 === 0) teksTengah(`B${1 + Math.floor(k / 4)}`, c + l / 2 + 21, y, 10, "#2B2A26");
+      }
+      // garis finis
+      const fy = PEMAIN_Y() - (PANJANG - d);
+      if (fy > -20 && fy < H + 20) {
+        const c = tengah(PANJANG), l = lebar(PANJANG);
+        for (let i = 0; i < l / 10; i++) { ctx.fillStyle = i % 2 ? "#2B2A26" : "#FFFDF6"; ctx.fillRect(c - l / 2 + i * 10, fy - 6, 10, 6); ctx.fillStyle = i % 2 ? "#FFFDF6" : "#2B2A26"; ctx.fillRect(c - l / 2 + i * 10, fy, 10, 6); }
+        teksTengah("FINIS · PINTU KELUAR", c, fy - 16, 11, "#FFFDF6");
+      }
+      // benda
+      for (const b of benda) {
+        if (b.kena) continue;
+        const y = PEMAIN_Y() - (b.d - d);
+        if (y < -30 || y > H + 30) continue;
+        const bx = tengah(b.d) + b.off * lebar(b.d);
+        if (b.jenis === "teh") gambarSprite(ctx, "cangkir", bx, y, 30);
+        else if (b.jenis === "emas") { ctx.save(); ctx.translate(bx, y); ctx.rotate(Math.sin(waktu * 4) * 0.2); ctx.fillStyle = "#F2C14E"; ctx.fillRect(-10, -13, 20, 26); ctx.strokeStyle = "#2B2A26"; ctx.lineWidth = 2; ctx.strokeRect(-10, -13, 20, 26); ctx.restore(); }
+        else if (b.jenis === "pel") { ctx.fillStyle = "rgba(159,195,224,.75)"; ctx.beginPath(); ctx.ellipse(bx, y, 24, 12, 0, 0, 7); ctx.fill(); teksTengah("LICIN", bx, y, 8, "#2F4A6B"); }
+        else if (b.jenis === "oyen") gambarSprite(ctx, "oyen", bx, y, 32);
+        else if (b.jenis === "kardus") { ctx.fillStyle = "#C9A06A"; ctx.fillRect(bx - 15, y - 13, 30, 26); ctx.strokeStyle = "#2B2A26"; ctx.lineWidth = 2; ctx.strokeRect(bx - 15, y - 13, 30, 26); ctx.beginPath(); ctx.moveTo(bx - 15, y); ctx.lineTo(bx + 15, y); ctx.stroke(); }
+        else gambarSprite(ctx, "berkas", bx, y, 32);
+      }
+      // lawan
+      LAWAN.forEach((l) => {
+        const y = PEMAIN_Y() - (l.d - d);
+        if (y < -40 || y > H + 40) return;
+        const lx = tengah(l.d) + l.off + Math.sin(waktu * 1.3 + l.goyang) * 14;
+        gambarTroli(lx, y, l.warna, l.sprite, l.nama.split(" ").pop());
+      });
+      // pemain
+      if (turbo > 0) { ctx.fillStyle = "rgba(242,193,78,.6)"; for (let i = 0; i < 3; i++) ctx.fillRect(x - 10 + i * 8, PEMAIN_Y() + 26 + Math.random() * 10, 4, 10 + Math.random() * 10); }
+      gambarTroli(x, PEMAIN_Y(), "#6B5B7A", null, api.nama);
+      // bilah kemajuan
+      ctx.fillStyle = "rgba(43,42,38,.7)"; ctx.fillRect(W - 14, 16, 8, H - 32);
+      const prog = (v) => 16 + (H - 32) * (1 - Math.min(1, v / PANJANG));
+      LAWAN.forEach((l) => { ctx.fillStyle = l.warna; ctx.fillRect(W - 16, prog(l.d) - 2, 12, 4); });
+      ctx.fillStyle = "#F2C14E"; ctx.fillRect(W - 18, prog(d) - 3, 16, 6);
+      teksTengah(`${Math.round(laju / 10)} km/j`, 40, H - 18, 12, "#FFFDF6");
+      gambarKilat(efek, dt);
+    });
+    const stop2 = () => { stop(); kanvas.removeEventListener("pointerdown", gerak); kanvas.removeEventListener("pointermove", gerak); };
     return stop2;
   };
 
