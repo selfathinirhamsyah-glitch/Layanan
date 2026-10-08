@@ -1,5 +1,7 @@
 # Kantor Layanan Perasaan
 
+> Panduan lengkap (cara online-kan, kirim ke Mira, tur, kunci jawaban misteri): lihat [PANDUAN.md](PANDUAN.md).
+
 Website satu halaman (HTML/CSS/JS murni) untuk Mira: kantor layanan fiktif yang menerima keluhan, kabar baik, dan semangat.
 
 ## Isi
