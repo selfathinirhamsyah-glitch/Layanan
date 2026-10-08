@@ -85,6 +85,18 @@
     sendokBengkok: { nama: "Sendok Teh Bengkok", sprite: "sendok", ket: "Bengkok sejak dipakai mencongkel toples gula. Masih bisa mengaduk, asal pelan." },
   });
 
+  /* ---------- profil tersangka di papan bukti ---------- */
+  L13.KASUS[0].tersangka = (L) => {
+    const sudah = [1, 2, 3, 4, 5, 6].filter((n) => L.flagGlobal(`deduksi:${n}`)).length;
+    if (!sudah) return `<span class="avatar">?</span><div><p><strong>Tersangka: belum ada</strong></p><p>Kumpulkan bukti, lalu simpulkan di akhir bab.</p></div>`;
+    const motif = L.flagGlobal("deduksi:6");
+    return `<span class="avatar">${px("oyen")}</span><div>
+      <p><strong>Tersangka: Oyen</strong> <span class="cap-tersangka">${motif ? "BUKAN PENJAHAT" : "DICURIGAI"}</span></p>
+      <p>Jabatan: Kepala Bagian. Ciri: kaki empat, berdasi, sering menatap tembok.</p>
+      <p>Kesimpulan terkumpul: ${sudah} dari 6.</p>
+      <p>Motif: ${motif ? "teh manis untuk yang lembur, dan menyimpan hal-hal kecil yang bikin senyum." : "???"}</p></div>`;
+  };
+
   /* =========================================================
      BAB 1 · Gula yang Hilang
      ========================================================= */
@@ -125,6 +137,7 @@
               if (j === 1) await L.bilang("satpam", "Siap. Saya curiga semua orang. Termasuk saya. Itu prosedur.");
               await L.bilang("satpam", "Pantry ada di lantai 3. Lewat tangga di pojok, lift sedang suka bercanda.");
               L.flag("bicaraSatpam", true);
+              L.bukti("laporanSatpam", "Laporan jaga", "Gula hilang tiap hari antara jam 9 dan 12. Yang lewat cuma Oyen.");
               L.tujuan("kode");
             } },
           { id: "pot", x: 228, y: 302, w: 56, h: 66, label: "Pot tanaman", gambar: "tanaman2",
@@ -140,7 +153,18 @@
               L.flag("liftKedip", true); L.segarkan(); L.sfx("lift");
               await L.bilang("narasi", "Layar di atas pintu lift menunjukkan angka 13. Satu detik. Lalu kembali ke L, seperti tidak terjadi apa-apa.");
               await L.bilang("satpam", "Siap. Saya melihatnya. Saya akan pura-pura tidak melihatnya. Untuk sementara.");
-              await L.bilang("oyen", "Laporan diterima. Lanjutkan besok.");
+              await L.deduksi({
+                judul: "Kasus gula yang hilang", pertanyaan: "Siapa tersangka utama hilangnya gula?",
+                opsi: ["Pak Satpam", "Dimas", "Bu Ratna", "Seseorang berkaki empat, berdasi"], benar: 3,
+                buktiBenar: ["tapakKartu", "laporanSatpam"],
+                salah: [
+                  ["satpam", "Siap. Saya keberatan. Saya berjaga semalaman. Dan saya tidak suka gula. Saya suka garam."],
+                  ["dimas", "SAYA?? Eh. Saya cuma pernah... mencicipi. Sekali. *dua kali. Tapi jari kaki saya lima!"],
+                  ["ratna", "Saya yang mengisi gulanya ya. Kalau saya ambil lagi, repot di saya sendiri."],
+                ],
+                siapaBenar: "dimas", benarTeks: "Berkaki empat... berdasi... di gedung ini cuma ada satu. Eh. Saya nggak bilang siapa-siapa ya. *O-nya pakai Y-E-N.",
+              });
+              await L.bilang("oyen", "Laporan diterima. Tersangka dicatat. Motif belum diketahui. Lanjutkan besok.");
               L.flag("liftKedip", false);
               L.langka("sendokBengkok");
               await L.selesaiBab();
@@ -149,7 +173,7 @@
         ],
       },
       pantry: {
-        nama: "Pantry · Lantai 3", latar: "pantry",
+        nama: "Pantry · Lantai 3", latar: "pantry", seram: 1,
         async masuk(L) {
           if (!L.flag("masukPantry")) {
             L.flag("masukPantry", true);
@@ -178,9 +202,10 @@
               L.sfx("boing");
               await L.bilang("narasi", "Toplesnya kosong. Tidak ada gula. Yang ada cuma selembar kartu kuning dengan bekas tapak kaki kecil.");
               L.dapat("kartu");
+              L.bukti("tapakKartu", "Tapak di kartu akses", "Bekas tapak kaki kecil. Empat jari. Bukan manusia.");
               L.flag("toplesKosong", true);
               const j = await L.tanya("ratna", "Itu bukan kartu saya ya. Saya cuma menyimpan gula di situ. Dulu.", ["Ini punya siapa ya, Bu?", "Boleh aku simpan, Bu?"]);
-              if (j === 0) await L.bilang("ratna", "Hmm. Tapak kakinya kecil ya. Empat jari. Saya nggak mau menuduh siapa-siapa. Tapi Oyen tadi lewat sambil bersiul.");
+              if (j === 0) { await L.bilang("ratna", "Hmm. Tapak kakinya kecil ya. Empat jari. Saya nggak mau menuduh siapa-siapa. Tapi Oyen tadi lewat sambil bersiul."); L.bukti("siulan", "Kesaksian Bu Ratna", "Oyen lewat pantry sambil bersiul. Kucing tidak biasa bersiul."); }
               else { await L.bilang("ratna", "Boleh. Kamu yang menyelidiki. Saya buatkan teh ya, buat menemani."); await L.bilang("narasi", "Bu Ratna menyodorkan teh tawar. Gulanya, tentu saja, tidak ada."); }
               await L.bilang("narasi", "Di kartu tertulis: \"AKSES: 13?\". Tanda tanyanya ditulis tangan. Mungkin lift di lobi tahu sesuatu.");
               L.tujuan("lapor");

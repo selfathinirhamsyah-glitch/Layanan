@@ -9,9 +9,17 @@
   const K = window.KLP;
   const { $, $$, esc, px, sfx, memo, NAMA } = K;
   const S = () => K.data.l13;            // status tersimpan
-  const JUMLAH_BAB = 6;
+  const JUMLAH_BAB = 6;                  // bab Misteri Lantai 13
 
   const L13 = K.L13 = K.L13 || { bab: {}, barang: {}, langka: {} };
+  // Daftar kasus. Nomor bab unik di semua kasus; kasus lain bisa butuh bab tertentu selesai dulu.
+  L13.KASUS = L13.KASUS || [
+    { id: "l13", judul: "Misteri Lantai 13", bab: [1, 2, 3, 4, 5, 6], satuan: "Bab" },
+  ];
+  const kasusDari = (n) => L13.KASUS.find((k) => k.bab.includes(n));
+  const noTampil = (n) => kasusDari(n).bab.indexOf(n) + 1;
+  const labelBab = (n) => `${kasusDari(n).satuan || "Bab"} ${noTampil(n)}`;
+  L13.kasusDari = kasusDari; L13.labelBab = labelBab;
 
   /* ---------- tanggal & bab harian ---------- */
   const tglLokal = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -22,28 +30,30 @@
     return Math.max(0, Math.round((b - a) / 86400000));
   }
   const selesai = (n) => S().selesai.includes(n);
+  const mulaiKasus = (k) => (k.id === "l13" ? S().mulai : (S().mulaiKasus || {})[k.id]);
   function statusBab(n) {
     if (selesai(n)) return "selesai";
-    if (n > 1 && !selesai(n - 1)) return "menunggu";
-    if (S().bukaSemua || n === 1) return "tersedia";
-    const hari = hariSejak(S().mulai);
-    return hari >= n - 1 ? "tersedia" : "besok";
+    const k = kasusDari(n), i = k.bab.indexOf(n);
+    if (i === 0 && k.syarat && !selesai(k.syarat)) return "terkunci";
+    if (i > 0 && !selesai(k.bab[i - 1])) return "menunggu";
+    if (S().bukaSemua || i === 0) return "tersedia";
+    return hariSejak(mulaiKasus(k)) >= i ? "tersedia" : "besok";
   }
   function sisaHari(n) {
-    const hari = hariSejak(S().mulai);
-    return Math.max(1, n - 1 - hari);
+    const k = kasusDari(n);
+    return Math.max(1, k.bab.indexOf(n) - hariSejak(mulaiKasus(k)));
   }
   L13.statusBab = statusBab;
 
   /* ---------- pengumuman di lobi ---------- */
   K.pengumuman.push(() => {
-    for (let n = 1; n <= JUMLAH_BAB; n++) {
+    for (const k of L13.KASUS) for (const n of k.bab) {
       const b = L13.bab[n];
       if (!b) continue;
       if (statusBab(n) === "tersedia" && !S().flag[`b${n}:mulai`]) {
-        return n === 1
-          ? { dari: "Oyen", sprite: "oyen", teks: "Surat tugas untuk Anda: selidiki Misteri Lantai 13. Berkas ada di lobi. Diketahui." }
-          : { dari: "Pak Singa", sprite: "singa", teks: `Perhatian. Bab ${n} sudah bisa diakses. ${b.teaser}` };
+        if (n === 1) return { dari: "Oyen", sprite: "oyen", teks: "Surat tugas untuk Anda: selidiki Misteri Lantai 13. Berkas ada di lobi. Diketahui." };
+        if (k.pengumuman && noTampil(n) === 1) return k.pengumuman;
+        return { dari: "Pak Singa", sprite: "singa", teks: `Perhatian. ${k.judul}, ${labelBab(n)} sudah bisa diakses. ${b.teaser}` };
       }
     }
     return null;
@@ -52,9 +62,24 @@
   /* =========================================================
      BERKAS PENYELIDIKAN (hub)
      ========================================================= */
+  function daftarBab(k) {
+    return `<ol class="daftar-bab">
+        ${k.bab.map((n) => {
+          const b = L13.bab[n], st = statusBab(n), no = noTampil(n);
+          const ket = !b ? "Sedang ditulis." : st === "selesai" ? "Selesai. Boleh diulang." : st === "tersedia" ? (S().flag[`b${n}:mulai`] ? "Sedang diselidiki." : "Bisa dimulai sekarang.") : st === "menunggu" ? `Selesaikan ${k.satuan || "Bab"} ${no - 1} dulu.` : st === "terkunci" ? k.syaratTeks : `Terbuka ${sisaHari(n) === 1 ? "besok" : `${sisaHari(n)} hari lagi`}.`;
+          const bisa = b && (st === "selesai" || st === "tersedia");
+          return `<li class="bab bab-${st}">
+            <span class="bab-no mono">${no}</span>
+            <span class="bab-isi"><strong>${b && (st === "selesai" || st === "tersedia") ? esc(b.judul) : "▒▒▒▒▒▒▒▒"}</strong><small>${esc(ket)}</small></span>
+            ${bisa ? `<button class="btn small ${st === "tersedia" ? "primary" : ""}" type="button" data-bab="${n}">${st === "selesai" ? "Ulangi" : S().flag[`b${n}:mulai`] ? "Lanjut" : "Mulai"}</button>` : `<span class="bab-gembok" aria-hidden="true">▒</span>`}
+          </li>`;
+        }).join("")}
+      </ol>`;
+  }
   function isiBerkas() {
     const r = $("#ruangMisteri");
-    const nSelesai = S().selesai.length;
+    const nSelesai = S().selesai.filter((n) => n <= JUMLAH_BAB).length;
+    const lain = L13.KASUS.filter((k) => k.id !== "l13");
     r.innerHTML = `
       <div class="form-head"><span class="loket-badge">Berkas Rahasia</span><span class="mono small">${nSelesai}/${JUMLAH_BAB} bab</span></div>
       <h2 id="h-misteri">Misteri Lantai 13</h2>
@@ -63,26 +88,24 @@
         <p>Kepada: <strong>${esc(NAMA)}</strong>, Pegawai Kehormatan.<br>Perihal: gula hilang, stempel berpindah, tembok yang ditatap.<br>Tugas: selidiki. Pelan-pelan saja. Satu bab per hari.</p>
         <p class="ttd-oyen">— Oyen, Kepala Bagian <span class="cap-kaki" aria-hidden="true"></span></p>
       </div>
-      <ol class="daftar-bab">
-        ${Array.from({ length: JUMLAH_BAB }, (_, i) => i + 1).map((n) => {
-          const b = L13.bab[n], st = statusBab(n);
-          const ket = !b ? "Sedang ditulis." : st === "selesai" ? "Selesai. Boleh diulang." : st === "tersedia" ? (S().flag[`b${n}:mulai`] ? "Sedang diselidiki." : "Bisa dimulai sekarang.") : st === "menunggu" ? `Selesaikan Bab ${n - 1} dulu.` : `Terbuka ${sisaHari(n) === 1 ? "besok" : `${sisaHari(n)} hari lagi`}.`;
-          const bisa = b && (st === "selesai" || st === "tersedia");
-          return `<li class="bab bab-${st}">
-            <span class="bab-no mono">${n}</span>
-            <span class="bab-isi"><strong>${b && (st !== "besok" && st !== "menunggu") ? esc(b.judul) : "▒▒▒▒▒▒▒▒"}</strong><small>${esc(ket)}</small></span>
-            ${bisa ? `<button class="btn small ${st === "tersedia" ? "primary" : ""}" type="button" data-bab="${n}">${st === "selesai" ? "Ulangi" : S().flag[`b${n}:mulai`] ? "Lanjut" : "Mulai"}</button>` : `<span class="bab-gembok" aria-hidden="true">▒</span>`}
-          </li>`;
-        }).join("")}
-      </ol>
-      <p class="muted small">Progres, laci, dan pilihan disimpan di perangkat ini saja. Kalau penyimpanan gagal, misterinya tetap bisa dimainkan, hanya progresnya hilang saat halaman ditutup.</p>
-      <p class="muted small">Pengaturan kejutan ada di Radio Kantor (pojok kanan atas). Mode Kaget saat ini: <strong>${K.data.setelan.kaget ? "nyala" : "mati"}</strong>.</p>
+      ${daftarBab(L13.KASUS[0])}
+      ${lain.map((k) => `
+        <section class="kasus-lain kasus-${k.id}">
+          <h3 class="kasus-judul">${esc(k.judul)}</h3>
+          ${k.surat ? `<div class="surat-tugas surat-${k.id}">${k.surat()}</div>` : ""}
+          ${daftarBab(k)}
+        </section>`).join("")}
+      <div class="actions kiri"><button class="btn" type="button" data-papan="l13">Papan Bukti</button>${lain.map((k) => `<button class="btn" type="button" data-papan="${k.id}">Bukti: ${esc(k.pendek || k.judul)}</button>`).join("")}</div>
+      <p class="muted small">Progres, laci, bukti, dan pilihan disimpan di perangkat ini saja. Kalau penyimpanan gagal, misterinya tetap bisa dimainkan, hanya progresnya hilang saat halaman ditutup.</p>
+      <p class="muted small">Pengaturan di Radio Kantor (pojok kanan atas). Mode Kaget: <strong>${K.data.setelan.kaget ? "nyala" : "mati"}</strong> · Lampu lorong: <strong>${K.data.setelan.seram === "tegang" ? "lebih tegang" : "seram-lucu"}</strong>.</p>
       <div class="actions"><button class="btn ghost" type="button" data-go="s-lobi">← Lobi</button></div>`;
   }
   K.saatMasuk["s-misteri"] = isiBerkas;
   $("#ruangMisteri").addEventListener("click", (e) => {
     const b = e.target.closest("[data-bab]");
     if (b) mainkan(Number(b.dataset.bab));
+    const pb = e.target.closest("[data-papan]");
+    if (pb) papanBukti(pb.dataset.papan);
   });
 
   /* ---------- tombol rahasia: ketuk kalender meja 7x ---------- */
@@ -130,8 +153,18 @@
     bilang, tanya, kejut, lihat, sfx,
     gembok: tekaGembok, urutan: tekaUrutan, susun: tekaSusun, jam: tekaJam,
     gelap(nyala, total = false) { gelap.hidden = !nyala; gelap.classList.toggle("total", !!total); adegan.classList.toggle("dalam-gelap", nyala); },
+    get tegang() { return K.data.setelan.seram === "tegang"; },
+    bukti(id, judul, isi) {
+      const daftar = S().bukti || (S().bukti = []);
+      if (daftar.some((b) => b.id === id)) return;
+      daftar.push({ id, kasus: kasusDari(babAktif).id, bab: babAktif, judul, isi });
+      K.simpan(); sfx("pilih"); kilasBukti(judul);
+    },
+    punyaBukti: (id) => (S().bukti || []).some((b) => b.id === id),
+    deduksi, bisik, papanBukti,
     async selesaiBab() {
       const n = babAktif;
+      hentikanSuasana();
       if (!S().selesai.includes(n)) S().selesai.push(n);
       S().flag[`b${n}:mulai`] = true;
       S().posisi = null;
@@ -148,7 +181,9 @@
     const b = L13.bab[n];
     if (!b) return;
     babAktif = n;
-    if (!S().mulai) { S().mulai = tglLokal(); }
+    const kasus = kasusDari(n);
+    if (kasus.id === "l13") { if (!S().mulai) S().mulai = tglLokal(); }
+    else { S().mulaiKasus = S().mulaiKasus || {}; if (!S().mulaiKasus[kasus.id]) S().mulaiKasus[kasus.id] = tglLokal(); }
     const ulang = selesai(n) && !S().flag[`b${n}:ulang`];
     if (selesai(n)) {
       // main ulang: bersihkan flag bab ini, barang tetap di laci
@@ -158,7 +193,8 @@
     void ulang;
     document.body.classList.add("layar-penuh");
     lapis.hidden = false;
-    $("#l13Bab").textContent = `Bab ${n} · ${b.judul}`;
+    $("#l13Bab").textContent = `${labelBab(n)} · ${b.judul}`;
+    lapis.dataset.kasus = kasus.id;
     pilihBarang = null;
     gambarLaci();
     const pertama = !S().flag[`b${n}:mulai`];
@@ -170,6 +206,7 @@
     if (pertama && b.pembuka) jalankan(() => b.pembuka(api));
   }
   function keluar() {
+    hentikanSuasana();
     lapis.hidden = true;
     document.body.classList.remove("layar-penuh");
     tutupDialog();
@@ -190,7 +227,42 @@
     gelap.style.setProperty("--x", "50%"); gelap.style.setProperty("--y", "45%");
     if (!langsung && !K.kurangiGerak) { adegan.classList.remove("ganti"); void adegan.offsetWidth; adegan.classList.add("ganti"); }
     gambarRuang();
-    b.ruang[id].masuk && jalankan(() => b.ruang[id].masuk(api));
+    mulaiSuasana(b.ruang[id].seram || 0);
+    if (b.ruang[id].masuk) jalankan(() => (ruangAktif === id && L13.bab[babAktif] === b ? b.ruang[id].masuk(api) : null), true);
+  }
+
+  /* ---------- suasana seram per ruangan ---------- */
+  let timerSuasana = null;
+  const BUNYI_SERAM = ["langkah", "derit", "tetes", "bisik", "angin"];
+  const KALIMAT_SERAM = ["(langkah kaki pelan di lorong... lalu berhenti)", "(pintu berderit sendiri)", "(tetes air dari plafon. Tik. Tik.)", "(ada yang berbisik. Atau itu cuma AC.)", "(lampu berkedip, seperti sedang berpikir)", "(bayangan lewat di ujung mata)", "(bau teh manis, entah dari mana)"];
+  function hentikanSuasana() {
+    clearTimeout(timerSuasana); timerSuasana = null;
+    adegan.classList.remove("seram-1", "seram-2", "tegang");
+  }
+  function mulaiSuasana(tingkat) {
+    hentikanSuasana();
+    if (!tingkat) return;
+    const tegang = api.tegang;
+    adegan.classList.add(`seram-${tingkat}`);
+    adegan.classList.toggle("tegang", tegang);
+    const jadwal = () => {
+      const jeda = (tegang ? 6000 : 10000) + Math.random() * (tegang ? 5000 : 7000);
+      timerSuasana = setTimeout(() => {
+        if (lapis.hidden) return;
+        sfx(K.acak(BUNYI_SERAM));
+        if (tegang || tingkat > 1) bisik(K.acak(KALIMAT_SERAM));
+        adegan.classList.remove("kedip"); void adegan.offsetWidth; adegan.classList.add("kedip");
+        jadwal();
+      }, jeda);
+    };
+    jadwal();
+  }
+  const bisikEl = $("#l13Bisik");
+  let timerBisik;
+  function bisik(teks, ms = 3200) {
+    bisikEl.textContent = teks.replaceAll("{NAMA}", NAMA);
+    bisikEl.hidden = false; bisikEl.classList.remove("muncul"); void bisikEl.offsetWidth; bisikEl.classList.add("muncul");
+    clearTimeout(timerBisik); timerBisik = setTimeout(() => (bisikEl.hidden = true), ms);
   }
   function gambarRuang() {
     const r = L13.bab[babAktif].ruang[ruangAktif];
@@ -226,12 +298,14 @@
     const nm = L13.barang[barang]?.nama || barang;
     return K.acak([`${nm} dan ${label.toLowerCase()} tidak cocok. Keduanya terlihat canggung.`, `Anda mencoba memakai ${nm.toLowerCase()} di situ. Tidak terjadi apa-apa, kecuali sedikit malu.`, `Bu Ratna dari jauh: "Kayaknya bukan di situ ya."`]);
   }
-  async function jalankan(fn) {
-    if (sibuk) return;
+  let antrean = null; // "masuk" ruangan yang dipicu dari dalam aksi lain, dijalankan setelahnya
+  async function jalankan(fn, antre = false) {
+    if (sibuk) { if (antre) antrean = fn; return; }
     sibuk = true;
     try { await fn(); }
     catch (err) { console.error(err); }
     finally { sibuk = false; }
+    if (antrean) { const f = antrean; antrean = null; jalankan(f); }
   }
 
   /* ---------- ukuran adegan 3:4 ---------- */
@@ -477,6 +551,16 @@
   const kejutEl = $("#l13Kejut");
   async function kejut({ gambar, teriak = "", punchline, siapa = "narasi" }) {
     const keras = K.data.setelan.kaget && !K.kurangiGerak;
+    if (keras && api.tegang) {
+      // ketegangan dulu: gelap, detak jantung, sunyi
+      kejutEl.hidden = false;
+      kejutEl.className = "l13-kejut tegang-dulu";
+      kejutEl.innerHTML = `<p class="kejut-sunyi">...</p>`;
+      sfx("detak");
+      await new Promise((r) => setTimeout(r, 900));
+      sfx("detak");
+      await new Promise((r) => setTimeout(r, 900));
+    }
     kejutEl.hidden = false;
     kejutEl.className = `l13-kejut ${keras ? "keras" : "lembut"}`;
     kejutEl.innerHTML = `
@@ -524,13 +608,86 @@
     const b = L13.bab[n];
     const langka = b.langka ? L13.langka[b.langka] : null;
     await lihat(`
-      <p class="mono selesai-cap">BAB ${n} SELESAI</p>
+      <p class="mono selesai-cap">${esc(labelBab(n).toUpperCase())} SELESAI</p>
       <h3 class="teka-judul">${esc(b.judul)}</h3>
       <p>${esc(b.penutup || "Laporan diterima. Lanjutkan besok.")}</p>
       ${langka ? `<div class="hadiah-langka"><span class="avatar">${px(langka.sprite)}</span><span><small>Barang langka untuk Meja Kerja</small><strong>${esc(langka.nama)}</strong></span></div>` : ""}
       <p class="ap-poin">+${poin} Poin Sabar</p>
-      ${n < JUMLAH_BAB ? `<p class="muted small">Bab ${n + 1} ${S().bukaSemua ? "sudah bisa diakses (mode penguji)." : "terbuka besok. Datang lagi ya. Gedungnya tidak ke mana-mana."}</p>` : ""}`, "Kembali ke berkas");
+      ${(() => { const k = kasusDari(n), i = k.bab.indexOf(n); return i < k.bab.length - 1 ? `<p class="muted small">${esc(labelBab(k.bab[i + 1]))} ${S().bukaSemua ? "sudah bisa diakses (mode penguji)." : "terbuka besok. Datang lagi ya. Gedungnya tidak ke mana-mana."}</p>` : ""; })()}`, "Kembali ke berkas");
     keluar();
+  }
+
+  /* =========================================================
+     DETEKTIF: bukti, papan bukti, deduksi
+     ========================================================= */
+  function kilasBukti(judul) {
+    const el = document.createElement("div");
+    el.className = "kilas-barang kilas-bukti";
+    el.innerHTML = `<span class="kb-foto kb-pin" aria-hidden="true"></span><span><small>Bukti baru di papan</small><strong>${esc(judul)}</strong></span>`;
+    lapis.appendChild(el);
+    setTimeout(() => el.remove(), 2600);
+  }
+  function papanBukti(idKasus) {
+    const kasus = L13.KASUS.find((k) => k.id === (idKasus || (babAktif ? kasusDari(babAktif).id : "l13"))) || L13.KASUS[0];
+    const daftar = (S().bukti || []).filter((b) => b.kasus === kasus.id);
+    const html = `
+      <h3 class="teka-judul">Papan Bukti · ${esc(kasus.judul)}</h3>
+      ${kasus.tersangka ? `<div class="profil-tersangka">${kasus.tersangka(api)}</div>` : ""}
+      <div class="papan-gabus">
+        ${daftar.length ? daftar.map((b, i) => `<div class="catatan-bukti" style="--r:${((i * 37) % 7) - 3}deg"><span class="pin" aria-hidden="true"></span><strong>${esc(b.judul)}</strong><p>${esc(b.isi)}</p><small>${esc(labelBab(b.bab))}</small></div>`).join("") : `<p class="papan-kosong">Belum ada bukti. Detektif yang baik mulai dengan mengetuk benda-benda.</p>`}
+      </div>`;
+    if (lapis.hidden) {
+      // dibuka dari berkas (di luar permainan): pakai panel lihat biasa di lapisan sementara
+      lapis.hidden = false; document.body.classList.add("layar-penuh");
+      lapis.classList.add("hanya-papan");
+      lihat(html, "Tutup papan").then(() => { lapis.classList.remove("hanya-papan"); lapis.hidden = true; document.body.classList.remove("layar-penuh"); });
+      return;
+    }
+    if (sibuk) { return; }
+    jalankan(() => lihat(html, "Tutup papan"));
+  }
+  $("#l13Laci").closest(".l13-laci").addEventListener("click", (e) => { if (e.target.closest("[data-papan-sini]")) { sfx("kertas"); papanBukti(); } });
+
+  async function deduksi({ judul = "Deduksi", pertanyaan, opsi, benar, buktiBenar, salah = [], benarTeks, siapaBenar = "narasi" }) {
+    const kasus = kasusDari(babAktif);
+    const terima = Array.isArray(buktiBenar) ? buktiBenar : [buktiBenar];
+    await bilang("narasi", "Detektif {NAMA}, saatnya menyusun kesimpulan. Pilih jawaban, lalu tunjuk satu bukti yang mendukung.");
+    for (;;) {
+      const bukti = (S().bukti || []).filter((b) => b.kasus === kasus.id);
+      let pilihJawab = null, pilihBukti = null;
+      const gambar = () => `
+        <p class="mono small deduksi-cap">KESIMPULAN DETEKTIF</p>
+        <h3 class="teka-judul">${esc(judul)}</h3>
+        <p class="teka-ket"><strong>${esc(pertanyaan)}</strong></p>
+        <div class="deduksi-opsi">${opsi.map((o, i) => `<button type="button" class="chip${pilihJawab === i ? " dipilih" : ""}" data-jawab="${i}">${esc(o)}</button>`).join("")}</div>
+        <p class="teka-ket">Bukti pendukung:</p>
+        <div class="deduksi-bukti">${bukti.map((b) => `<button type="button" class="catatan-bukti kecil${pilihBukti === b.id ? " dipilih" : ""}" data-bukti="${b.id}"><strong>${esc(b.judul)}</strong></button>`).join("")}</div>
+        <div class="actions"><button class="btn primary" type="button" data-simpulkan ${pilihJawab === null || pilihBukti === null ? "disabled" : ""}>Simpulkan</button></div>`;
+      bukaModal(gambar());
+      const hasil = await new Promise((res) => {
+        modalIsi.onclick = (e) => {
+          const j = e.target.closest("[data-jawab]"), bk = e.target.closest("[data-bukti]");
+          if (j) { pilihJawab = Number(j.dataset.jawab); sfx("pilih"); bukaModal(gambar()); return; }
+          if (bk) { pilihBukti = bk.dataset.bukti; sfx("kertas"); bukaModal(gambar()); return; }
+          if (e.target.closest("[data-simpulkan]") && pilihJawab !== null && pilihBukti !== null) { modalIsi.onclick = null; tutupModal(); res({ j: pilihJawab, b: pilihBukti }); }
+        };
+      });
+      sfx("stempel");
+      if (hasil.j !== benar) {
+        const [siapa, teks] = salah[hasil.j] || ["dimas", "Eh... kayaknya bukan itu deh. *saya juga sering salah."];
+        await bilang(siapa, teks);
+        await bilang("narasi", "Kesimpulan ditolak. Papan bukti menunggu dengan sabar. Coba lagi.");
+        continue;
+      }
+      if (!terima.includes(hasil.b)) {
+        await bilang("ratna", "Jawabannya sudah pas ya. Tapi bukti yang itu belum cukup kuat. Coba pilih bukti lain.");
+        continue;
+      }
+      api.flagGlobal(`deduksi:${babAktif}`, true);
+      sfx("menang");
+      await bilang(siapaBenar, benarTeks || "Kesimpulan diterima. Dicap. Ditempel di papan.");
+      return;
+    }
   }
 
   /* ---------- petunjuk bertahap dari Bu Ratna ---------- */
@@ -580,12 +737,12 @@
     isiLobiSebelum();
     const slot = $("#misteriSlot");
     if (!slot) return;
-    const n = S().selesai.length;
-    const ada = Array.from({ length: JUMLAH_BAB }, (_, i) => i + 1).find((x) => statusBab(x) === "tersedia");
+    const n = S().selesai.filter((x) => x <= JUMLAH_BAB).length;
+    const ada = L13.KASUS.flatMap((k) => k.bab).find((x) => L13.bab[x] && statusBab(x) === "tersedia" && !selesai(x));
     slot.innerHTML = `
       <button type="button" class="kartu-misteri" data-go="s-misteri">
         <span class="km-ikon">${px("kartu")}</span>
-        <span class="km-isi"><strong>Berkas: Misteri Lantai 13</strong><small>${n === JUMLAH_BAB ? "Kasus ditutup. Anda penjaganya sekarang." : ada ? `Bab ${ada} menunggu penyelidikan.` : "Bab berikutnya terbuka besok."}</small></span>
+        <span class="km-isi"><strong>Berkas: Misteri Lantai 13</strong><small>${ada ? `${esc(kasusDari(ada).judul)}: ${esc(labelBab(ada))} menunggu penyelidikan.` : n === JUMLAH_BAB ? "Kasus ditutup. Anda penjaganya sekarang." : "Bab berikutnya terbuka besok."}</small></span>
         <span class="km-panah" aria-hidden="true">→</span>
       </button>`;
     $("#lantaiGaib")?.setAttribute("role", "button");

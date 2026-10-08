@@ -131,7 +131,7 @@
     },
     ruang: {
       tangga: {
-        nama: "Tangga bawah tanah", latar: "tangga",
+        nama: "Tangga bawah tanah", latar: "tangga", seram: 2,
         titik: [
           { id: "pintu", x: 150, y: 80, w: 110, h: 180, label: "Pintu gudang",
             async ketuk(L) {
@@ -156,8 +156,9 @@
         ],
       },
       arsip: {
-        nama: "Gudang Arsip", latar: "arsip",
+        nama: "Gudang Arsip", latar: "arsip", seram: 2,
         async masuk(L) {
+          if (L.tegang && !L.flag("bisikArsip")) { L.flag("bisikArsip", true); L.bisik("(...ada yang bernapas di balik lemari. Pelan. Teratur. Seperti mendengkur.)", 4200); L.sfx("bisik"); }
           if (!L.flag("senterNyala")) { L.gelap(true, true); if (!L.flag("bilangGelap")) { L.flag("bilangGelap", true); await L.bilang("narasi", "Gelap total. Anda tidak bisa melihat tangan sendiri. Dimas bisa, katanya, tapi itu karena dia menutup mata."); } }
           else L.gelap(true);
         },
@@ -184,6 +185,7 @@
                 punchline: "Rapat sedang berlangsung. Mohon ketuk dulu.",
               });
               await L.bilang("narasi", "Oyen keluar dari lemari dengan tenang, merapikan dasinya, lalu berjalan ke atas tanpa menoleh.");
+              L.bukti("rapatLemari", "Rapat di lemari arsip", "Oyen keluar dari lemari besi gudang arsip. Katanya sedang rapat. Dengan siapa, tidak jelas.");
               await L.bilang("dimas", "ITU OYEN. Eh. Itu Oyen. Dia rapat sama siapa di dalam lemari?? *saya nggak mau tahu. saya mau tahu.");
               await L.bilang("narasi", "Di balik pintu lemari tertempel poster tua.");
               await bacaPoster(L);
@@ -206,7 +208,22 @@
                 <p class="tulisan-cakar">Jam lobi, jam pantry, jam atap. Kalau ketiganya setuju, tombolnya lepas sendiri.</p>
                 <p class="tulisan-cakar">Jangan lupa teh manis untuk yang lembur.</p>
                 <p class="tulisan-cakar" style="text-align:right">— O.</p>`, "Tutup buku");
+              L.bukti("tulisanCakar", "Tulisan tangan di buku", "Buku catatan penjaga ditulis miring, seperti pakai cakar. Ditandatangani \"O.\"");
+              L.bukti("catatanJam", "Catatan: 16.59", "Lantai 13 terbuka kalau jam lobi, pantry, dan atap sepakat di 16.59, jam paling tenang.");
+              L.bukti("catatanTeh", "Catatan: teh manis", "\"Jangan lupa teh manis untuk yang lembur.\" Ada bekas teh di sampul buku.");
               await L.bilang("dimas", "O? O itu siapa? ...OH. Eh. Bukan. Mungkin O itu... Orang. Orang biasa. *bukan kucing. pasti bukan kucing.");
+              await L.deduksi({
+                judul: "Kasus buku catatan penjaga", pertanyaan: "Siapa \"O.\", penulis buku catatan penjaga lantai 13?",
+                opsi: ["Orang biasa (kata Dimas)", "Office boy tahun 1998", "Oyen", "Oknum misterius"], benar: 2,
+                buktiBenar: ["tulisanCakar", "rapatLemari"],
+                salah: [
+                  ["dimas", "Iya kan! Orang biasa! ...tapi orang biasa nggak nulis pakai cakar ya. Oke. Saya tarik."],
+                  ["satpam", "Siap. Office boy tahun 1998 sudah pensiun dan membuka warung. Alibinya: sedang menggoreng."],
+                  null,
+                  ["ratna", "Oknum misterius itu bukan nama ya. Itu cuma cara bilang \"belum tahu\"."],
+                ],
+                siapaBenar: "dimas", benarTeks: "Jadi Oyen penjaga lantai 13?? Tapi... kalau penjaga, kenapa dia ngambil gula? *saya bingung. saya juga takut. sedikit.",
+              });
               await L.bilang("narasi", "Dimas sudah lari duluan ke atas. Anda menyusul dengan langkah yang lebih santai.");
               await L.selesaiBab();
             } },
@@ -252,6 +269,18 @@
     if (j === 0) await L.bilang("ratna", "Saya tahu ada yang sering bikin teh manis buat yang lembur. Saya nggak pernah tanya siapa. Ada hal yang lebih enak kalau nggak ditanya ya.");
     else await L.bilang("ratna", "Iya. Gulanya muncul lagi tadi pagi. Satu toples. Ada catatannya: \"pinjam dulu\". Tulisannya miring.");
     await L.bilang("narasi", "Kalian minum teh sampai jam 17.00. Tidak ada yang bicara. Itu juga termasuk kegiatan.");
+    await L.deduksi({
+      judul: "Kasus jam yang tidak sepakat", pertanyaan: "Kenapa semua jam harus menunjuk 16.59?",
+      opsi: ["Supaya bisa pulang lebih cepat", "Jam paling tenang: pekerjaan hampir selesai, belum ada yang buru-buru", "Karena jam 17.00 ada rapat", "Karena Oyen suka angka 59"], benar: 1,
+      buktiBenar: "catatanJam",
+      salah: [
+        ["satpam", "Siap. Kalau tujuannya pulang cepat, jamnya diset ke jam 8 pagi. Saya sudah pernah coba. Tidak berhasil."],
+        null,
+        ["ratna", "Rapat jam lima sore itu nggak ada ya. Kalau ada, saya yang membatalkan."],
+        ["dimas", "Oyen suka angka 59?? Eh. Mungkin. Tapi itu bukan alasan, itu selera."],
+      ],
+      siapaBenar: "ratna", benarTeks: "Iya. Jam yang paling enak buat minum teh.",
+    });
     await L.selesaiBab();
   }
   L13.bab[5] = {
@@ -265,6 +294,7 @@
     },
     async pembuka(L) {
       L.tujuan("jam");
+      if (L.punya("buku")) L.bukti("catatanJam", "Catatan: 16.59", "Lantai 13 terbuka kalau jam lobi, pantry, dan atap sepakat di 16.59, jam paling tenang.");
       await L.bilang("narasi", "Lobi. Jam dinding masih macet di 10.10. Buku catatan penjaga terasa sedikit hangat di laci.");
       await L.bilang("satpam", "Siap. Laporan: semua jam di gedung menunjukkan waktu berbeda. Sudah dari dulu. Saya kira itu gaya.");
     },
@@ -339,6 +369,7 @@
     },
     async pembuka(L) {
       L.tujuan("tombol");
+      if (L.punya("buku")) L.bukti("catatanTeh", "Catatan: teh manis", "\"Jangan lupa teh manis untuk yang lembur.\" Ada bekas teh di sampul buku.");
       await L.bilang("narasi", "Jam lobi menunjukkan 16.59. Semua jam di gedung sepakat. Lift berbunyi \"ting\" sendiri, lalu pintunya terbuka. Tidak ada yang memanggil.");
       await L.bilang("satpam", "Siap. Lift itu terbuka untuk Anda. Saya tidak ikut. Saya berjaga di sini. Kalau ada apa-apa, tiup peluit. Kalau tidak punya peluit, teriak pelan.");
     },
@@ -352,7 +383,7 @@
         ],
       },
       lift: {
-        nama: "Di dalam lift", latar: "lift",
+        nama: "Di dalam lift", latar: "lift", seram: 2,
         titik: [
           { id: "panel", x: 196, y: 120, w: 70, h: 160, label: "Panel tombol", tampil: (L) => !L.flag("tombolTerpasang"),
             async ketuk(L) { await L.bilang("narasi", "Panel tombol: 5, 4, 3, 2, 1, L. Dan satu lubang bulat kosong di bawahnya, seukuran stiker."); },
@@ -385,6 +416,7 @@
           L.flag("masuk13", true);
           await L.bilang("narasi", "Ruangan sunyi dan hangat. Rak-rak penuh toples kaca berlabel tulisan tangan. Di meja kecil ada dua gelas teh dan toples gula yang penuh.");
           await L.bilang("narasi", "Di samping meja, duduk dengan sangat rapi, ada Oyen.");
+          L.bukti("toplesHalKecil", "Rak toples lantai 13", "Ratusan toples berlabel hal kecil yang bikin senyum. Di meja: teh manis dan toples gula yang penuh.");
         },
         titik: [
           { id: "toples1", x: 14, y: 70, w: 140, h: 50, label: "Toples (rak atas)",
@@ -398,6 +430,21 @@
           { id: "oyen", x: 214, y: 254, w: 66, h: 70, label: "Oyen", gambar: "oyen",
             async ketuk(L) {
               if (L.flag("diangkat")) { await L.bilang("oyen", "Gula tetap saya yang pegang."); return; }
+              if (!L.flagGlobal("deduksi:6")) {
+                await L.bilang("narasi", "Sebelum bicara, Anda membuka papan bukti di kepala. Semua jalur mengarah ke kucing di depan Anda. Tinggal satu pertanyaan.");
+                await L.deduksi({
+                  judul: "Kasus Lantai 13", pertanyaan: "Apa motif di balik gula yang hilang, stempel yang berpindah, dan tembok yang ditatap?",
+                  opsi: ["Menjual gula di pasar gelap kucing", "Membuat teh manis untuk yang lembur dan menyimpan hal-hal kecil", "Balas dendam pada printer", "Ingin jadi Kepala Kantor"], benar: 1,
+                  buktiBenar: ["catatanTeh", "toplesHalKecil"],
+                  salah: [
+                    ["oyen", "Pasar gelap kucing tidak ada. Kalau ada, saya sudah jadi ketuanya."],
+                    null,
+                    ["oyen", "Printer tidak bersalah. Printer hanya sering macet. Itu bukan kejahatan."],
+                    ["oyen", "Jabatan saya sudah cukup. Saya punya dasi. Itu puncak karier kucing."],
+                  ],
+                  siapaBenar: "oyen", benarTeks: "...Diketahui. Anda detektif yang baik.",
+                });
+              }
               await L.bilang("oyen", "Diketahui. Anda sampai.");
               await L.bilang("oyen", "Ini lantai tiga belas. Tidak tercatat di lift, karena kalau tercatat, orang datang buru-buru.");
               let tanya = ["Ini tempat apa?", "Jadi gula yang hilang...?", "Stempel yang berpindah?"];

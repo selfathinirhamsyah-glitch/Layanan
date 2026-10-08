@@ -109,7 +109,7 @@
     },
     ruang: {
       fotokopi: {
-        nama: "Ruang Fotokopi", latar: "fotokopi",
+        nama: "Ruang Fotokopi", latar: "fotokopi", seram: 1,
         titik: [
           { id: "mesin", x: 20, y: 150, w: 120, h: 150, label: "Mesin fotokopi",
             async ketuk(L) {
@@ -120,12 +120,13 @@
             async ketuk(L) { await L.bilang("narasi", "Printer. Layarnya bertuliskan PAPER JAM. Mesin fotokopi di sebelahnya condong sedikit ke arahnya. Sedikit sekali."); } },
           { id: "rak", x: 212, y: 144, w: 74, h: 48, label: "Rak stempel",
             async ketuk(L) {
-              if (!L.flag("tinta")) { await L.bilang("narasi", "Rak stempel. Empat stempel berserakan: DITERIMA, DIPERIKSA, DISETUJUI, DISIMPAN. Semuanya kering. Ada bekas tapak kaki kecil di rak."); return; }
+              if (!L.flag("tinta")) { await L.bilang("narasi", "Rak stempel. Empat stempel berserakan: DITERIMA, DIPERIKSA, DISETUJUI, DISIMPAN. Semuanya kering. Ada bekas tapak kaki kecil di rak."); L.bukti("tapakRak", "Tapak di rak stempel", "Bekas tapak kaki kecil, empat jari, di rak stempel. Ada sedikit tinta merah."); return; }
               await L.bilang("narasi", "Stempel-stempel sudah basah tinta dan siap dipakai. Berkas setengah jadi di meja menunggu dicap.");
             },
             async pakai(L, b) {
               if (b !== "tinta") return false;
               L.flag("tinta", true); L.buang("tinta"); L.segarkan(); L.sfx("stempel");
+              L.bukti("tapakRak", "Tapak di rak stempel", "Bekas tapak kaki kecil, empat jari, di rak stempel. Ada sedikit tinta merah.");
               await L.bilang("narasi", "Anda menekan keempat stempel ke bantalan tinta. Puk, puk, puk, puk. Rasanya produktif.");
               L.tujuan("urutan");
             } },
@@ -159,6 +160,19 @@
               await L.bilang("narasi", "Mesin fotokopi lalu mencetak lembar kedua dengan sopan: denah gedung. Anda menghitung lantainya. Tiga belas.");
               L.dapat("denah");
               L.langka("fotokopiBoo");
+              L.bukti("denah13", "Denah 13 lantai", "Mesin fotokopi menyimpan salinan denah gedung yang asli: 13 lantai.");
+              await L.deduksi({
+                judul: "Kasus stempel yang berpindah", pertanyaan: "Siapa yang mengecap berkas tengah malam?",
+                opsi: ["Mesin fotokopi", "Mas Kukang", "Seseorang berkaki empat, berdasi", "Dimas"], benar: 2,
+                buktiBenar: ["tapakRak", "kesaksianKukang", "tapakKartu"],
+                salah: [
+                  ["kukang", "...mesin fotokopi tidak punya tangan. Ia hanya punya perasaan. Perasaan tidak bisa mengecap."],
+                  ["kukang", "...saya tidur. Dan kalau saya yang mengecap, berkasnya baru selesai minggu depan."],
+                  null,
+                  ["dimas", "BUKAN SAYA. Saya takut ruang fotokopi malam-malam. *siang-siang juga."],
+                ],
+                siapaBenar: "dimas", benarTeks: "OYEN LAGI?? Eh. Maksudnya, tersangka yang sama. Ini pola. Detektif bilang ini namanya pola.",
+              });
               await L.bilang("oyen", "Diketahui. Denahnya benar. Gedungnya yang malu. Lanjutkan besok.");
               await L.selesaiBab();
             } },
@@ -171,7 +185,7 @@
           { id: "kukang", x: 144, y: 150, w: 54, h: 60, label: "Mas Kukang", gambar: "kukang",
             async ketuk(L) {
               const j = await L.tanya("kukang", "......ya?", ["Mas lihat siapa yang mindahin stempel?", "Mesinnya kenapa, Mas?", "Nggak, cuma nyapa"]);
-              if (j === 0) await L.bilang("kukang", "...semalam ada yang mengecap pakai kaki. Bunyinya puk... puk... empat kali. Lalu mengeong pelan. Saya tidak membuka mata. Takut tidak sopan.");
+              if (j === 0) { await L.bilang("kukang", "...semalam ada yang mengecap pakai kaki. Bunyinya puk... puk... empat kali. Lalu mengeong pelan. Saya tidak membuka mata. Takut tidak sopan."); L.bukti("kesaksianKukang", "Kesaksian Mas Kukang", "Tengah malam: bunyi \"puk\" empat kali, lalu mengeong pelan."); }
               else if (j === 1) await L.bilang("kukang", "...mesinnya sedang jatuh cinta. Pada printer. Jangan diganggu. Kecuali untuk fotokopi.");
               else await L.bilang("kukang", "......halo juga. (Jawabannya datang dua puluh detik kemudian, tapi tulus.)");
             } },
@@ -203,6 +217,7 @@
   async function selesaiSusun(L) {
     L.flag("perluSusun", false);
     L.buang("karcisSobek"); L.dapat("karcis"); L.langka("karcis");
+    L.bukti("karcis13", "Karcis Parkir No. 13", "Karcis untuk lantai 13. Titipan kunci gudang, tiga tahun lalu.");
     await L.bilang("narasi", "Karcis Parkir No. 13. Lantai: 13. Titipan: kunci gudang, di laci pos jaga nomor 2.");
     L.tujuan("pos");
   }
@@ -238,6 +253,7 @@
                 siapa: "satpam",
                 punchline: "Siap. Penyamaran saya sudah tiga hari. Tolong jangan bilang siapa-siapa.",
               });
+              L.bukti("alibiPot", "Alibi Pak Satpam", "Selama tiga hari Pak Satpam menyamar jadi pot di lobi. Pot tidak bisa ke parkiran.");
               const j = await L.tanya("satpam", "Saya menyamar untuk mengawasi gula. Pot adalah posisi paling strategis di lobi. Tidak ada yang curiga pada pot.", ["Janji, nggak bilang siapa-siapa", "Pak, ini lucu banget"]);
               if (j === 0) {
                 await L.bilang("satpam", "Siap. Terima kasih. Ini peluit saya. Tanda kepercayaan. Jangan ditiup di dalam ruangan.");
@@ -255,7 +271,7 @@
         ],
       },
       parkiran: {
-        nama: "Parkiran", latar: "parkiran",
+        nama: "Parkiran", latar: "parkiran", seram: 1,
         titik: [
           { id: "mobil", x: 40, y: 224, w: 120, h: 86, label: "Bawah mobil",
             async ketuk(L) {
@@ -269,7 +285,10 @@
           { id: "palang", x: 18, y: 140, w: 124, h: 40, label: "Palang parkir",
             async ketuk(L) { await ambilSobekan(L, 2, "Sobekan karcis tersangkut di palang parkir. Palangnya naik sendiri saat Anda mengambilnya, seperti mempersilakan."); } },
           { id: "motor", x: 192, y: 290, w: 88, h: 58, label: "Motor",
-            async ketuk(L) { await ambilSobekan(L, 3, "Sobekan karcis menempel di jok motor. Joknya hangat. Ada yang baru duduk di sini, kecil, berbulu."); } },
+            async ketuk(L) {
+              if (!L.flag("sobek3")) L.bukti("jokHangat", "Jok motor hangat", "Jok motor masih hangat. Bekas duduk kecil, bulat, ada sehelai bulu oranye.");
+              await ambilSobekan(L, 3, "Sobekan karcis menempel di jok motor. Joknya hangat. Ada yang baru duduk di sini, kecil, berbulu.");
+            } },
           { id: "sampah", x: 8, y: 326, w: 40, h: 56, label: "Tong sampah",
             async ketuk(L) { await ambilSobekan(L, 4, "Di tong sampah ada sobekan karcis dan setengah gorengan. Anda mengambil karcisnya saja. Gorengannya biar tenang di situ."); } },
           { id: "pos", x: 206, y: 150, w: 84, h: 90, label: "Pos jaga",
@@ -281,6 +300,18 @@
               await L.bilang("satpam", "Siap. Kunci itu dititipkan entah oleh siapa, tiga tahun lalu. Bersama karcis untuk lantai yang tidak ada.");
               await L.bilang("satpam", "Ruang arsip di bawah tanah gelap. Ini senter saya. Kembalikan. Atau tidak, saya punya dua.");
               L.dapat("senter");
+              await L.deduksi({
+                judul: "Kasus karcis yang tertiup angin", pertanyaan: "Siapa yang terakhir duduk di jok motor sebelum Anda datang?",
+                opsi: ["Pak Satpam", "Dimas", "Seseorang berkaki empat, berdasi", "Kak Badak"], benar: 2,
+                buktiBenar: "jokHangat",
+                salah: [
+                  ["satpam", "Siap. Saya pot. Pot tidak duduk. Silakan cek alibi saya di papan."],
+                  ["dimas", "Saya naik sepeda! Dengan tiga gembok! Jok motor terlalu tinggi buat saya."],
+                  null,
+                  ["satpam", "Siap. Kak Badak terlalu besar untuk jok itu. Joknya pasti protes."],
+                ],
+                siapaBenar: "satpam", benarTeks: "Siap. Bulu oranye. Saya juga mencurigai pihak tersebut. Sejak lama. Diam-diam.",
+              });
               await L.bilang("oyen", "Diketahui. Arsip dibuka besok. Ketuk dulu sebelum masuk.");
               await L.selesaiBab();
             } },
