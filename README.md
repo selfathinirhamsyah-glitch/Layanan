@@ -34,11 +34,14 @@ Adventure point-and-click dengan bukti, Papan Bukti, deduksi, dan interogasi.
 Satu bab/babak terbuka per hari (tanggal di perangkat).
 Untuk mengetes semua bab sekaligus: buka Meja Kerja (Lantai 5) dan **ketuk kalender meja 7 kali** (ketuk 7 kali lagi untuk mematikan).
 
+### Khusus Mira
+Ulang tahun 21 Agustus (surat ucapan + tiup lilin, termasuk versi "terlambat" sampai 60 hari sesudahnya), Kartu Pegawai biru di Meja Kerja, serta topik pantry, barang koperasi, gosip, dan adegan setelah kredit bertema novel, drakor, Marvel, dan CORTIS. Ada di `mira.js` + `mira.css`. Tanggal lahir bisa diganti lewat `?lahir=YYYY-MM-DD`.
+
 ### Penyimpanan
 Semua progres (poin, skor, barang, gosip, misteri) disimpan di `localStorage` perangkat itu sendiri dengan kunci `klp-v2`. Kalau penyimpanan diblokir, semua tetap bisa dimainkan; progresnya saja yang hilang saat halaman ditutup. Isi curhat dan obrolan "dengerin aja" tidak pernah disimpan.
 
 ### Struktur file
-`core.js` (data, suara) → `sprites.js` → `script.js` (loket) → `kantor.js` (lobi, lift, radio) → `skala.js` + `pasang-skala.js` → `games.js` → `pantry-data.js` + `pantry.js` → `koperasi.js` → `l13-mesin.js` + `l13-bab*.js` + `l13-kasus-lift.js` → `panduan.js`.
+`core.js` (data, suara) → `sprites.js` → `script.js` (loket) → `kantor.js` (lobi, lift, radio) → `skala.js` + `pasang-skala.js` → `games.js` → `pantry-data.js` + `pantry.js` → `koperasi.js` → `l13-mesin.js` + `l13-bab*.js` + `l13-kasus-lift.js` → `mira.js` → `panduan.js`.
 
 ## Ganti nama
 - Ubah `NAMA_DEFAULT` di baris atas `script.js`, atau

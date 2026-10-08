@@ -617,8 +617,23 @@
       <p>${esc(b.penutup || "Laporan diterima. Lanjutkan besok.")}</p>
       ${langka ? `<div class="hadiah-langka"><span class="avatar">${px(langka.sprite)}</span><span><small>Barang langka untuk Meja Kerja</small><strong>${esc(langka.nama)}</strong></span></div>` : ""}
       <p class="ap-poin">+${poin} Poin Sabar</p>
-      ${(() => { const k = kasusDari(n), i = k.bab.indexOf(n); return i < k.bab.length - 1 ? `<p class="muted small">${esc(labelBab(k.bab[i + 1]))} ${S().bukaSemua ? "sudah bisa diakses (mode penguji)." : "terbuka besok. Datang lagi ya. Gedungnya tidak ke mana-mana."}</p>` : ""; })()}`, "Kembali ke berkas");
+      ${(() => { const k = kasusDari(n), i = k.bab.indexOf(n); return i < k.bab.length - 1 ? `<p class="muted small">${esc(labelBab(k.bab[i + 1]))} ${S().bukaSemua ? "sudah bisa diakses (mode penguji)." : "terbuka besok. Datang lagi ya. Gedungnya tidak ke mana-mana."}</p>` : ""; })()}`, b.pascaKredit ? "Lanjut (jangan keluar dulu...)" : "Kembali ke berkas");
+    if (b.pascaKredit) await adeganPascaKredit(b.pascaKredit);
     keluar();
+  }
+  // adegan setelah kredit, gaya film superhero: tunggu sampai kreditnya habis
+  function adeganPascaKredit(adegan) {
+    const kredit = [
+      ["Pemeran utama", NAMA], ["Kepala Bagian", "Oyen"], ["Teh & kesabaran", "Bu Ratna"], ["Keamanan & kacang", "Pak Satpam"],
+      ["Panik profesional", "Dimas"], ["Gerak lambat", "Mas Kukang"], ["Pemeran kain pel", "Kain Pel"], ["Katering", "Teh tawar"],
+      ["Tidak ada hewan yang dirugikan", "Kecuali harga diri Dimas"],
+    ];
+    return lihat(`
+      <div class="pasca-kredit">
+        <div class="kredit-gulir" aria-hidden="true"><div>${kredit.map(([a, b2]) => `<p>${esc(a)}<br><b>${esc(b2)}</b></p>`).join("")}</div></div>
+        <p class="pk-cap">ADEGAN SETELAH KREDIT</p>
+        <p class="pk-adegan">${esc(adegan.replaceAll("{NAMA}", NAMA))}</p>
+      </div>`, "Kembali ke berkas");
   }
 
   /* =========================================================

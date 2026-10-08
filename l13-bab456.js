@@ -361,6 +361,7 @@
     teaser: "Lift berbunyi \"ting\" sendiri jam 16.59.",
     ruangAwal: "lobi",
     langka: "kunci13",
+    pascaKredit: "Lantai 13, sore. Oyen menuang teh ke dua gelas. Ia menatap gelas kedua cukup lama. Lalu menulis label untuk toples baru: \"{NAMA} datang lagi besok.\"",
     penutup: "Anda resmi menjadi Penjaga Lantai 13. Tombol 13 di lift sekarang menyala dan membuka Ruang Rahasia berisi koleksi Anda. Gula tetap dipegang Oyen.",
     petunjuk: {
       tombol: ["Stikernya cocok untuk panel lift ya.", "Masuk lift dulu, lalu pilih Stiker Tombol 13 di laci dan ketuk panel tombolnya."],

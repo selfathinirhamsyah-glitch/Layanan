@@ -36,6 +36,7 @@
       id: "lobi", judul: "Lobi", sprite: "kapibara", oleh: "Bu Ratna",
       buka: "Lobi itu ruang tunggu. Tapi di sini nunggunya nggak harus nunggu apa-apa ya.",
       langkah: [
+        ["kue", "Menjelang dan sesudah tanggal <b>21 Agustus</b>, ada kartu biru di lobi. Isinya surat dari seluruh kantor dan kue yang lilinnya bisa ditiup. Kalau suratnya telat, itu prosedur."],
         ["singa", "<b>Pengumuman Kantor</b>: kabar terbaru, misalnya gosip baru atau bab misteri yang sudah terbuka."],
         ["cangkir", "<b>Absen Perasaan</b>: tahan tombol untuk menuang teh. Isi gelas = isi baterai kamu hari ini. Seruput kalau kebanyakan. Lalu ketuk <b>Catat absen</b>."],
         ["marmut", "Isi gelasnya menentukan siapa yang menyapa kamu dan game apa yang disarankan. Absen pertama tiap hari dapat +5 Poin Sabar."],
@@ -99,6 +100,7 @@
       id: "meja", judul: "Meja Kerja", sprite: "oyen", oleh: "Oyen",
       buka: "Meja Anda. Lantai 5. Dibersihkan oleh tidak ada siapa-siapa.",
       langkah: [
+        ["kartu", "<b>Kartu Pegawai</b> kamu ada di paling atas: NIP, golongan, warna dinas, bacaan, tontonan, dan lagu radio. Sudah dicatat Bagian Kepegawaian."],
         ["kursi", "Barang dari koperasi dipajang di meja. Ketuk barangnya, pegawai yang lewat akan berkomentar."],
         ["sendok", "Rak di dinding untuk <b>barang langka</b> dari misteri."],
         ["dokumen", "<b>Buku Rekor</b>: skor tertinggi, Poin Sabar sepanjang masa, game yang dimainkan."],
@@ -120,6 +122,7 @@
         ["kapibara", "Buntu? Ketuk <b>Petunjuk</b> di pojok kanan atas. Bu Ratna kasih petunjuk bertahap, dari samar sampai hampir jawaban."],
         ["marmut", "Kadang ada <b>kejutan</b>. Selalu lucu, tidak seram. Setelahnya ada Formulir Laporan Kaget. Kejutan bisa dimatikan di Radio Kantor."],
         ["senter", "Beberapa ruangan agak gelap dan berbisik. Mau lebih tegang atau tetap santai? Atur di <b>Saklar Lampu Lorong</b> (Radio Kantor)."],
+        ["oyen", "Sesudah beberapa bab selesai, <b>jangan buru-buru keluar</b>. Kadang ada adegan setelah kredit."],
         ["panduan", "Progres tersimpan otomatis. Boleh keluar kapan saja dan lanjut lagi nanti."],
       ],
       catatan: "Jawaban tidak dicantumkan di buku ini. Itu namanya misteri. Diketahui.",

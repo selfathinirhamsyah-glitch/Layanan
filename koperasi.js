@@ -39,6 +39,18 @@
     { id: "kursi", sprite: "kursi", nama: "Kursi Putar Mode Merenung", harga: 70,
       ket: "Diputar tiga kali ke kiri sambil menatap jendela. Tidak menyelesaikan masalah, tapi enak.",
       kom: { ratna: "Mahal ya. Tapi muternya enak.", satpam: "Siap. Kursi ini pernah saya uji. Saya pusing. Tapi tenang.", dimas: "Saya pernah muter sampai lupa lagi ngapain. Rekomendasi.", oyen: "Itu kursi saya.", kukang: "...saya muter satu kali. Sudah sore." } },
+    { id: "pembatas", sprite: "pembatas", nama: "Pembatas Buku Anti Lupa Halaman", harga: 15,
+      ket: "Menjaga halaman terakhir novel yang dibaca, dan menjaga ujung kertas dari dilipat. Tidak menjamin besok tidak lanjut baca sampai jam dua.",
+      kom: { ratna: "Ini bagus ya. Dulu saya mau jadi pustakawan, jadi saya setuju sekali.", satpam: "Siap. Halaman terakhir diamankan. Tidak ada yang boleh mengintip bab terakhir.", dimas: "Saya pakai bon gorengan buat pembatas. *bonnya ikut kebaca juga.", oyen: "Halaman tidak boleh dilipat. Kertas juga punya perasaan.", kukang: "...saya pakai yang ini di halaman 212. ...dari 2019." } },
+    { id: "drakor", sprite: "tisu", nama: "Paket Maraton Drakor", harga: 35,
+      ket: "Isi: tisu, mi instan, selimut, dan surat izin begadang satu malam. Episode 16 tetap terasa terlalu cepat. Itu bukan cacat produk.",
+      kom: { ratna: "Tisunya yang lembut ya. Adegan makan sendirian di minimarket butuh yang lembut.", satpam: "Siap. Kalau ada adegan sedih, saya jaga pintunya. Tidak ada yang akan melihat Anda menangis.", dimas: "Saya nangis di episode SATU. *pas lagu pembukanya. lagunya bagus.", oyen: "Kenapa semua orang di drakor lari di bandara. Bandara bukan untuk lari.", kukang: "...satu episode per bulan. ...saya baru episode 3 dari drama tahun 2016." } },
+    { id: "tempurung", sprite: "tempurung", nama: "Tempurung Cadangan (bukan perisai)", harga: 55,
+      ket: "Sumbangan Pak Satpam. Bulat, kuat, dicat sedikit biru. Menahan komentar, berkas jatuh, dan spoiler film. Tidak bisa dilempar lalu kembali sendiri. Sudah dicoba.",
+      kom: { ratna: "Dipakai kalau hari lagi banyak yang dilempar ke kamu ya.", satpam: "Siap. Tempurung lama saya. Sudah saya cat biru, sesuai data warna favorit Anda. Jangan dilempar. Tidak kembali.", dimas: "Saya pernah lempar. NGGAK BALIK. Saya jalan kaki ngambilnya. *dua lantai.", oyen: "Bukan perisai. Tempurung. Fiksi dan kenyataan harus dibedakan.", kukang: "...di dalamnya hangat. ...saya tahu tidak sengaja." } },
+    { id: "lightstick", sprite: "lightstick", nama: "Lightstick Senter Biru", harga: 40,
+      ket: "Dirakit Bang Rakun dari senter bekas. Menyala biru. Cocok untuk konser, nonton panggung dari HP, atau mencari remot di bawah sofa.",
+      kom: { ratna: "Biru ya. Warnanya tenang. Cocok buat goyang pelan.", satpam: "Siap. Boleh dinyalakan di dalam gedung. Tapi kalau joget, jangan di tangga.", dimas: "SAYA PUNYA SATU— eh. Saya pinjam punya Bang Rakun. Buat latihan di lift. *jangan cek CCTV.", oyen: "Jangan diarahkan ke mata saya. Kecuali sebentar. Itu lucu.", kukang: "...saya goyang satu kali. ...lagunya sudah selesai." } },
     { id: "gula", sprite: "gula", nama: "Gula Pasir 1 Sendok", harga: 5, syarat: "l13:bab1",
       ket: "Barang langka sejak misteri gula. Dibungkus kertas, dicap DISIMPAN.",
       kom: { ratna: "Akhirnya ada ya. Satu sendok saja, buat teh.", satpam: "Siap. Gula ini sudah diverifikasi bukan curian.", dimas: "GULA! Eh. Gula.", oyen: "...Itu dari persediaan saya.", kukang: "...manisnya pelan." } },
@@ -265,6 +277,7 @@
       <div class="form-head"><span class="loket-badge">Lantai 5</span><span class="mono small">Poin Sabar: <b class="poin-angka">${K.data.poin}</b></span></div>
       <h2 id="h-meja">Meja Kerja ${N}</h2>
       <p class="muted">Meja resmi Pegawai Kehormatan. Dibersihkan setiap hari oleh tidak ada siapa-siapa.</p>
+      ${K.kartuPegawai ? K.kartuPegawai() : ""}
 
       <div class="meja-panggung" aria-label="Meja kerja">
         <div class="meja-dinding">

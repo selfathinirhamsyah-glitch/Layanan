@@ -193,6 +193,7 @@
     teaser: "Ada \"sosok\" di CCTV lift.",
     ruangAwal: "posJaga",
     langka: "fotoCctv",
+    pascaKredit: "Pagi hari. Mas Kukang akhirnya sampai di lantai 2. Pintu lift terbuka. Ia menatap lorong lama sekali. \"...ternyata bukan lantai 2 yang saya cari.\" Pintu tertutup lagi.",
     penutup: "Hantu lift ternyata kain pel. Tapi kain pel tidak naik lift sendirian, dan pintu B2 bertanda tangan \"R\".",
     petunjuk: {
       mulai: ["Ngobrol dulu dengan Pak Satpam ya. Beliau yang melapor.", "Pak Satpam berdiri di depan meja jaga. Ketuk dia."],
@@ -516,6 +517,7 @@
     teaser: "Lift turun ke lantai yang tidak ada di denah.",
     ruangAwal: "posJaga",
     langka: "kopiPertama",
+    pascaKredit: "B2, seminggu kemudian. Bang Rakun menempel cetak biru baru di dinding: \"PROYEK BERIKUTNYA: PRINTER.\" Di lantai 1, printer bergetar sedikit. Mesin fotokopi menenangkannya.",
     penutup: "Mesin kopi lantai 1 akhirnya jalan. Bang Rakun tidak dihukum. Bu Gajah malah minta dibuatkan kopi kedua.",
     petunjuk: {
       mulai: ["Ngobrol dulu dengan Pak Satpam ya, sebelum beliau patroli.", "Pak Satpam ada di depan meja jaga."],

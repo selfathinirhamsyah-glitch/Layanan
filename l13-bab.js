@@ -105,6 +105,7 @@
     teaser: "Gula di pantry hilang lagi.",
     ruangAwal: "lobi",
     langka: "sendokBengkok",
+    pascaKredit: "Pantry, tengah malam. Sebuah sendok bergerak pelan ke arah toples gula. Lalu berhenti. Lalu mundur. Dari balik kulkas terdengar bisikan kecil: \"belum waktunya.\"",
     penutup: "Toples gula ternyata menyimpan kartu akses ke lantai yang tidak ada. Lift sempat menunjukkan angka 13, lalu pura-pura tidak.",
     petunjuk: {
       mulai: ["Coba ngobrol dulu dengan Pak Satpam di lobi ya.", "Pak Satpam berdiri di dekat meja resepsionis. Ketuk dia."],

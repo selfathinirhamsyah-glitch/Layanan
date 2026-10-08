@@ -227,6 +227,7 @@
     teaser: "Pak Satpam menemukan sesuatu di parkiran.",
     ruangAwal: "lobi",
     langka: "karcis",
+    pascaKredit: "Pos jaga, malam. Pak Satpam membuka lemari. Di dalamnya ada kostum pot kedua, lebih besar, dengan daun yang lebih meyakinkan. Ia mengangguk pada dirinya sendiri dan menutup lemari pelan-pelan.",
     penutup: "Kunci gudang arsip dan senter sudah di laci Anda. Pak Satpam kembali berjaga, kali ini tanpa menyamar. Daun di kepalanya lupa dilepas.",
     petunjuk: {
       mulai: ["Pak Satpam katanya patroli ya. Tapi pot di lobi itu kelihatan... tegang.", "Coba ketuk pot tanaman di lobi."],

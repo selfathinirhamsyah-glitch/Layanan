@@ -194,7 +194,25 @@ Kalau kamu mengetes di HP Mira, matikan lagi setelah selesai, atau tes di HP-mu 
 
 ---
 
-## 6. Easter egg
+## 6. Khusus Mira
+
+Data yang kamu kasih sudah dimasukkan ke kantor:
+
+- **Ulang tahun 21 Agustus 2012** (bisa diganti lewat URL `?lahir=2012-08-21`, format tahun-bulan-tanggal).
+  - **14 hari sebelumnya**: lobi menampilkan hitung mundur, dan Pak Singa "diam-diam" mengumumkan kue sedang dipesan.
+  - **Tepat 21 Agustus**: kantor libur. Ada kartu biru yang bergoyang di lobi, konfeti biru, dan surat ucapan dari 8 pegawai. Kuenya punya lilin sesuai umur, dan lilinnya bisa ditiup. Hadiahnya +21 Poin Sabar dan Kue Ulang Tahun Biru di rak Meja Kerja.
+  - **Sampai 60 hari sesudahnya**: suratnya tetap ada, tapi "terlambat N hari" dengan alasan birokrasi (difotokopi Mas Kukang, Dimas salah lantai, Oyen tidur di atasnya). Karena hari ini sudah lewat 21 Agustus, versi inilah yang Mira lihat sekarang.
+  - Surat bisa diunduh sebagai gambar.
+- **Kartu Pegawai** di Meja Kerja (Lantai 5) dengan tali biru. NIP-nya dibuat dari tanggal lahir, seperti NIP sungguhan. Warna dinas: biru · Bacaan wajib: novel · Tontonan resmi: drakor & film Marvel · Lagu radio: CORTIS.
+- **Biru**: warna utama kantor memang sudah biru tua. Kue, konfeti ulang tahun, kartu pegawai, dan barang-barang baru juga dibuat biru.
+- **Novel**: topik Pantry baru dengan Mas Kukang ("Novel yang lagi dibaca"), barang koperasi *Pembatas Buku Anti Lupa Halaman*, dan gosip novelnya yang belum tamat sejak 2019.
+- **Drakor**: topik Pantry baru dengan Bu Ratna ("Drakor semalam"), barang *Paket Maraton Drakor*, dan gosip Kak Badak menangis di episode 7.
+- **Marvel**: topik Pantry baru dengan Dimas ("Kalau kantor ini film superhero"), barang *Tempurung Cadangan (bukan perisai)*, gosip Dimas menunggu adegan setelah kredit, dan **adegan setelah kredit** di akhir Bab 1, Bab 3, Bab 6, Babak 1 Kasus Lift, dan Babak 3 Kasus Lift.
+- **CORTIS**: barang *Lightstick Senter Biru* dan gosip Dimas latihan koreografi di lift. Member grupnya tidak dijadikan tokoh dan tidak diberi dialog.
+
+---
+
+## 7. Easter egg
 
 | Di mana | Apa |
 |---|---|
@@ -208,7 +226,7 @@ Kalau kamu mengetes di HP Mira, matikan lagi setelah selesai, atau tes di HP-mu 
 
 ---
 
-## 7. Privasi & data
+## 8. Privasi & data
 
 - Isi kolom keluhan, cerita kabar baik, dan tulisan di mode "dengerin aja" **tidak pernah disimpan atau dikirim**.
 - Yang disimpan (hanya di HP Mira, di `localStorage`) cuma: Poin Sabar, skor, barang koperasi, gosip, progres misteri, target Loket C, dan "hal kecil" yang ia tulis sendiri di Ruang Rahasia.
@@ -218,13 +236,14 @@ Kalau kamu mengetes di HP Mira, matikan lagi setelah selesai, atau tes di HP-mu 
 
 ---
 
-## 8. Mengubah isi
+## 9. Mengubah isi
 
 Semua teks ada di file JavaScript, jadi bisa diubah langsung lewat GitHub (buka file → ikon pensil → **Commit changes**). Kalau situsnya terhubung ke GitHub (Pilihan B), perubahannya otomatis online.
 
 | Mau mengubah | File |
 |---|---|
 | Nama bawaan | `script.js`, baris `const NAMA_DEFAULT = "Mira";` |
+| Tanggal lahir, kartu pegawai, surat ulang tahun | `mira.js` (baris `LAHIR_DEFAULT`) |
 | Balasan loket, kompensasi, tips | `script.js` |
 | Profil & kutipan karakter | `kantor.js` (bagian `K.PEGAWAI`) |
 | Obrolan Pantry, kalimat "dengerin aja", gosip | `pantry-data.js` |
@@ -235,7 +254,7 @@ Semua teks ada di file JavaScript, jadi bisa diubah langsung lewat GitHub (buka 
 
 ---
 
-## 9. Masalah umum
+## 10. Masalah umum
 
 | Masalah | Penyebab & solusi |
 |---|---|

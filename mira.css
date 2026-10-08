@@ -1,0 +1,77 @@
+/* =========================================================
+   Data pegawai kehormatan: ulang tahun & kartu pegawai
+   ========================================================= */
+:root { --mira: #3E78C4; --mira-muda: #CFE0F5; }
+
+/* kartu di lobi */
+.kartu-ultah {
+  width: 100%; display: grid; grid-template-columns: 50px 1fr auto; gap: 12px; align-items: center; text-align: left;
+  font: inherit; margin: 0 0 18px; padding: 10px 14px; color: #FFFDF6; background: var(--mira);
+  border: 2px solid #2B2A26; border-radius: var(--wobble-sm); box-shadow: 4px 4px 0 #1F3E66; cursor: pointer;
+}
+.kartu-ultah.segera { cursor: default; background: #E6EEF8; color: #1F3E66; box-shadow: 4px 4px 0 var(--mira-muda); }
+.kartu-ultah.hari { animation: ultahGoyang 2.4s ease-in-out infinite; }
+@keyframes ultahGoyang { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-.6deg); } }
+.ku-ikon { width: 46px; height: 46px; background: #FFFDF6; border: 2px solid #2B2A26; padding: 3px; }
+.ku-ikon svg { width: 100%; height: 100%; }
+.ku-isi strong { display: block; font-family: var(--font-px); font-size: 1.02rem; }
+.ku-isi small { display: block; font-size: .95rem; line-height: 1.3; opacity: .92; }
+
+/* surat */
+.surat-ultah { --c-acc: #2F5E9E; }
+.surat-ultah p { margin: 0 0 10px; }
+.ultah-alasan { margin: 0 0 12px; padding-left: 22px; }
+.ultah-alasan li { margin-bottom: 4px; }
+.ultah-ucapan, .ultah-data { list-style: none; margin: 4px 0 14px; padding: 0; display: grid; gap: 8px; }
+.ultah-ucapan li { display: flex; gap: 8px; align-items: flex-start; line-height: 1.3; }
+.ultah-ucapan li .cert-avatar { flex-shrink: 0; margin: 0; }
+.ultah-ucapan strong { display: block; font-family: var(--font-px); font-size: .78rem; color: #2F5E9E; }
+.ultah-data li { padding-left: 14px; position: relative; line-height: 1.35; }
+.ultah-data li::before { content: ""; position: absolute; left: 0; top: .55em; width: 7px; height: 7px; background: #3E78C4; }
+
+/* kue & lilin (dibuat dari kotak-kotak, tetap rapi saat diunduh) */
+.kue-panggung { text-align: center; margin: 6px 0 16px; }
+.lilin-baris { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; max-width: 220px; margin: 0 auto -2px; }
+.lilin { position: relative; width: 6px; height: 22px; background: repeating-linear-gradient(#7FB2D9 0 4px, #FFFDF6 4px 7px); border: 1px solid #2B2A26; margin-top: 12px; }
+.lilin i { position: absolute; left: 50%; top: -12px; width: 8px; height: 10px; margin-left: -4px; background: #F2C14E; border: 1px solid #B5803A; border-radius: 50% 50% 40% 40%; animation: nyala .5s steps(2) infinite; animation-delay: calc(var(--i) * 37ms); }
+.lilin.padam i { background: transparent; border-color: transparent; animation: none; }
+.lilin.padam i::after { content: ""; position: absolute; left: 2px; top: -4px; width: 3px; height: 8px; background: #B8B2A4; opacity: .8; }
+@keyframes nyala { 50% { transform: translateY(-1px) scaleX(.85); } }
+.kue-badan { position: relative; width: 220px; max-width: 100%; height: 74px; margin: 0 auto; background: #C98B5B; border: 2px solid #2B2A26; }
+.kue-krim { position: absolute; left: 0; right: 0; top: 0; height: 22px; background: #5B8FD1; border-bottom: 2px solid #2B2A26;
+  clip-path: polygon(0 0, 100% 0, 100% 70%, 92% 100%, 84% 70%, 70% 100%, 58% 70%, 44% 100%, 30% 70%, 18% 100%, 8% 70%, 0 100%); }
+.kue-tulisan { position: absolute; left: 0; right: 0; bottom: 12px; font-family: var(--font-px); font-size: .9rem; color: #FFFDF6; letter-spacing: .08em; }
+.kue-ket { font-size: .92rem; color: var(--c-soft); margin-top: 8px !important; }
+.tiup-pesan { min-height: 1.2em; margin: 10px 0 0; text-align: center; }
+
+/* konfeti biru */
+.sobekan.biru { background: repeating-linear-gradient(to bottom, #E6EEF8 0 4px, #5B8FD1 4px 6px); }
+.sobekan.biru-tua { background: #3E78C4; }
+
+/* kartu pegawai di Meja Kerja */
+.kartu-id {
+  position: relative; max-width: 360px; margin: 26px auto 18px; background: #FFFDF6; color: #2B2A26;
+  border: 2px solid #2B2A26; border-radius: 10px; box-shadow: 4px 4px 0 #1F3E66; overflow: visible; transform: rotate(-1deg);
+}
+.kid-tali { position: absolute; left: 50%; top: -26px; width: 26px; height: 30px; margin-left: -13px; background: var(--mira); border: 2px solid #2B2A26; border-bottom: none; }
+.kid-tali::after { content: ""; position: absolute; left: 6px; bottom: -6px; width: 10px; height: 8px; background: #A9B4BC; border: 2px solid #2B2A26; }
+.kid-kepala { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--mira); color: #FFFDF6; border-radius: 8px 8px 0 0; font-family: var(--font-px); font-size: .8rem; letter-spacing: .12em; }
+.kid-isi { display: grid; grid-template-columns: 86px 1fr; gap: 12px; padding: 12px; }
+.kid-foto { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; text-align: center; height: 104px; padding: 6px; background: repeating-linear-gradient(45deg, #E6EEF8 0 6px, #F4F8FC 6px 12px); border: 2px dashed #3E78C4; }
+.kid-foto strong { font-family: var(--font-px); font-size: .75rem; color: #3E78C4; }
+.kid-foto small { font-size: .75rem; line-height: 1.15; color: #5D5A50; }
+.kid-data { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; margin: 0; font-size: .92rem; line-height: 1.25; }
+.kid-data dt { color: #5D5A50; font-size: .84rem; }
+.kid-data dd { margin: 0; }
+.kid-data dd b { color: #3E78C4; }
+.kid-kaki { padding: 6px 12px; border-top: 2px dashed #CFC5AD; font-size: .82rem; color: #5D5A50; text-align: center; }
+@media (max-width: 360px) { .kid-isi { grid-template-columns: 1fr; } .kid-foto { height: auto; } }
+
+/* adegan setelah kredit */
+.pasca-kredit { background: #111; color: #EDE7D6; margin: -6px; padding: 18px 16px; text-align: center; }
+.pasca-kredit .kredit-gulir { font-family: var(--font-num); font-size: 1.05rem; line-height: 1.5; color: #A9B4BC; max-height: 150px; overflow: hidden; position: relative; margin-bottom: 14px; }
+.pasca-kredit .kredit-gulir > div { animation: gulirKredit 7s linear both; }
+@keyframes gulirKredit { from { transform: translateY(40%); } to { transform: translateY(-60%); } }
+.pasca-kredit .pk-cap { font-family: var(--font-px); color: #F2C14E; letter-spacing: .12em; font-size: .8rem; margin: 0 0 8px; }
+.pasca-kredit .pk-adegan { font-family: var(--font-hand); font-size: 1.15rem; line-height: 1.4; margin: 0; }
+@media (prefers-reduced-motion: reduce) { .pasca-kredit .kredit-gulir > div { animation: none; } .kartu-ultah.hari { animation: none; } }
