@@ -46,6 +46,8 @@ Kalau suatu saat mau dipakai untuk orang lain, tambahkan `?nama=` di akhir link:
 https://kantor-mira.netlify.app/?nama=Dina
 ```
 
+Di dalam website sudah ada **Buku Panduan Pegawai Baru** (tombol *Panduan* di pojok kanan atas). Pak Satpam juga menawarkannya saat Mira pertama kali masuk lobi, jadi kamu tidak perlu menjelaskan cara pakainya.
+
 **Saran saat mengirim:**
 - Tidak perlu dijelaskan panjang. Cukup misalnya: "Ada kantor yang mau nerima keluhan kamu. Buka pas lagi senggang ya."
 - Paling enak dibuka di HP. Di Chrome atau Safari, Mira bisa memilih **Tambahkan ke Layar Utama** supaya website-nya muncul seperti aplikasi.

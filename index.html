@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="pantry.css">
   <link rel="stylesheet" href="koperasi.css">
   <link rel="stylesheet" href="l13.css">
+  <link rel="stylesheet" href="panduan.css">
 </head>
 <body data-loket="umum">
 
@@ -31,10 +32,16 @@
       <h1 class="kop-title">Kantor Layanan Perasaan</h1>
       <p class="kop-small">Cabang Khusus <span class="nama"></span> · Jl. Pelan-Pelan No. 3</p>
     </div>
-    <button class="btn-radio" id="btnSetelan" type="button" aria-label="Radio Kantor: pengaturan suara dan mode kaget">
-      <span class="ikon-radio" id="ikonRadio" data-sprite="radio"></span>
-      <span class="btn-radio-ket">Radio</span>
-    </button>
+    <div class="kop-tombol">
+      <button class="btn-radio" id="btnPanduan" type="button" aria-label="Buku Panduan Pegawai Baru: cara memakai kantor ini">
+        <span class="ikon-radio" data-sprite="panduan"></span>
+        <span class="btn-radio-ket">Panduan</span>
+      </button>
+      <button class="btn-radio" id="btnSetelan" type="button" aria-label="Radio Kantor: pengaturan suara dan mode kaget">
+        <span class="ikon-radio" id="ikonRadio" data-sprite="radio"></span>
+        <span class="btn-radio-ket">Radio</span>
+      </button>
+    </div>
   </header>
   <div class="kop-rule" aria-hidden="true"></div>
 
@@ -409,6 +416,7 @@
         <div class="form-head"><span class="loket-badge">Lantai L</span><span class="mono small">Poin Sabar: <b class="poin-angka">0</b></span></div>
         <h2 id="h-lobi">Lobi &amp; Ruang Tunggu</h2>
         <div id="lobiSapa"></div>
+        <div id="panduanSlot"></div>
 
         <section class="papan-umum" aria-labelledby="h-pengumuman">
           <h3 id="h-pengumuman" class="papan-judul">Pengumuman Kantor</h3>
@@ -571,7 +579,7 @@
     </div>
   </div>
   <div class="l13-laci">
-    <div class="l13-laci-kepala"><span class="l13-laci-label">Laci</span><small id="l13LaciKet">Ketuk barang untuk memilih</small></div>
+    <div class="l13-laci-kepala"><span class="l13-laci-label">Laci</span><small id="l13LaciKet">Ketuk barang untuk memilih</small><button class="l13-caramain" type="button" data-panduan="misteri">Cara main ?</button></div>
     <div id="l13Laci" class="l13-laci-isi"></div>
   </div>
   <div class="l13-modal" id="l13Modal" hidden><div class="l13-modal-isi" id="l13ModalIsi"></div></div>
@@ -581,6 +589,19 @@
 <div class="pintu-lift" id="pintuLift" hidden aria-hidden="true">
   <div class="daun kiri"></div><div class="daun kanan"></div>
   <div class="pintu-lantai mono" id="pintuLantai">▲ 1</div>
+</div>
+
+<!-- Buku Panduan Pegawai Baru -->
+<div class="overlay panduan-overlay" id="panelPanduan" hidden role="dialog" aria-modal="true" aria-labelledby="panduanJudul">
+  <div class="overlay-inner buku-panduan">
+    <div class="bp-kepala">
+      <span class="bp-ikon" data-sprite="panduan" aria-hidden="true"></span>
+      <div><p class="bp-sub mono">Edisi Revisi ke-13 · tidak wajib dibaca, tapi enak</p><h2 id="panduanJudul">Buku Panduan Pegawai Baru</h2></div>
+      <button class="btn small" id="tutupPanduan" type="button" aria-label="Tutup panduan">✕</button>
+    </div>
+    <div class="bp-isi" id="panduanIsi" aria-live="polite"></div>
+    <div class="bp-bawah" id="panduanBawah"></div>
+  </div>
 </div>
 
 <!-- Radio Kantor: pengaturan suara & mode kaget -->
@@ -668,5 +689,6 @@
 <script src="l13-bab.js" defer></script>
 <script src="l13-bab23.js" defer></script>
 <script src="l13-bab456.js" defer></script>
+<script src="panduan.js" defer></script>
 </body>
 </html>

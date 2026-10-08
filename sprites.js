@@ -554,6 +554,20 @@
         "...kkkkkk...",
       ],
     },
+    panduan: { // buku panduan terbuka
+      p: { k: K, w: "#FFFDF6", N: "#2F4A6B" },
+      g: [
+        "............",
+        "kkkkk..kkkkk",
+        "kwwwwkkwwwwk",
+        "kwkkwkkwkkwk",
+        "kwwwwkkwwwwk",
+        "kwkkwkkwkkwk",
+        "kwwwwkkwwwwk",
+        "kNNNNkkNNNNk",
+        "kkkkkkkkkkkk",
+      ],
+    },
     tanaman0: { // layu
       p: { k: K, g: "#A3A060", p: "#B0714F" },
       g: [
