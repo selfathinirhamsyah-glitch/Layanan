@@ -61,9 +61,9 @@ Navigasi utamanya adalah **panel tombol lift** di bawah layar. Panel ini muncul 
 
 | Tombol | Ruangan | Isinya |
 |---|---|---|
-| **L** | Lobi | Sapaan petugas, pengumuman kantor, absen perasaan (Gelas Teh), denah gedung, Papan Pegawai, berkas Misteri Lantai 13 |
+| **L** | Lobi | Sapaan petugas, pengumuman kantor, absen perasaan (Gelas Teh), denah gedung, Papan Pegawai, berkas misteri (Lantai 13 + Kasus Lift Tengah Malam) |
 | **1** | Loket | Loket A (keluhan), B (kabar baik), C (semangat), D (tersembunyi, muncul kalau Mira ragu-ragu ±10 detik) |
-| **2** | Rehat | 4 mini game, Poin Sabar, papan Pegawai Teladan |
+| **2** | Rehat | 5 mini game (termasuk Balap Troli Arsip), Poin Sabar, papan Pegawai Teladan |
 | **3** | Pantry | Ngobrol dengan 5 karakter (ada mode "dengerin aja") dan papan gosip |
 | **4** | Kopkar | Koperasi: belanja barang absurd pakai Poin Sabar, struk bisa diunduh |
 | **5** | Meja | Meja Kerja Mira: koleksi barang, barang langka, buku rekor |
@@ -96,18 +96,29 @@ Tombol **Radio** ada di pojok kanan atas.
   Mode Perpustakaan (bisu) · Bisik-bisik · **Volume Rapat** (bawaan) · Volume Kantin · Volume Pak Singa
 - **Tuas Mode Kaget**: kalau dimatikan, semua kejutan di misteri muncul pelan-pelan dengan keterangan "(seharusnya ini mengagetkan)".
 - Setelah kejutan pertama, Oyen bertanya apakah Mira bersedia dikagetkan lagi. Jawabannya langsung mengubah tuas ini.
+- **Saklar Lampu Lorong** (tingkat seram cerita detektif):
+  - **Seram-lucu** (bawaan): bisikan dan lampu berkedip sesekali, cepat dibalas lelucon.
+  - **Lebih tegang**: ruangan lebih gelap, bisikan lebih sering, dan ada jeda gelap + detak jantung sebelum kejutan.
+  - Dua-duanya tetap tanpa darah, wajah seram, teriakan menakutkan, atau hantu sungguhan. "Hantunya" selalu ternyata kain pel, radio, atau pegawai kantor.
 - Kalau HP diatur untuk mengurangi gerakan (*reduce motion*), animasi dan kejutan otomatis diperhalus.
 
 ---
 
-## 5. Misteri Lantai 13
+## 5. Misteri Lantai 13 & Kasus Lift Tengah Malam
 
-Adventure point-and-click dengan 6 bab. Masuknya lewat kartu **"Berkas: Misteri Lantai 13"** di Lobi.
+Adventure point-and-click detektif. Masuknya lewat kartu **"Berkas: Misteri Lantai 13"** di Lobi. Di dalam berkas ada dua kasus:
+- **Misteri Lantai 13**: 6 bab.
+- **Kasus Lift Tengah Malam**: 3 babak, terbuka setelah Bab 1 Misteri Lantai 13 selesai. Jadwal hariannya terpisah, jadi Mira bisa main dua kasus berselang-seling.
 
 - **Bab 1** bisa langsung dimainkan. Bab berikutnya terbuka **satu per hari** menurut tanggal di HP, dan hanya kalau bab sebelumnya sudah selesai.
 - Setiap bab memakan waktu sekitar 5–10 menit. Progres tersimpan otomatis, jadi bisa ditinggal lalu dilanjut.
 - Kalau buntu, ada tombol **Petunjuk** (Bu Ratna) di pojok kanan atas. Petunjuknya bertahap, dari samar sampai hampir jawaban.
 - Cara main: ketuk benda untuk memeriksa. Untuk memakai barang, ketuk barangnya di **Laci** (bawah layar) sampai menyala kuning, lalu ketuk bendanya.
+
+### Cara kerja detektif
+- Benda dan kesaksian penting otomatis jadi **bukti** di **Papan Bukti** (tombol *Bukti* di laci, atau tombol *Papan Bukti* di berkas). Papan juga menampilkan profil tersangka yang berubah seiring kasus.
+- Di akhir bab ada **Deduksi**: pilih jawaban, lalu tunjuk satu bukti pendukung. Salah tidak dihukum: tersangka yang dituduh membalas dengan lelucon, lalu Mira boleh coba lagi. Kalau jawabannya benar tapi buktinya kurang kuat, Bu Ratna minta pilih bukti lain.
+- Kasus Lift punya **interogasi**: ketuk tersangka, *Tanya alibi*, lalu *Tunjukkan bukti*. Bukti yang tepat membuka kesaksian atau membuat alibi goyah.
 
 ### Mode penguji (untuk kamu)
 Untuk membuka semua bab sekaligus: ke **Lantai 5 (Meja)**, lalu **ketuk kalender meja 7 kali**. Oyen akan memberi konfirmasi. Ketuk 7 kali lagi untuk mematikannya.
@@ -149,6 +160,38 @@ Kalau kamu mengetes di HP Mira, matikan lagi setelah selesai, atau tes di HP-mu 
 3. Ngobrol dengan Oyen sampai Mira diangkat jadi Penjaga Lantai 13.
 4. Tombol 13 di lift sekarang membuka **Ruang Rahasia**: SK bisa diunduh, toples koleksi, dan tempat menyimpan satu hal kecil.
 
+**Jawaban Deduksi (Misteri Lantai 13)**
+
+| Bab | Pertanyaan | Jawaban | Bukti yang diterima |
+|---|---|---|---|
+| 1 | Tersangka hilangnya gula | Seseorang berkaki empat, berdasi | Tapak di kartu akses / Laporan jaga |
+| 2 | Yang mengecap berkas tengah malam | Seseorang berkaki empat, berdasi | Tapak di rak / Kesaksian Mas Kukang / Tapak di kartu akses |
+| 3 | Yang terakhir duduk di jok motor | Seseorang berkaki empat, berdasi | Jok motor hangat |
+| 4 | Siapa "O." | Oyen | Tulisan tangan di buku / Rapat di lemari arsip |
+| 5 | Kenapa jam harus 16.59 | Jam paling tenang | Catatan: 16.59 |
+| 6 | Motif | Teh manis untuk yang lembur & menyimpan hal kecil | Catatan: teh manis / Rak toples lantai 13 |
+
+**Kasus Lift Tengah Malam**
+
+*Babak 1 · Lift yang Turun Sendiri* (Pos Jaga, Dalam Lift)
+1. Ngobrol dengan Pak Satpam (bukti: Log lift). Baca buku log (bukti: Bau kopi).
+2. Monitor CCTV → pilih **CAM 3 · Dalam lift** (bukti: Sosok di CCTV). Lalu ketuk pintu lift.
+3. Di lift: ketuk *Pojok gelap* (kejutan: Mas Kukang yang belum sampai lantai 2), lalu *Lantai basah* (Tapak basah + Benang putih tebal).
+4. Ketuk *Panel tombol*: lift turun sendiri ke pintu "B2 — R". Deduksi: **kain pel** (bukti: Benang putih tebal).
+
+*Babak 2 · Lima Tersangka* (Ruang Rapat)
+1. Kejutan proyektor (presentasi naik gaji Oyen).
+2. Tunjukkan bukti dari lift (Sosok di CCTV / Tapak basah / Benang) ke **Dimas** → Kesaksian Dimas (lihat Bang Rakun jam 23.55 bawa ember, obeng, termos).
+3. Tunjukkan **Kesaksian Dimas** ke **Bang Rakun** (alibi goyah), lalu **Tapak basah** ke Bang Rakun (tapak cocok). Opsional: Log lift ke Pak Satpam.
+4. Ketuk papan tulis. Deduksi: **Bang Rakun**.
+
+*Babak 3 · Ruang di Bawah Lobi* (Pos Jaga, Lift, B2)
+1. Ngobrol dengan Pak Satpam (beliau pergi patroli toilet, jam jadi 00.13). Masuk lift.
+2. Panel tombol → roda angka **0013**.
+3. Di B2: radio (bisikan ternyata siaran radio horor), cetak biru, mesin di meja, lalu terpal hijau (kejutan: Bang Rakun).
+4. Ketuk Bang Rakun. Deduksi: **memperbaiki mesin kopi diam-diam** (bukti: Catatan bengkel / Mesin kopi lantai 1).
+5. Susun instruksi: Isi air → Pasang pompa → Tekan tombol merah → Tunggu "hhhh" → Jangan panik. Dapat **Cangkir Kopi Pertama**, dan mesin kopi di ruang tunggu sekarang betul-betul mengeluarkan kopi.
+
 ---
 
 ## 6. Easter egg
@@ -156,7 +199,7 @@ Kalau kamu mengetes di HP Mira, matikan lagi setelah selesai, atau tes di HP-mu 
 | Di mana | Apa |
 |---|---|
 | Halaman depan | Ketuk cap merah "KLP" 5 kali |
-| Fasilitas ruang tunggu | Siram tanaman 5 kali · mesin kopi klik ke-7 · kotak saran · "Bicara dengan Manajer" 5 kali |
+| Fasilitas ruang tunggu | Siram tanaman 5 kali · mesin kopi klik ke-7 (setelah Kasus Lift selesai, mesinnya jalan dengan pesan baru) · kotak saran · "Bicara dengan Manajer" 5 kali |
 | Denah lobi | Garis berkedip di atas lantai 5 (setelah Bab 1, bisa diketuk) |
 | Panel lift | Tombol tanpa angka (berkedip setelah Bab 1, jadi "13" setelah tamat) |
 | Game Stempel Kilat | Berkas yang ditiduri Oyen: jangan dicap, biarkan lewat (+1) |
@@ -187,7 +230,7 @@ Semua teks ada di file JavaScript, jadi bisa diubah langsung lewat GitHub (buka 
 | Obrolan Pantry, kalimat "dengerin aja", gosip | `pantry-data.js` |
 | Barang koperasi & harga | `koperasi.js` (bagian `BARANG`) |
 | Isi game | `games.js` |
-| Cerita misteri | `l13-bab.js` (Bab 1), `l13-bab23.js` (Bab 2–3), `l13-bab456.js` (Bab 4–6 + Ruang Rahasia) |
+| Cerita misteri | `l13-bab.js` (Bab 1), `l13-bab23.js` (Bab 2–3), `l13-bab456.js` (Bab 4–6 + Ruang Rahasia), `l13-kasus-lift.js` (Kasus Lift Tengah Malam) |
 | Gambar karakter (pixel) | `sprites.js` (grid 12×12 huruf) |
 
 ---
