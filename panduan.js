@@ -60,13 +60,14 @@
     },
     {
       id: "rehat", judul: "Ruang Istirahat (games)", sprite: "marmut", oleh: "Dimas",
-      buka: "SELAMAT DATANG DI LANTAI 2— eh, maaf. Di sini ada lima game. Semuanya singkat. Semuanya resmi.",
+      buka: "SELAMAT DATANG DI LANTAI 2— eh, maaf. Di sini ada lima game, sekarang 3D. Semuanya singkat. Semuanya resmi.",
       langkah: [
         ["kura", "<b>Rally vs Pak Satpam</b>: ketuk layar saat kok masuk lingkaran. Makin pas, makin besar nilainya. Gagal 3 kali, selesai."],
         ["berkas", "<b>Stempel Kilat</b> (60 detik): pilih DISETUJUI, DITOLAK, atau NANTI AJA. Kalau ada Oyen tidur di atas berkas, <b>jangan dicap</b>."],
         ["saran", "<b>Tangkap Kertas Terbang</b> (45 detik): geser jari untuk memindahkan map. Hindari undangan rapat jam 4 sore."],
         ["gorengan", "<b>Ngemil Diam-diam di Rapat</b> (45 detik): tahan layar untuk ngemil, <b>lepas</b> saat Oyen menoleh."],
         ["badak", "<b>Balap Troli Arsip</b> (±1 menit): troli melaju sendiri, <b>geser jari</b> kiri-kanan buat belok. Lawan Pak Satpam, Dimas, dan Kak Badak. Teh = turbo, lantai dipel = licin, berkas emas = bonus."],
+        ["kartu", "Sebelum main ada pilihan <b>Tampilan: 3D atau 2D klasik</b>. Kalau HP terasa berat atau panas, pilih 2D klasik. Skornya sama saja."],
         ["marmut", "Sebelum main, kamu boleh menumpuk berkas di kepala saya (beban pikiran). Kalau sesudah main berkurang, dapat bonus. *kepala saya kuat kok."],
         ["oyen", "Semua game memberi <b>Poin Sabar</b>. Rekor tersimpan. Papan Pegawai Teladan selalu dimenangkan kamu. Itu keputusan Kepala Bagian."],
       ],

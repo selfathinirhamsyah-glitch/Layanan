@@ -18,7 +18,7 @@ Navigasi utama berupa **panel lift** di bawah layar dan denah gedung di Lobi.
 |---|---|
 | L · Lobi | Pengumuman kantor, absen perasaan harian (Gelas Teh), denah, Papan Pegawai, berkas misteri |
 | 1 · Loket | Loket A–D (versi pertama) dengan skala interaktif: Tarik Senyum (A), Timbangan (B), Pukul Kok (C) |
-| 2 · Rehat | 5 mini game: Rally vs Pak Satpam, Stempel Kilat, Tangkap Kertas Terbang, Ngemil Diam-diam di Rapat, Balap Troli Arsip. Poin Sabar, rekor, papan Pegawai Teladan |
+| 2 · Rehat | 5 mini game 3D (three.js di `vendor/`, ada pilihan 2D klasik): Rally vs Pak Satpam, Stempel Kilat, Tangkap Kertas Terbang, Ngemil Diam-diam di Rapat, Balap Troli Arsip. Poin Sabar, rekor, papan Pegawai Teladan |
 | 3 · Pantry | Obrolan bercabang dengan Bu Ratna, Pak Satpam, Dimas, Oyen, Mas Kukang (termasuk mode "dengerin aja") dan gosip kantor |
 | 4 · Koperasi | Belanja barang absurd pakai Poin Sabar, ditemani satu karakter, struk bisa diunduh |
 | 5 · Meja | Koleksi barang, rak barang langka, buku rekor, hapus data |
@@ -41,7 +41,7 @@ Ulang tahun 21 Agustus (surat ucapan + tiup lilin, termasuk versi "terlambat" sa
 Semua progres (poin, skor, barang, gosip, misteri) disimpan di `localStorage` perangkat itu sendiri dengan kunci `klp-v2`. Kalau penyimpanan diblokir, semua tetap bisa dimainkan; progresnya saja yang hilang saat halaman ditutup. Isi curhat dan obrolan "dengerin aja" tidak pernah disimpan.
 
 ### Struktur file
-`core.js` (data, suara) → `sprites.js` → `script.js` (loket) → `kantor.js` (lobi, lift, radio) → `skala.js` + `pasang-skala.js` → `games.js` → `pantry-data.js` + `pantry.js` → `koperasi.js` → `l13-mesin.js` + `l13-bab*.js` + `l13-kasus-lift.js` → `mira.js` → `panduan.js`.
+`core.js` (data, suara) → `sprites.js` → `script.js` (loket) → `kantor.js` (lobi, lift, radio) → `skala.js` + `pasang-skala.js` → `games.js` + `games3d.js` → `pantry-data.js` + `pantry.js` → `koperasi.js` → `l13-mesin.js` + `l13-bab*.js` + `l13-kasus-lift.js` → `mira.js` → `panduan.js`.
 
 ## Ganti nama
 - Ubah `NAMA_DEFAULT` di baris atas `script.js`, atau

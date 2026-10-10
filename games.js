@@ -115,7 +115,7 @@
   const domGame = $("#arenaDom");
   const kontrol = $("#arenaKontrol");
   const panel = $("#arenaPanel");
-  let gameAktif = null, berhenti = null, bebanSebelum = 0;
+  let gameAktif = null, berhenti = null, bebanSebelum = 0, apiAktif = null;
 
   function bukaArena(id) {
     gameAktif = id;
@@ -136,6 +136,10 @@
     tutupArena();
   });
 
+  // 3D: game kanvas pakai three.js (games3d.js), Stempel pakai CSS 3D
+  const bisa3DIni = () => gameAktif === "stempel" || !!(K.G3 && K.G3.punya(gameAktif) && K.G3.bisa3D());
+  const pakai3D = () => K.data.setelan.game3d !== false && bisa3DIni();
+
   function tampilPanel(jenis, hasil) {
     const g = GAMES[gameAktif];
     panel.hidden = false;
@@ -145,8 +149,27 @@
       panel.innerHTML = `
         <div class="ap-kepala"><span class="avatar">${px(g.sprite)}</span><p>${esc(g.cara)}</p></div>
         ${gameAktif === "rally" ? `<div class="ap-bagian"><p class="ap-label">Pemanasan (opsional): pukul satu kok. Makin semangat, makin cepat Pak Satpam membalas.</p><div id="pemanasanKok"></div></div>` : ""}
+        <div class="ap-bagian ap-tampilan">
+          <p class="ap-label">Tampilan</p>
+          <div class="pilih-tampilan" role="radiogroup" aria-label="Tampilan game">
+            <button type="button" class="chip" role="radio" data-tampilan="3d" ${bisa3DIni() ? "" : "disabled"}>3D</button>
+            <button type="button" class="chip" role="radio" data-tampilan="2d">2D klasik</button>
+          </div>
+          <p class="muted small" id="ketTampilan"></p>
+        </div>
         <div class="ap-bagian"><div id="bebanSebelum"></div></div>
         <div class="actions"><button class="btn primary" type="button" id="mulaiMain">Mulai</button></div>`;
+      const segarTampilan = () => {
+        const tiga = pakai3D();
+        panel.querySelectorAll("[data-tampilan]").forEach((b) => { const on = (b.dataset.tampilan === "3d") === tiga; b.classList.toggle("dipilih", on); b.setAttribute("aria-checked", on); });
+        $("#ketTampilan").textContent = !bisa3DIni() ? "HP ini belum bisa menampilkan 3D, jadi game memakai versi 2D klasik. Sama serunya." : tiga ? "Kalau HP terasa berat atau panas, pilih 2D klasik." : "Versi gambar datar yang ringan.";
+      };
+      panel.querySelector(".pilih-tampilan").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-tampilan]");
+        if (!b || b.disabled) return;
+        K.data.setelan.game3d = b.dataset.tampilan === "3d"; K.simpan(); sfx("pilih"); segarTampilan();
+      });
+      segarTampilan();
       let semangat = K.data.semangatTerakhir || 0;
       if (gameAktif === "rally") K.skala.kok($("#pemanasanKok"), { onUbah(lv) { semangat = lv; } });
       const beban = K.skala.tumpukan($("#bebanSebelum"), { judul: "Beban pikiran sebelum main (opsional)", awal: 0 });
@@ -194,9 +217,17 @@
     const g = GAMES[gameAktif];
     const pakaiDom = gameAktif === "stempel";
     kanvas.hidden = pakaiDom; domGame.hidden = !pakaiDom;
+    domGame.classList.toggle("tiga-d", pakaiDom && pakai3D());
     siapkanKanvas();
-    // hitung mundur
     const hm = $("#hitungMundur");
+    let tiga = pakai3D() && !pakaiDom;
+    if (tiga && !window.THREE) {
+      hm.textContent = "memuat 3D…"; hm.hidden = false; hm.classList.remove("pop");
+      tiga = await K.G3.siap();
+      if (!gameAktif) return;
+      if (!tiga) memo("Bang Rakun · Teknisi", "Mesin 3D belum mau nyala di HP ini. Untuk sekarang pakai versi 2D dulu ya.");
+    }
+    // hitung mundur
     for (const t of ["3", "2", "1", "MULAI"]) {
       hm.textContent = t; hm.hidden = false; hm.classList.remove("pop"); void hm.offsetWidth; hm.classList.add("pop");
       sfx(t === "MULAI" ? "tingtong" : "klik");
@@ -204,8 +235,10 @@
       if (!gameAktif) return;
     }
     hm.hidden = true;
-    const api = buatApi(semangat);
-    berhenti = MAIN[gameAktif](api);
+    const api = buatApi(semangat, tiga);
+    apiAktif = api;
+    const hentikan = MAIN[gameAktif](api);
+    berhenti = () => { hentikan(); api.d3?.hapus(); api.d3 = null; };
     api.selesai = (skor, komentar) => {
       berhenti?.(); berhenti = null;
       const id = gameAktif;
@@ -233,8 +266,15 @@
     ctx.setTransform(dpr * skala, 0, 0, dpr * skala, 0, 0);
     ctx.imageSmoothingEnabled = false;
   }
-  function buatApi(semangat) {
+  function buatApi(semangat, tiga = false) {
     const api = {
+      d3: null,
+      // dipanggil oleh game di awal; hasilnya null kalau main 2D
+      buat3D(data) {
+        if (!tiga || !window.THREE || !K.G3) return null;
+        try { api.d3 = K.G3.buat(gameAktif, api, kanvas, data); return api.d3; }
+        catch (err) { console.error(err); api.d3 = null; $("#arenaKanvas3d").hidden = true; return null; }
+      },
       ctx, W: () => W, H: () => H, dom: domGame, kontrol, semangat, nama: NAMA.toUpperCase().slice(0, 8),
       skor(n) { $("#hudSkor").textContent = n; },
       info(t) { $("#hudInfo").textContent = t; },
@@ -319,6 +359,7 @@
       fase = "balik"; t = 0;
     }
     kanvas.addEventListener("pointerdown", ketuk);
+    const d3 = api.buat3D();
     api.info("Siap. Saya servis duluan.");
     const stop = api.loop((dt) => {
       // logika
@@ -337,6 +378,8 @@
       if (ayun > 0) ayun -= dt;
 
       // gambar
+      if (d3) { ctx.clearRect(0, 0, W, H); d3.gambar({ fase, t, targetX, ayun }, performance.now() / 1000); }
+      else {
       ctx.fillStyle = "#7FA868"; ctx.fillRect(0, 0, W, H);
       ctx.strokeStyle = "#FFFDF6"; ctx.lineWidth = 3;
       ctx.strokeRect(20, 20, W - 40, H - 40);
@@ -361,6 +404,7 @@
         ctx.beginPath(); ctx.moveTo(0, 6); ctx.lineTo(-9, -10); ctx.lineTo(9, -10); ctx.closePath(); ctx.fill(); ctx.stroke();
         ctx.fillStyle = "#B5443A"; ctx.beginPath(); ctx.arc(0, 7, 4.5, 0, 7); ctx.fill(); ctx.stroke();
         ctx.restore();
+      }
       }
       hati(nyawa, 3, 32, H - 34);
       gambarKilat(efek, dt);
@@ -467,6 +511,7 @@
     function gerak(e) { targetMapX = batas(api.titik(e).x, 40, W - 40); }
     kanvas.addEventListener("pointerdown", gerak);
     kanvas.addEventListener("pointermove", gerak);
+    const d3 = api.buat3D();
     api.info("Kipas angin dinyalakan. Mode: menoleh.");
     const stop = api.loop((dt) => {
       waktu += dt; sisa -= dt;
@@ -502,6 +547,8 @@
         } else if (k.y > H + 20) kertas.splice(i, 1);
       }
       // gambar
+      if (d3) { ctx.clearRect(0, 0, W, H); d3.gambar({ sudut, mapX, mapY: mapY(), getar, kertas }, waktu); }
+      else {
       ctx.fillStyle = "#F0EADB"; ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = "rgba(47,74,107,.07)"; for (let x = 0; x < W; x += 22) ctx.fillRect(x, 0, 1, H); for (let y = 0; y < H; y += 22) ctx.fillRect(0, y, W, 1);
       // kipas
@@ -531,6 +578,7 @@
       ctx.fillRect(-42, -8, 84, 30); ctx.strokeRect(-42, -8, 84, 30);
       ctx.fillRect(-42, -16, 30, 9); ctx.strokeRect(-42, -16, 30, 9);
       ctx.restore();
+      }
       teksTengah("geser map ke kiri-kanan", W / 2, H - 22, 12, "#5D5A50");
       gambarKilat(efek, dt);
       $("#hudWaktu").textContent = `${Math.max(0, Math.ceil(sisa))} dtk`;
@@ -552,6 +600,7 @@
     kanvas.addEventListener("pointerleave", lepas);
     kanvas.addEventListener("pointercancel", lepas);
     kanvas.addEventListener("contextmenu", (e) => e.preventDefault());
+    const d3 = api.buat3D();
     api.info("Oyen: Rapat dimulai. Agenda: gula.");
     const KALIMAT_OYEN = ["Agenda satu: gula.", "Agenda dua: gula (lanjutan).", "Grafik ini naik. Saya tidak tahu kenapa.", "Pertanyaan? Tidak ada. Bagus.", "Slide berikutnya: foto saya tidur."];
     const stop = api.loop((dt) => {
@@ -580,6 +629,8 @@
       if (kedip > 0) kedip -= dt;
 
       // gambar ruangan rapat
+      if (d3) { ctx.clearRect(0, 0, W, H); d3.gambar({ keadaan, makan: tahan && !harusLepas && keadaan !== "menoleh", potongan }, waktu); }
+      else {
       ctx.fillStyle = "#E9E2D0"; ctx.fillRect(0, 0, W, H);
       // papan tulis
       ctx.fillStyle = "#FFFDF6"; ctx.strokeStyle = "#2B2A26"; ctx.lineWidth = 3;
@@ -601,9 +652,11 @@
       for (let i = 0; i < 3; i++) gambarSprite(ctx, "gorengan", W / 2 - 34 + i * 34, H * 0.78, 44);
       ctx.fillStyle = "#9C6B43"; // bekas gigitan
       for (let i = 0; i < potongan; i++) { ctx.beginPath(); ctx.arc(W / 2 + 50, H * 0.77 - 6 + i * 7, 6, 0, 7); ctx.fill(); }
+      }
       // status
+      if (d3) { ctx.fillStyle = "rgba(43,42,38,.55)"; ctx.fillRect(W / 2 - 90, H - 38, 180, 28); }
       teksTengah(tahan && !harusLepas ? (keadaan === "menoleh" ? "" : "ngemil...") : harusLepas ? "lepas dulu" : "tahan untuk ngemil", W / 2, H - 24, 14, "#FFFDF6");
-      hati(nyawa, 3, 26, H * 0.62 + 24);
+      hati(nyawa, 3, 26, d3 ? H - 60 : H * 0.62 + 24);
       if (kedip > 0) { ctx.fillStyle = `rgba(181,68,58,${kedip * 0.5})`; ctx.fillRect(0, 0, W, H); }
       gambarKilat(efek, dt);
       $("#hudWaktu").textContent = `${Math.max(0, Math.ceil(sisa))} dtk`;
@@ -641,6 +694,7 @@
     function gerak(e) { targetX = api.titik(e).x; }
     kanvas.addEventListener("pointerdown", gerak);
     kanvas.addEventListener("pointermove", gerak);
+    const d3 = api.buat3D({ PANJANG, tengah, lebar, benda, LAWAN });
     api.info("Pak Satpam: Siap. Rem troli tidak berfungsi. Itu fitur.");
 
     function posisi() {
@@ -718,6 +772,8 @@
       }
 
       // ===== gambar =====
+      if (d3) { ctx.clearRect(0, 0, W, H); d3.gambar({ d, x, turbo, licin, targetX }, waktu); }
+      else {
       ctx.fillStyle = "#8D8A84"; ctx.fillRect(0, 0, W, H);
       const langkahY = 8;
       for (let y = 0; y <= H + langkahY; y += langkahY) {
@@ -766,6 +822,7 @@
       // pemain
       if (turbo > 0) { ctx.fillStyle = "rgba(242,193,78,.6)"; for (let i = 0; i < 3; i++) ctx.fillRect(x - 10 + i * 8, PEMAIN_Y() + 26 + Math.random() * 10, 4, 10 + Math.random() * 10); }
       gambarTroli(x, PEMAIN_Y(), "#6B5B7A", null, api.nama);
+      }
       // bilah kemajuan
       ctx.fillStyle = "rgba(43,42,38,.7)"; ctx.fillRect(W - 14, 16, 8, H - 32);
       const prog = (v) => 16 + (H - 32) * (1 - Math.min(1, v / PANJANG));
@@ -778,6 +835,6 @@
     return stop2;
   };
 
-  addEventListener("resize", () => { if (!arena.hidden && !kanvas.hidden) siapkanKanvas(); });
+  addEventListener("resize", () => { if (!arena.hidden && !kanvas.hidden) { siapkanKanvas(); try { apiAktif?.d3?.ukur(); } catch { /* tidak apa-apa */ } } });
   K.bukaGame = bukaArena;
 })();

@@ -63,11 +63,17 @@ Navigasi utamanya adalah **panel tombol lift** di bawah layar. Panel ini muncul 
 |---|---|---|
 | **L** | Lobi | Sapaan petugas, pengumuman kantor, absen perasaan (Gelas Teh), denah gedung, Papan Pegawai, berkas misteri (Lantai 13 + Kasus Lift Tengah Malam) |
 | **1** | Loket | Loket A (keluhan), B (kabar baik), C (semangat), D (tersembunyi, muncul kalau Mira ragu-ragu ±10 detik) |
-| **2** | Rehat | 5 mini game (termasuk Balap Troli Arsip), Poin Sabar, papan Pegawai Teladan |
+| **2** | Rehat | 5 mini game 3D (termasuk Balap Troli Arsip), bisa diganti ke 2D klasik, Poin Sabar, papan Pegawai Teladan |
 | **3** | Pantry | Ngobrol dengan 5 karakter (ada mode "dengerin aja") dan papan gosip |
 | **4** | Kopkar | Koperasi: belanja barang absurd pakai Poin Sabar, struk bisa diunduh |
 | **5** | Meja | Meja Kerja Mira: koleksi barang, barang langka, buku rekor |
 | **▒ → 13** | Rahasia | Terbuka setelah Misteri Lantai 13 tamat |
+
+### Games 3D
+Semua game di Ruang Istirahat sekarang tampil 3D: lapangan rally dari belakang pemain, kertas yang berputar di udara, ruang rapat dari kursi Mira, balapan troli dengan kamera mengejar, dan meja stempel yang miring. Pegawai tetap pixel art, berdiri seperti papan di dunia 3D.
+- Sebelum main ada pilihan **Tampilan: 3D / 2D klasik**. Pilihannya diingat.
+- Kalau HP terlalu berat, resolusinya turun sendiri. Kalau HP tidak mendukung 3D (WebGL), game otomatis pakai versi 2D.
+- Mesin 3D-nya (three.js) ada di folder `vendor/`, jadi tidak perlu internet tambahan. Ukurannya ±600 KB dan baru dimuat saat game dimulai.
 
 ### Cara mendapat Poin Sabar
 - Main game (paling banyak)
@@ -248,7 +254,7 @@ Semua teks ada di file JavaScript, jadi bisa diubah langsung lewat GitHub (buka 
 | Profil & kutipan karakter | `kantor.js` (bagian `K.PEGAWAI`) |
 | Obrolan Pantry, kalimat "dengerin aja", gosip | `pantry-data.js` |
 | Barang koperasi & harga | `koperasi.js` (bagian `BARANG`) |
-| Isi game | `games.js` |
+| Isi game | `games.js` (logika), `games3d.js` (tampilan 3D) |
 | Cerita misteri | `l13-bab.js` (Bab 1), `l13-bab23.js` (Bab 2–3), `l13-bab456.js` (Bab 4–6 + Ruang Rahasia), `l13-kasus-lift.js` (Kasus Lift Tengah Malam) |
 | Gambar karakter (pixel) | `sprites.js` (grid 12×12 huruf) |
 
