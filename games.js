@@ -73,12 +73,20 @@
         <p>${saran ? `Bu Ratna titip pesan: hari ini cocoknya main <strong>${esc(GAMES[saran].nama)}</strong>. EH, maksudnya, terserah kamu. *tapi itu saran bagus.` : "SELAMAT DATANG— eh, maaf kekencengan. Silakan pilih game. Semua game di sini resmi, sudah ada SK-nya."}</p>
       </div>
 
+      ${K.progres ? K.progres.htmlPapan() : ""}
+
+      <button type="button" class="kartu-duel" data-duel>
+        <span class="kd-vs" aria-hidden="true"><span>${px("kura")}</span><b>VS</b><span>${px("marmut")}</span></span>
+        <span class="kd-isi"><strong>Mode Duel · 2 Pemain</strong><small>Satu HP, hadap-hadapan. Turnamen 3 atau 5 ronde: Hoki Meja Rapat, Cap Duluan, Tarik Map, Kabel Kusut. Tidak ada teman? Lawan bot Pak Satpam.</small></span>
+        <span class="km-panah" aria-hidden="true">→</span>
+      </button>
+
       <section class="teladan" aria-labelledby="h-teladan">
         <h3 id="h-teladan" class="papan-judul">Pegawai Teladan Minggu Ini</h3>
         <p class="teladan-sub mono">Minggu ke-${mingguKe()} · ${BULAN[new Date().getMonth()]}</p>
         <ol class="teladan-list">
           <li class="juara"><span class="avatar avatar-sm">${px("dokumen")}</span>
-            <span><strong>${esc(NAMA)}</strong><small>${totalMira >= 100 ? `${totalMira} Poin Sabar sepanjang masa` : "Nilai: tak terhingga (keputusan Kepala Bagian, tidak dapat diganggu gugat)"}</small></span>
+            <span><strong>${esc(NAMA)}</strong>${K.progres ? `<small class="teladan-pangkat">${esc(K.progres.pangkatDari(K.data.progres.xp).nama)}</small>` : ""}<small>${totalMira >= 100 ? `${totalMira} Poin Sabar sepanjang masa` : "Nilai: tak terhingga (keputusan Kepala Bagian, tidak dapat diganggu gugat)"}</small></span>
             <span class="piala" aria-hidden="true">${px("berkas")}</span></li>
           <li><span class="avatar avatar-sm">${px("kura")}</span><span><strong>Pak Satpam</strong><small>Rally 212 (dihitung sendiri)</small></span></li>
           <li><span class="avatar avatar-sm">${px("marmut")}</span><span><strong>Dimas</strong><small>3 poin (lupa main, sibuk panik)</small></span></li>
@@ -101,9 +109,11 @@
     K.pasangSprite(r);
   }
   K.saatMasuk["s-istirahat"] = isiRuang;
+  K.segarkanIstirahat = () => { if (K.layarAktif() === "s-istirahat" && arena.hidden) isiRuang(); };
   $("#ruangIstirahat").addEventListener("click", (e) => {
     const b = e.target.closest("[data-main]");
     if (b) bukaArena(b.dataset.main);
+    if (e.target.closest("[data-duel]")) K.bukaDuel?.();
   });
 
   /* =========================================================
@@ -139,6 +149,13 @@
   // 3D: game kanvas pakai three.js (games3d.js), Stempel pakai CSS 3D
   const bisa3DIni = () => gameAktif === "stempel" || !!(K.G3 && K.G3.punya(gameAktif) && K.G3.bisa3D());
   const pakai3D = () => K.data.setelan.game3d !== false && bisa3DIni();
+  // tingkat kesulitan: kecepatan seluruh game & pengali Poin Sabar
+  const TINGKAT = {
+    santai: { nama: "Santai", laju: 0.85, poin: 1, ket: "Lebih pelan. Cocok buat pemanasan atau sambil ngobrol." },
+    normal: { nama: "Normal", laju: 1, poin: 1, ket: "Kecepatan standar kantor." },
+    lembur: { nama: "Lembur", laju: 1.28, poin: 1.5, ket: "Semuanya lebih cepat. Poin Sabar x1.5 dan XP lebih banyak. Untuk yang suka tantangan." },
+  };
+  const tingkatIni = () => TINGKAT[K.data.setelan.tingkat] ? K.data.setelan.tingkat : "normal";
 
   function tampilPanel(jenis, hasil) {
     const g = GAMES[gameAktif];
@@ -149,6 +166,13 @@
       panel.innerHTML = `
         <div class="ap-kepala"><span class="avatar">${px(g.sprite)}</span><p>${esc(g.cara)}</p></div>
         ${gameAktif === "rally" ? `<div class="ap-bagian"><p class="ap-label">Pemanasan (opsional): pukul satu kok. Makin semangat, makin cepat Pak Satpam membalas.</p><div id="pemanasanKok"></div></div>` : ""}
+        <div class="ap-bagian ap-tingkat">
+          <p class="ap-label">Tingkat kesulitan</p>
+          <div class="pilih-tampilan pilih-tingkat" role="radiogroup" aria-label="Tingkat kesulitan">
+            ${Object.entries(TINGKAT).map(([id, t]) => `<button type="button" class="chip${id === "lembur" ? " chip-lembur" : ""}" role="radio" data-tingkat="${id}">${t.nama}</button>`).join("")}
+          </div>
+          <p class="muted small" id="ketTingkat"></p>
+        </div>
         <div class="ap-bagian ap-tampilan">
           <p class="ap-label">Tampilan</p>
           <div class="pilih-tampilan" role="radiogroup" aria-label="Tampilan game">
@@ -170,6 +194,17 @@
         K.data.setelan.game3d = b.dataset.tampilan === "3d"; K.simpan(); sfx("pilih"); segarTampilan();
       });
       segarTampilan();
+      const segarTingkat = () => {
+        const t = tingkatIni();
+        panel.querySelectorAll("[data-tingkat]").forEach((b) => { const on = b.dataset.tingkat === t; b.classList.toggle("dipilih", on); b.setAttribute("aria-checked", on); });
+        $("#ketTingkat").textContent = TINGKAT[t].ket;
+      };
+      panel.querySelector(".pilih-tingkat").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-tingkat]");
+        if (!b) return;
+        K.data.setelan.tingkat = b.dataset.tingkat; K.simpan(); sfx("pilih"); segarTingkat();
+      });
+      segarTingkat();
       let semangat = K.data.semangatTerakhir || 0;
       if (gameAktif === "rally") K.skala.kok($("#pemanasanKok"), { onUbah(lv) { semangat = lv; } });
       const beban = K.skala.tumpukan($("#bebanSebelum"), { judul: "Beban pikiran sebelum main (opsional)", awal: 0 });
@@ -177,13 +212,14 @@
       return;
     }
     // sesudah
-    const { skor, poin, rekor, komentar } = hasil;
+    const { skor, poin, rekor, komentar, prog, tk } = hasil;
     panel.innerHTML = `
       <div class="ap-hasil">
         <p class="ap-skor-label">Skor</p>
         <p class="ap-skor mono">${skor}</p>
         ${rekor ? `<p class="ap-rekor">Rekor baru. Dicatat di buku besar.</p>` : `<p class="muted small">Rekor: ${K.data.skor[gameAktif]}</p>`}
-        <p class="ap-poin">+${poin} Poin Sabar</p>
+        <p class="ap-poin">+${poin} Poin Sabar${tk === "lembur" ? " (Lembur x1.5)" : ""}</p>
+        ${K.progres ? K.progres.htmlHasil(prog) : ""}
       </div>
       <div class="ap-kepala"><span class="avatar">${px(komentar[0])}</span><p>${esc(komentar[1])}</p></div>
       ${bebanSebelum > 0 ? `<div class="ap-bagian"><div id="bebanSesudah"></div><div class="actions"><button class="btn small" type="button" id="catatBeban">Catat beban sesudah main</button></div></div>` : ""}
@@ -245,12 +281,15 @@
       const rekor = skor > (K.data.skor[id] ?? -Infinity);
       if (rekor) K.data.skor[id] = skor;
       K.data.mainGame = (K.data.mainGame || 0) + 1;
-      const poin = K.tambahPoin(g.poin(skor));
+      const tk = api.tingkat;
+      const poin = K.tambahPoin(Math.round(g.poin(skor) * TINGKAT[tk].poin));
       K.simpan();
       K.catat(`game:${id}`, { skor });
       K.catat("game");
+      const prog = K.progres ? K.progres.lapor({ jenis: "solo", game: id, skor, tingkat: tk, stat: api.stat, poin }) : null;
       sfx(rekor ? "menang" : "poin");
-      tampilPanel("sesudah", { skor, poin, rekor, komentar });
+      tampilPanel("sesudah", { skor, poin, rekor, komentar, prog, tk });
+      if (prog?.naikPangkat) setTimeout(() => K.progres.rayakanPangkat(prog.naikPangkat), 600);
     };
   }
 
@@ -267,7 +306,12 @@
     ctx.imageSmoothingEnabled = false;
   }
   function buatApi(semangat, tiga = false) {
+    const laju = TINGKAT[tingkatIni()].laju;
+    const stat = {};
     const api = {
+      stat, tingkat: tingkatIni(),
+      tambah(k, n = 1) { stat[k] = (stat[k] || 0) + n; },
+      catatStat(k, v) { stat[k] = v; },
       d3: null,
       // dipanggil oleh game di awal; hasilnya null kalau main 2D
       buat3D(data) {
@@ -283,7 +327,7 @@
         let jalan = true, lalu = performance.now(), raf = 0;
         const putar = (now) => {
           if (!jalan) return;
-          const dt = Math.min(0.05, (now - lalu) / 1000); lalu = now;
+          const dt = Math.min(0.05, (now - lalu) / 1000) * laju; lalu = now;
           if (!document.hidden) fn(dt, now / 1000);
           raf = requestAnimationFrame(putar);
         };
@@ -351,6 +395,7 @@
       if (jarak > 42) { efek.push(kilat("kecepetan", targetX, zonaY() - 50, "#5D5A50")); sfx("klik"); return; }
       const nilai = jarak < 10 ? 2 : 1;
       skor += nilai; pukulan++;
+      api.tambah("pukulan"); if (nilai === 2) api.tambah("sempurna");
       api.skor(skor);
       efek.push(kilat(jarak < 10 ? "SEMPURNA +2" : jarak < 26 ? "BAGUS +1" : "TIPIS +1", targetX, zonaY() - 50, jarak < 10 ? "#4F6E5E" : "#2F4A6B"));
       sfx("pukul");
@@ -420,7 +465,7 @@
   };
   MAIN.stempel = (api) => {
     const DURASI = 60;
-    let sisa = DURASI, skor = 0, jedaSpawn = 0.3, kartu = [], id = 0, benar = 0, salah = 0;
+    let sisa = DURASI, skor = 0, jedaSpawn = 0.3, kartu = [], id = 0, benar = 0, salah = 0, combo = 0;
     api.dom.innerHTML = `<div class="stempel-jalur" id="stJalur"><div class="stempel-garis-bawah">batas meja</div></div>`;
     const jalur = $("#stJalur");
     api.kontrol.innerHTML = `
@@ -453,14 +498,16 @@
       k.el.appendChild(stempel);
       sfx("stempel");
       if (k.jenis === "oyen") {
-        skor -= 3; salah++;
+        skor -= 3; salah++; combo = 0;
         api.info("Oyen: Ditolak. Alasan: saya sedang tidur di situ.");
         sfx("meong");
       } else if (k.jenis === pilihan) {
-        skor += 2; benar++;
-        api.info(pilih(["Bu Ratna: Pas ya.", "Mas Kukang: ...tepat.", "Dimas: BENAR— eh, benar.", ""]));
+        skor += 2; benar++; combo++;
+        api.tambah("benar"); api.catatStat("comboMaks", Math.max(api.stat.comboMaks || 0, combo));
+        if (combo % 5 === 0) { skor += 3; sfx("poin"); api.info(`COMBO x${combo}! +3 bonus. Bu Ratna: Tangannya lagi enak ya.`); }
+        else api.info(combo >= 3 ? `Combo x${combo}` : pilih(["Bu Ratna: Pas ya.", "Mas Kukang: ...tepat.", "Dimas: BENAR— eh, benar.", ""]));
       } else {
-        skor -= 1; salah++;
+        skor -= 1; salah++; combo = 0;
         api.info(`Dimas: Eh, itu harusnya ${{ setuju: "DISETUJUI", tolak: "DITOLAK", nanti: "NANTI AJA" }[k.jenis]}. Nggak apa-apa, saya juga sering.`);
         k.el.classList.add("keliru");
       }
@@ -487,8 +534,8 @@
           k.el.style.top = `${k.y * 82}%`;
           if (k.y >= 1) {
             k.selesai = true;
-            if (k.jenis === "oyen") { skor += 1; api.info("Oyen lewat dengan selamat. Tidurnya tidak terganggu. +1"); sfx("meong"); }
-            else { api.info("Berkas jatuh dari meja. Pak Satpam memungutnya."); sfx("kertas"); }
+            if (k.jenis === "oyen") { skor += 1; api.tambah("oyenLewat"); api.info("Oyen lewat dengan selamat. Tidurnya tidak terganggu. +1"); sfx("meong"); }
+            else { combo = 0; api.info("Berkas jatuh dari meja. Pak Satpam memungutnya. Combo putus."); sfx("kertas"); }
             api.skor(skor);
             k.el.classList.add("jatuh");
             setTimeout(() => k.el.remove(), 500);
@@ -541,8 +588,8 @@
         if (k.y > mapY() - 12 && k.y < mapY() + 14 && Math.abs(k.x - mapX) < 42) {
           kertas.splice(i, 1);
           if (k.jenis === "rapat") { skor -= 2; getar = 0.3; efek.push(kilat("rapat 16.00 -2", k.x, k.y - 20, "#B5443A")); sfx("salah"); api.info("Undangan rapat jam 4 sore masuk map. Akan kami pura-pura tidak lihat."); }
-          else if (k.jenis === "emas") { skor += 3; efek.push(kilat("+3 surat rahasia", k.x, k.y - 20, "#9A7224")); sfx("poin"); api.info("Dapat surat dari Mesin Fotokopi untuk Printer. Isinya rahasia. +3"); K.catat("suratPrinter"); }
-          else { skor += 1; efek.push(kilat("+1", k.x, k.y - 20, "#2F4A6B")); sfx("kertas"); }
+          else if (k.jenis === "emas") { skor += 3; api.tambah("emas"); api.tambah("tangkap"); efek.push(kilat("+3 surat rahasia", k.x, k.y - 20, "#9A7224")); sfx("poin"); api.info("Dapat surat dari Mesin Fotokopi untuk Printer. Isinya rahasia. +3"); K.catat("suratPrinter"); }
+          else { skor += 1; api.tambah("tangkap"); efek.push(kilat("+1", k.x, k.y - 20, "#2F4A6B")); sfx("kertas"); }
           api.skor(skor);
         } else if (k.y > H + 20) kertas.splice(i, 1);
       }
@@ -617,7 +664,7 @@
       }
       if (tahan && !harusLepas) {
         if (keadaan === "menoleh") {
-          nyawa--; harusLepas = true; kedip = 0.5;
+          nyawa--; harusLepas = true; kedip = 0.5; api.tambah("ketahuan");
           sfx("meong");
           efek.push(kilat("KETAHUAN", W / 2, H * 0.55, "#B5443A"));
           api.info(pilih(["Oyen: Gorengan disita. Untuk keperluan rapat.", "Oyen: ...Diketahui.", "Oyen: Mulutnya kenapa gerak-gerak?"]));
@@ -759,6 +806,7 @@
         $("#hudWaktu").textContent = `Posisi ${posisi()}/4`;
         if (d >= PANJANG) {
           selesai = true; finis = posisi();
+          api.catatStat("finis", finis); api.catatStat("emas", emas);
           sfx(finis === 1 ? "menang" : "tingtong");
           const skor = [0, 160, 110, 80, 60][finis] + emas * 12 + Math.max(0, 40 - tabrak * 8);
           const KOMENTAR = [null,

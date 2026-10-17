@@ -63,11 +63,24 @@ Navigasi utamanya adalah **panel tombol lift** di bawah layar. Panel ini muncul 
 |---|---|---|
 | **L** | Lobi | Sapaan petugas, pengumuman kantor, absen perasaan (Gelas Teh), denah gedung, Papan Pegawai, berkas misteri (Lantai 13 + Kasus Lift Tengah Malam) |
 | **1** | Loket | Loket A (keluhan), B (kabar baik), C (semangat), D (tersembunyi, muncul kalau Mira ragu-ragu ±10 detik) |
-| **2** | Rehat | 5 mini game 3D (termasuk Balap Troli Arsip), bisa diganti ke 2D klasik, Poin Sabar, papan Pegawai Teladan |
+| **2** | Rehat | 5 mini game 3D (bisa 2D klasik), Mode Duel 2 pemain (4 game, turnamen, bot), pangkat, misi harian, tingkat Lembur, papan Pegawai Teladan |
 | **3** | Pantry | Ngobrol dengan 5 karakter (ada mode "dengerin aja") dan papan gosip |
 | **4** | Kopkar | Koperasi: belanja barang absurd pakai Poin Sabar, struk bisa diunduh |
 | **5** | Meja | Meja Kerja Mira: koleksi barang, barang langka, buku rekor |
 | **▒ → 13** | Rahasia | Terbuka setelah Misteri Lantai 13 tamat |
+
+### Mode Duel (2 pemain, satu HP) & tantangan
+Disusun dari pola main remaja 2025–2026: game berdua dengan teman jadi favorit cowok maupun cewek, sering main di ruangan yang sama, plus rasa "ranked" ala Mobile Legends dan ronde-ronde ala Stumble Guys.
+- **Mode Duel**: HP ditaruh di meja, dua pemain hadap-hadapan. Sisi atas tampil terbalik supaya terbaca dari seberang. Ada 4 game:
+  - **Hoki Meja Rapat**: air hockey dengan tatakan gelas dan donat, duluan 4 gol (batas 75 detik).
+  - **Cap Duluan**: adu refleks dengan lampu palsu, waktu reaksi tampil dalam milidetik, duluan 3 poin.
+  - **Tarik Map**: tarik tambang dengan ketukan cepat, rebut gelas kopi untuk tarikan dua kali lipat.
+  - **Kabel Kusut**: seperti game "ular cahaya", belok kiri/kanan dan jangan menabrak, duluan menang 2 kali.
+- **Format**: turnamen 3 atau 5 ronde (urutan acak, ada ronde penentuan kalau seri), atau satu game saja. Pemain memilih nama dan karakter. Tiap ronde diawali dua tombol SIAP, satu di tiap sisi. Ada podium juara, rekor head-to-head, dan tombol rematch.
+- **Lawan bot Pak Satpam** (Santai/Normal/Lembur) untuk main sendiri.
+- **Pangkat**: XP dari tiap game, 8 pangkat dari Pegawai Magang sampai Legenda Kantor, tampil juga di papan Pegawai Teladan.
+- **Misi harian**: 3 misi per hari (salah satunya misi duel yang boleh dikerjakan lawan bot), hadiah Poin Sabar + XP, bonus kalau ketiganya beres. Ada juga hitungan hari beruntun.
+- **Tingkat kesulitan** di game solo: Santai, Normal, Lembur (semua lebih cepat, Poin Sabar x1.5). Stempel Kilat punya **combo**.
 
 ### Games 3D
 Semua game di Ruang Istirahat sekarang tampil 3D: lapangan rally dari belakang pemain, kertas yang berputar di udara, ruang rapat dari kursi Mira, balapan troli dengan kamera mengejar, dan meja stempel yang miring. Pegawai tetap pixel art, berdiri seperti papan di dunia 3D.
@@ -254,7 +267,7 @@ Semua teks ada di file JavaScript, jadi bisa diubah langsung lewat GitHub (buka 
 | Profil & kutipan karakter | `kantor.js` (bagian `K.PEGAWAI`) |
 | Obrolan Pantry, kalimat "dengerin aja", gosip | `pantry-data.js` |
 | Barang koperasi & harga | `koperasi.js` (bagian `BARANG`) |
-| Isi game | `games.js` (logika), `games3d.js` (tampilan 3D) |
+| Isi game | `games.js` (logika), `games3d.js` (tampilan 3D), `duel.js` (Mode Duel), `progres.js` (pangkat & misi) |
 | Cerita misteri | `l13-bab.js` (Bab 1), `l13-bab23.js` (Bab 2–3), `l13-bab456.js` (Bab 4–6 + Ruang Rahasia), `l13-kasus-lift.js` (Kasus Lift Tengah Malam) |
 | Gambar karakter (pixel) | `sprites.js` (grid 12×12 huruf) |
 

@@ -1,0 +1,128 @@
+/* =========================================================
+   Mode Duel, pangkat, misi harian
+   ========================================================= */
+:root { --p1: #3E78C4; --p2: #E58B3A; }
+
+/* ---------- papan pangkat & misi (Ruang Istirahat) ---------- */
+.papan-progres { display: grid; gap: 12px; margin: 0 0 18px; }
+.pangkat-kartu {
+  display: grid; grid-template-columns: 58px 1fr auto; gap: 12px; align-items: center; padding: 10px 12px;
+  background: #23272B; color: #F0EADB; border: 2px solid #2B2A26; border-radius: var(--wobble-sm);
+  box-shadow: 4px 4px 0 var(--pk);
+}
+.pk-lencana { position: relative; width: 56px; height: 56px; padding: 6px; background: var(--pk); border: 3px solid #F0EADB; clip-path: polygon(50% 0, 100% 22%, 100% 78%, 50% 100%, 0 78%, 0 22%); }
+.pk-lencana svg { width: 100%; height: 100%; }
+.pk-lencana b { position: absolute; right: 4px; bottom: 2px; font-size: 1rem; color: #FFFDF6; text-shadow: 1px 1px 0 #2B2A26; }
+.pk-isi { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.pk-isi small { color: #CFC5AD; font-size: .85rem; line-height: 1.2; }
+.pk-isi strong { font-family: var(--font-px); font-size: 1.08rem; color: #FFFDF6; }
+.pk-bar { display: block; height: 10px; background: #3B4046; border: 2px solid #111; }
+.pk-bar i { display: block; height: 100%; background: var(--pk); }
+.pk-beruntun { text-align: center; max-width: 74px; line-height: 1.1; }
+.pk-beruntun b { display: block; font-size: 1.8rem; color: #F2C14E; }
+.pk-beruntun small { font-size: .78rem; color: #CFC5AD; }
+.misi-harian { border: 2px dashed var(--line); border-radius: var(--wobble-sm); padding: 10px 12px; background: var(--paper); }
+.misi-judul { font-family: var(--font-px); margin: 0 0 8px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.misi-judul small { color: var(--ink-soft); font-size: .9rem; }
+.misi-harian ul { list-style: none; margin: 0 0 6px; padding: 0; display: grid; gap: 8px; }
+.misi { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center; }
+.misi-teks { font-size: .98rem; line-height: 1.25; }
+.misi-bar { grid-column: 1; height: 6px; background: var(--line-soft); border: 1px solid var(--line); }
+.misi-bar i { display: block; height: 100%; background: var(--accent); }
+.misi .btn, .misi-status { grid-row: 1 / span 2; grid-column: 2; }
+.misi-status { color: var(--ink-soft); font-size: 1.05rem; }
+.misi.beres .misi-bar i { background: #4F6E5E; }
+.misi.diklaim { opacity: .55; }
+.misi.diklaim .misi-teks { text-decoration: line-through; }
+.tag-duel { font-family: var(--font-px); font-size: .68rem; color: #FFFDF6; background: var(--p2); padding: 1px 5px; }
+.teladan-pangkat { color: #8A6519 !important; font-family: var(--font-px); font-size: .75rem; }
+.chip-lembur.dipilih { background: #B5443A !important; }
+.hasil-progres { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 10px; }
+.hasil-progres span { font-family: var(--font-px); font-size: .8rem; padding: 3px 8px; background: #23272B; color: #F2C14E; }
+.hasil-progres .hp-misi { background: #4F6E5E; color: #FFFDF6; }
+.hasil-progres .hp-pangkat { background: #B5443A; color: #FFFDF6; }
+
+/* ---------- kartu Mode Duel ---------- */
+.kartu-duel {
+  width: 100%; display: grid; grid-template-columns: 84px 1fr auto; gap: 12px; align-items: center; text-align: left; cursor: pointer;
+  font: inherit; color: #FFFDF6; margin: 0 0 18px; padding: 12px 14px; border: 2px solid #2B2A26; border-radius: var(--wobble-sm);
+  background: linear-gradient(135deg, var(--p1) 0 50%, var(--p2) 50% 100%); box-shadow: 4px 4px 0 #2B2A26;
+}
+.kartu-duel:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #2B2A26; }
+.kd-vs { display: flex; align-items: center; gap: 2px; }
+.kd-vs span { width: 34px; height: 34px; background: #FFFDF6; border: 2px solid #2B2A26; padding: 2px; }
+.kd-vs b { font-family: var(--font-px); font-size: .8rem; color: #F2C14E; text-shadow: 1px 1px 0 #2B2A26; }
+.kd-isi strong { display: block; font-family: var(--font-px); font-size: 1.05rem; text-shadow: 1px 1px 0 rgba(0,0,0,.35); }
+.kd-isi small { display: block; font-size: .92rem; line-height: 1.3; text-shadow: 1px 1px 0 rgba(0,0,0,.35); }
+
+/* ---------- lapisan duel ---------- */
+.duel { position: fixed; inset: 0; z-index: 70; background: #1C1F26; display: flex; justify-content: center; overflow: hidden; }
+#duelKanvas { display: block; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.duel-panel { position: absolute; inset: 0; overflow-y: auto; }
+.duel-panel:empty { pointer-events: none; }
+.duel-keluar {
+  position: absolute; left: 6px; top: 50%; transform: translateY(-50%); z-index: 5; width: 40px; height: 40px;
+  font: inherit; font-size: 1.1rem; color: #FFFDF6; background: rgba(43,42,38,.8); border: 2px solid #F0EADB; border-radius: 50%; cursor: pointer;
+}
+
+/* pengaturan */
+.duel-atur { max-width: 520px; margin: 0 auto; padding: 18px 16px 30px; background: var(--paper); min-height: 100%; color: var(--ink); }
+.duel-judul { margin: 0 0 4px 34px; font-family: var(--font-px); }
+.da-bagian, .da-pemain { border: 2px dashed var(--line); border-radius: var(--wobble-sm); padding: 10px 12px; margin: 12px 0; }
+.da-pemain.p1 { border-color: var(--p1); background: color-mix(in srgb, var(--p1) 8%, var(--paper)); }
+.da-pemain.p2 { border-color: var(--p2); background: color-mix(in srgb, var(--p2) 8%, var(--paper)); }
+.da-titik { display: inline-block; width: 12px; height: 12px; border: 2px solid #2B2A26; margin-right: 6px; vertical-align: -1px; }
+.da-nama { width: 100%; font: inherit; font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); background: #FFFDF6; color: #2B2A26; margin-bottom: 8px; }
+.da-karakter { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.da-kar { aspect-ratio: 1; padding: 4px; background: #FFFDF6; border: 2px solid var(--line); cursor: pointer; min-height: 44px; }
+.da-kar.dipilih { border-color: var(--ink); box-shadow: inset 0 0 0 3px #F2C14E; }
+.da-kar svg { width: 100%; height: 100%; }
+.da-bot { display: flex; gap: 8px; align-items: center; margin: 0; }
+.da-rekor { text-align: center; color: var(--ink-soft); font-size: 1.05rem; }
+.pilih-tampilan + .pilih-tampilan { margin-top: 6px; }
+
+/* antar-ronde: dua sisi, sisi atas diputar */
+.duel-antara { display: grid; grid-template-rows: 1fr auto 1fr; min-height: 100%; }
+.duel-separuh {
+  display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px; padding: 14px 18px; text-align: center;
+  background: color-mix(in srgb, var(--warna) 22%, #1C1F26); color: #F0EADB;
+}
+.duel-separuh.p2 { transform: rotate(180deg); }
+.ds-skor { display: flex; justify-content: space-between; gap: 10px; width: 100%; max-width: 380px; font-family: var(--font-px); font-size: .85rem; }
+.ds-skor b { font-size: 1.5rem; color: #F2C14E; }
+.ds-game { font-family: var(--font-px); font-size: 1.2rem; display: flex; gap: 8px; align-items: center; margin: 0; }
+.ds-cara { max-width: 380px; margin: 0; font-size: 1rem; line-height: 1.35; }
+.ds-siap {
+  font: inherit; font-family: var(--font-px); font-size: 1.1rem; display: flex; align-items: center; gap: 10px; padding: 12px 22px; min-height: 56px;
+  color: #FFFDF6; background: var(--warna); border: 3px solid #F0EADB; cursor: pointer; box-shadow: 0 5px 0 #111;
+}
+.ds-siap.ok { background: #4F6E5E; box-shadow: none; transform: translateY(4px); }
+.ds-siap-bot { font-family: var(--font-px); margin: 0; }
+.ds-garis { text-align: center; font-family: var(--font-px); font-size: 1.1rem; color: #F2C14E; background: #111; padding: 6px; letter-spacing: .3em; }
+.ds-hasil { font-family: var(--font-px); font-size: 1.3rem; margin: 0; }
+.ds-hasil.menang { color: #F2C14E; }
+.ds-lanjut { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); display: flex; justify-content: center; pointer-events: none; }
+.ds-lanjut .btn { pointer-events: auto; }
+
+/* hitung mundur dua arah */
+.duel-hitung { position: absolute; inset: 0; display: grid; grid-template-rows: 1fr 1fr; place-items: center; background: #1C1F26; }
+.dh-angka { font-family: var(--font-px); font-size: 4rem; color: #FFFDF6; grid-row: 2; }
+.dh-angka.atas { grid-row: 1; transform: rotate(180deg); }
+
+/* podium */
+.duel-podium { max-width: 520px; margin: 0 auto; padding: 22px 16px 30px; min-height: 100%; background: var(--paper); color: var(--ink); text-align: center; }
+.dp-cap { color: var(--ink-soft); letter-spacing: .2em; margin: 0 0 10px; }
+.dp-panggung { display: flex; justify-content: center; align-items: flex-end; gap: 10px; margin-bottom: 8px; }
+.dp-kursi { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.dp-kursi .avatar { width: 64px; height: 64px; }
+.dp-kursi.satu .avatar { width: 84px; height: 84px; }
+.dp-tiang { display: block; width: 100px; background: #CFC5AD; border: 2px solid #2B2A26; font-family: var(--font-px); font-size: 1.4rem; padding: 6px 0; }
+.dp-kursi.satu .dp-tiang { height: 92px; background: var(--warna); color: #FFFDF6; }
+.dp-kursi.dua .dp-tiang { height: 58px; }
+.dp-piala { width: 40px; height: 40px; animation: ultahGoyang 1.6s ease-in-out infinite; }
+.dp-skor { font-size: 2.4rem; margin: 6px 0; color: var(--accent); }
+.dp-ronde { text-align: left; max-width: 380px; margin: 10px auto; padding-left: 22px; }
+.dp-ronde li { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px dashed var(--line); padding: 3px 0; }
+@media (prefers-reduced-motion: reduce) { .dp-piala { animation: none; } }
+.duel[hidden], #duelKanvas[hidden] { display: none; }
+body:has(.duel:not([hidden])) #confetti { z-index: 80; }

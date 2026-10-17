@@ -22,7 +22,8 @@ window.KLP = window.KLP || {};
     gosipDibaca: [],
     barang: {},        // koperasi: { id: jumlah }
     absen: null,       // { tgl, level } absen perasaan harian (gelas teh)
-    setelan: { volume: 2, kaget: true, tanyaKaget: false, seram: "lucu" },
+    setelan: { volume: 2, kaget: true, tanyaKaget: false, seram: "lucu", tingkat: "normal", game3d: true },
+    progres: { xp: 0, pangkatDilihat: 0, misi: { tgl: null, daftar: [] }, beruntun: { tgl: null, n: 0 }, duel: { ronde: 0, turnamen: 0, rekor: {} } },
     sudahMasuk: false,
     semangatTerakhir: 0,
     l13: { selesai: [], inv: [], flag: {}, mulai: null, mulaiKasus: {}, bukaSemua: false, langka: [], posisi: null, halKecil: [], tglDiangkat: null, bukti: [] },

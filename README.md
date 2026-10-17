@@ -24,6 +24,8 @@ Navigasi utama berupa **panel lift** di bawah layar dan denah gedung di Lobi.
 | 5 · Meja | Koleksi barang, rak barang langka, buku rekor, hapus data |
 | 13 · Rahasia | Terbuka setelah Misteri Lantai 13 selesai: SK Penjaga Lantai 13, toples koleksi, simpan hal kecil |
 
+**Mode Duel** (Lantai 2): 2 pemain satu HP, hadap-hadapan, 4 game (Hoki Meja Rapat, Cap Duluan, Tarik Map, Kabel Kusut), turnamen 3/5 ronde atau lawan bot. Ada juga pangkat, misi harian, dan tingkat Lembur (`duel.js`, `progres.js`).
+
 **Radio Kantor** (pojok kanan atas): kenop volume 5 tingkat, Tuas Mode Kaget, dan Saklar Lampu Lorong (seram-lucu / lebih tegang).
 
 ### Berkas misteri (detektif)
@@ -41,7 +43,7 @@ Ulang tahun 21 Agustus (surat ucapan + tiup lilin, termasuk versi "terlambat" sa
 Semua progres (poin, skor, barang, gosip, misteri) disimpan di `localStorage` perangkat itu sendiri dengan kunci `klp-v2`. Kalau penyimpanan diblokir, semua tetap bisa dimainkan; progresnya saja yang hilang saat halaman ditutup. Isi curhat dan obrolan "dengerin aja" tidak pernah disimpan.
 
 ### Struktur file
-`core.js` (data, suara) → `sprites.js` → `script.js` (loket) → `kantor.js` (lobi, lift, radio) → `skala.js` + `pasang-skala.js` → `games.js` + `games3d.js` → `pantry-data.js` + `pantry.js` → `koperasi.js` → `l13-mesin.js` + `l13-bab*.js` + `l13-kasus-lift.js` → `mira.js` → `panduan.js`.
+`core.js` (data, suara) → `sprites.js` → `script.js` (loket) → `kantor.js` (lobi, lift, radio) → `skala.js` + `pasang-skala.js` → `progres.js` → `games.js` + `games3d.js` + `duel.js` → `pantry-data.js` + `pantry.js` → `koperasi.js` → `l13-mesin.js` + `l13-bab*.js` + `l13-kasus-lift.js` → `mira.js` → `panduan.js`.
 
 ## Ganti nama
 - Ubah `NAMA_DEFAULT` di baris atas `script.js`, atau
