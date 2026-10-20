@@ -63,7 +63,7 @@ Navigasi utamanya adalah **panel tombol lift** di bawah layar. Panel ini muncul 
 |---|---|---|
 | **L** | Lobi | Sapaan petugas, pengumuman kantor, absen perasaan (Gelas Teh), denah gedung, Papan Pegawai, berkas misteri (Lantai 13 + Kasus Lift Tengah Malam) |
 | **1** | Loket | Loket A (keluhan), B (kabar baik), C (semangat), D (tersembunyi, muncul kalau Mira ragu-ragu ±10 detik) |
-| **2** | Rehat | 5 mini game 3D termasuk Grand Prix Kantor ala kart/MotoGP (bisa 2D klasik), Mode Duel 2 pemain (4 game, turnamen, bot), pangkat, misi harian, tingkat Lembur, papan Pegawai Teladan |
+| **2** | Rehat | 7 game 3D: termasuk Grand Prix Kantor (ala kart/MotoGP), Legenda Lantai 2 (ala MOBA) dan Kantor Royale (ala battle royale), bisa 2D klasik, Mode Duel 2 pemain (4 game, turnamen, bot), pangkat, misi harian, tingkat Lembur, papan Pegawai Teladan |
 | **3** | Pantry | Ngobrol dengan 5 karakter (ada mode "dengerin aja") dan papan gosip |
 | **4** | Kopkar | Koperasi: belanja barang absurd pakai Poin Sabar, struk bisa diunduh |
 | **5** | Meja | Meja Kerja Mira: koleksi barang, barang langka, buku rekor |
@@ -81,6 +81,25 @@ Disusun dari pola main remaja 2025–2026: game berdua dengan teman jadi favorit
 - **Pangkat**: XP dari tiap game, 8 pangkat dari Pegawai Magang sampai Legenda Kantor, tampil juga di papan Pegawai Teladan.
 - **Misi harian**: 3 misi per hari (salah satunya misi duel yang boleh dikerjakan lawan bot), hadiah Poin Sabar + XP, bonus kalau ketiganya beres. Ada juga hitungan hari beruntun.
 - **Tingkat kesulitan** di game solo: Santai, Normal, Lembur (semua lebih cepat, Poin Sabar x1.5). Stempel Kilat punya **combo**.
+
+### Legenda Lantai 2 & Kantor Royale (gaya Mobile Legends & Free Fire)
+Game ini dibuat dengan gameplay yang mirip, tapi nama, hero, dan gambarnya karya sendiri, bukan salinan. Mobile Legends dan Free Fire adalah merek milik pembuatnya masing-masing.
+
+**Legenda Lantai 2** (arena hero 3 lawan 3, ±5–7 menit)
+- 6 hero pegawai: Kak Badak (Tank), Pak Satpam (Fighter), Mas Kukang (Mage), Oyen (Assassin), Dimas (Marksman), Bu Ratna (Support). Masing-masing punya serangan dasar, 2 skill, dan 1 ultimate dengan waktu jeda.
+- Satu lane vertikal (pas untuk HP tegak): tim biru di bawah, merah di atas. Tiap tim punya 2 menara + inti markas yang harus diruntuhkan berurutan.
+- Gelombang minion tiap 20 detik, minion super mulai menit ke-3. Ada jungle dengan Printer Liar dan bos **Mesin Fotokopi Purba**: siapa yang mengalahkannya dapat minion raksasa yang ikut mendorong lane.
+- Gold & level dari minion, takedown, dan menara. Tombol **Beli** di bawah membeli item rekomendasi sesuai peran. Ada tombol **Pulang ke markas** untuk memulihkan darah.
+- Semak menyembunyikan hero. Ada pengumuman Takedown Pertama, Double Kill, dst., umpan berita, papan skor, peta mini, dan layar akhir dengan KDA + MVP.
+- Teman dan lawan adalah bot. Tingkat kesulitan memengaruhi seberapa cerdik mereka memakai skill.
+
+**Kantor Royale** (20 pemain, ±3 menit)
+- Loncat dari **pesawat kertas** (ketuk LONCAT), turun pakai payung, lalu buka peti untuk mengambil barang.
+- Senjata: Pistol Air, Ketapel Karet (seperti shotgun), Pelontar Bola Kertas (cepat), Semprotan Tekanan Tinggi, dan Stempel Jarak Jauh (seperti sniper). Ada juga Rompi Map Lv1–3 dan Teh Hangat untuk memulihkan.
+- Barang otomatis terambil saat diinjak, dengan 2 slot senjata. Senjata yang lebih bagus menggantikan yang lebih lemah.
+- **Zona aman** menyusut dalam 5 fase. Di luar zona darah berkurang (kedinginan).
+- Sisa pemain, jumlah KO, umpan berita, peta mini dengan zona & jalur pesawat, angka kerusakan, dan panah penunjuk zona.
+- Juara = **pulang paling akhir**. Yang kalah "basah kuyup, pulang duluan". Tidak ada darah.
 
 ### Grand Prix Kantor (pengganti Balap Troli Arsip)
 Balapan sirkuit ala game kart dan MotoGP, dengan nama dan gaya kantor sendiri:
@@ -277,7 +296,7 @@ Semua teks ada di file JavaScript, jadi bisa diubah langsung lewat GitHub (buka 
 | Profil & kutipan karakter | `kantor.js` (bagian `K.PEGAWAI`) |
 | Obrolan Pantry, kalimat "dengerin aja", gosip | `pantry-data.js` |
 | Barang koperasi & harga | `koperasi.js` (bagian `BARANG`) |
-| Isi game | `games.js` (logika), `balap.js` (Grand Prix), `games3d.js` (tampilan 3D), `duel.js` (Mode Duel), `progres.js` (pangkat & misi) |
+| Isi game | `games.js` (logika), `balap.js` (Grand Prix), `arena.js` + `moba.js` + `royale.js` (Legenda Lantai 2 & Kantor Royale), `games3d.js` (tampilan 3D), `duel.js` (Mode Duel), `progres.js` (pangkat & misi) |
 | Cerita misteri | `l13-bab.js` (Bab 1), `l13-bab23.js` (Bab 2–3), `l13-bab456.js` (Bab 4–6 + Ruang Rahasia), `l13-kasus-lift.js` (Kasus Lift Tengah Malam) |
 | Gambar karakter (pixel) | `sprites.js` (grid 12×12 huruf) |
 

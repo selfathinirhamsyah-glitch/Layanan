@@ -165,3 +165,18 @@ body.layar-penuh .lift, body.layar-penuh .toast { display: none !important; }
 .gp-stat i { font-style: normal; font-size: .88rem; color: var(--ink-soft); }
 .gp-stat b { font-family: var(--font-num); font-weight: 400; color: #3E78C4; letter-spacing: 1px; }
 .gp-karakter { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+
+/* ---------- Legenda Lantai 2 & Kantor Royale ---------- */
+.moba-bar { display: flex; gap: 6px; width: 100%; }
+.moba-btn {
+  flex: 1; min-height: 44px; font: inherit; font-family: var(--font-px); font-size: .78rem; color: #FFFDF6; cursor: pointer;
+  background: #3B4046; border: 2px solid #23272B; padding: 4px 6px; line-height: 1.15;
+}
+.moba-btn.bisa { background: #9A7224; color: #FFFDF6; animation: kedip 1.2s steps(2) infinite; }
+.moba-btn.kecil { flex: .7; font-size: .7rem; background: #2F4A6B; }
+.moba-hero { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 6px; }
+.moba-h { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; font: inherit; color: var(--ink); cursor: pointer; background: var(--paper); border: 2px solid var(--line); border-radius: var(--wobble-sm); }
+.moba-h .avatar { width: 40px; height: 40px; }
+.moba-h strong { font-family: var(--font-px); font-size: .78rem; }
+.moba-h small { color: var(--ink-soft); font-size: .8rem; }
+.moba-h.dipilih { border-color: var(--ink); background: var(--accent-wash); box-shadow: inset 0 0 0 2px #F2C14E; }

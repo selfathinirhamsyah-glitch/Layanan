@@ -50,6 +50,16 @@
       cara: "Balapan sirkuit 3 lap. Kendaraan jalan sendiri; tahan ◀ ▶ (atau sentuh kiri/kanan layar) untuk belok. Tahan DRIFT sambil belok untuk mengisi mini turbo, lepas untuk melesat. Ambil kotak item (teh turbo, kulit pisang goreng, stempel kejar, payung), kumpulkan berkas emas biar makin kencang. Tahan DRIFT tepat saat lampu ke-3 untuk start roket.",
       poin: (s) => Math.round(Math.max(0, s) / 5),
     },
+    moba: {
+      nama: "Legenda Lantai 2", sprite: "badak", durasi: "3 vs 3, ±5 menit",
+      cara: "Arena hero 3 lawan 3. Joystick kiri untuk jalan, SERANG untuk menyerang otomatis, dua skill dan ULT dengan waktu jeda. Kumpulkan gold dari minion dan lawan, beli item, naik level. Runtuhkan menara lalu inti markas merah di atas. Semak bisa dipakai bersembunyi.",
+      poin: (s) => Math.round(Math.max(0, s) / 5),
+    },
+    royale: {
+      nama: "Kantor Royale", sprite: "payung", durasi: "20 pemain, ±3 menit",
+      cara: "Loncat dari pesawat kertas, turun pakai payung, buka peti untuk senjata air, rompi, dan teh. Joystick kiri untuk jalan, tahan TEMBAK (bidik otomatis), GANTI senjata, TEH untuk memulihkan. Tetap di dalam zona aman. Juaranya yang pulang paling akhir.",
+      poin: (s) => Math.round(Math.max(0, s) / 5),
+    },
   };
   K.GAMES = GAMES;
 
@@ -167,6 +177,8 @@
         <div class="ap-kepala"><span class="avatar">${px(g.sprite)}</span><p>${esc(g.cara)}</p></div>
         ${gameAktif === "rally" ? `<div class="ap-bagian"><p class="ap-label">Pemanasan (opsional): pukul satu kok. Makin semangat, makin cepat Pak Satpam membalas.</p><div id="pemanasanKok"></div></div>` : ""}
         ${gameAktif === "troli" && K.BALAP ? K.BALAP.htmlPilihan() : ""}
+        ${gameAktif === "moba" && K.MOBA ? K.MOBA.htmlPilihan() : ""}
+        ${gameAktif === "royale" && K.ROYALE ? K.ROYALE.htmlPilihan() : ""}
         <div class="ap-bagian ap-tingkat">
           <p class="ap-label">Tingkat kesulitan</p>
           <div class="pilih-tampilan pilih-tingkat" role="radiogroup" aria-label="Tingkat kesulitan">
@@ -196,6 +208,8 @@
       });
       segarTampilan();
       if (gameAktif === "troli") K.BALAP?.pasang(panel);
+      if (gameAktif === "moba") K.MOBA?.pasang(panel);
+      if (gameAktif === "royale") K.ROYALE?.pasang(panel);
       const segarTingkat = () => {
         const t = tingkatIni();
         panel.querySelectorAll("[data-tingkat]").forEach((b) => { const on = b.dataset.tingkat === t; b.classList.toggle("dipilih", on); b.setAttribute("aria-checked", on); });
@@ -276,6 +290,8 @@
     const api = buatApi(semangat, tiga);
     apiAktif = api;
     const hentikan = MAIN[gameAktif](api);
+    // game yang memasang bar tombol sendiri mengecilkan panggung: ukur ulang kanvas
+    if (kontrol.childElementCount) { siapkanKanvas(); try { api.d3?.ukur(); } catch { /* tidak apa-apa */ } }
     berhenti = () => { hentikan(); api.d3?.hapus(); api.d3 = null; };
     api.selesai = (skor, komentar) => {
       berhenti?.(); berhenti = null;
@@ -721,6 +737,9 @@
 
   /* ---------- 5. Grand Prix Kantor (balap.js) ---------- */
   MAIN.troli = (api) => K.BALAP.main(api);
+  /* ---------- 6–7. Legenda Lantai 2 (moba.js) & Kantor Royale (royale.js) ---------- */
+  MAIN.moba = (api) => K.MOBA.main(api);
+  MAIN.royale = (api) => K.ROYALE.main(api);
 
   addEventListener("resize", () => { if (!arena.hidden && !kanvas.hidden) { siapkanKanvas(); try { apiAktif?.d3?.ukur(); } catch { /* tidak apa-apa */ } } });
   K.bukaGame = bukaArena;
