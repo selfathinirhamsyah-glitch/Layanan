@@ -63,7 +63,7 @@ Navigasi utamanya adalah **panel tombol lift** di bawah layar. Panel ini muncul 
 |---|---|---|
 | **L** | Lobi | Sapaan petugas, pengumuman kantor, absen perasaan (Gelas Teh), denah gedung, Papan Pegawai, berkas misteri (Lantai 13 + Kasus Lift Tengah Malam) |
 | **1** | Loket | Loket A (keluhan), B (kabar baik), C (semangat), D (tersembunyi, muncul kalau Mira ragu-ragu ±10 detik) |
-| **2** | Rehat | 5 mini game 3D (bisa 2D klasik), Mode Duel 2 pemain (4 game, turnamen, bot), pangkat, misi harian, tingkat Lembur, papan Pegawai Teladan |
+| **2** | Rehat | 5 mini game 3D termasuk Grand Prix Kantor ala kart/MotoGP (bisa 2D klasik), Mode Duel 2 pemain (4 game, turnamen, bot), pangkat, misi harian, tingkat Lembur, papan Pegawai Teladan |
 | **3** | Pantry | Ngobrol dengan 5 karakter (ada mode "dengerin aja") dan papan gosip |
 | **4** | Kopkar | Koperasi: belanja barang absurd pakai Poin Sabar, struk bisa diunduh |
 | **5** | Meja | Meja Kerja Mira: koleksi barang, barang langka, buku rekor |
@@ -82,8 +82,18 @@ Disusun dari pola main remaja 2025–2026: game berdua dengan teman jadi favorit
 - **Misi harian**: 3 misi per hari (salah satunya misi duel yang boleh dikerjakan lawan bot), hadiah Poin Sabar + XP, bonus kalau ketiganya beres. Ada juga hitungan hari beruntun.
 - **Tingkat kesulitan** di game solo: Santai, Normal, Lembur (semua lebih cepat, Poin Sabar x1.5). Stempel Kilat punya **combo**.
 
+### Grand Prix Kantor (pengganti Balap Troli Arsip)
+Balapan sirkuit ala game kart dan MotoGP, dengan nama dan gaya kantor sendiri:
+- **3 lap, 6 pembalap**: Mira + Pak Satpam, Dimas, Kak Badak, Mas Kukang, Oyen. Peta mini, posisi, dan lap tampil di layar.
+- **Kendaraan**: Troli Arsip (seimbang), **Motor Pak Satpam** (paling kencang, miring saat menikung ala MotoGP, kamera ikut miring), Kursi Putar (drift paling lincah). Pembalap bisa dipilih dari 12 pegawai.
+- **Kendali**: kendaraan jalan sendiri. Tahan ◀ ▶ (atau sentuh kiri/kanan layar) untuk belok. Tahan **DRIFT** sambil belok untuk mengisi mini turbo (biru → oranye → ungu), lalu lepas untuk melesat. Ketuk **ITEM** untuk memakai item. Di laptop: panah, Spasi, X.
+- **Kotak "?"**: Teh Turbo, Kulit Pisang Goreng (ditaruh di belakang), Stempel Kejar (mengejar pembalap di depan), Payung Pelindung (kebal sebentar), Tiga Berkas Emas. Makin belakang posisinya, makin bagus item yang didapat.
+- **Berkas emas** menambah kecepatan maksimal (sampai 10). Kalau kena pisang/stempel, satu berkas jatuh. Ada juga **panah turbo** kuning di aspal.
+- **Start roket**: tahan DRIFT tepat saat lampu ke-3 menyala. Kalau terlalu cepat, mesinnya ngambek.
+- Skor = posisi finis + berkas emas + jumlah mini turbo. Misi "Juara 1 di Grand Prix Kantor" dan "4 berkas emas" ikut berlaku.
+
 ### Games 3D
-Semua game di Ruang Istirahat sekarang tampil 3D: lapangan rally dari belakang pemain, kertas yang berputar di udara, ruang rapat dari kursi Mira, balapan troli dengan kamera mengejar, dan meja stempel yang miring. Pegawai tetap pixel art, berdiri seperti papan di dunia 3D.
+Semua game di Ruang Istirahat sekarang tampil 3D: lapangan rally dari belakang pemain, kertas yang berputar di udara, ruang rapat dari kursi Mira, balapan Grand Prix dengan kamera mengejar, dan meja stempel yang miring. Pegawai tetap pixel art, berdiri seperti papan di dunia 3D.
 - Sebelum main ada pilihan **Tampilan: 3D / 2D klasik**. Pilihannya diingat.
 - Kalau HP terlalu berat, resolusinya turun sendiri. Kalau HP tidak mendukung 3D (WebGL), game otomatis pakai versi 2D.
 - Mesin 3D-nya (three.js) ada di folder `vendor/`, jadi tidak perlu internet tambahan. Ukurannya ±600 KB dan baru dimuat saat game dimulai.
@@ -267,7 +277,7 @@ Semua teks ada di file JavaScript, jadi bisa diubah langsung lewat GitHub (buka 
 | Profil & kutipan karakter | `kantor.js` (bagian `K.PEGAWAI`) |
 | Obrolan Pantry, kalimat "dengerin aja", gosip | `pantry-data.js` |
 | Barang koperasi & harga | `koperasi.js` (bagian `BARANG`) |
-| Isi game | `games.js` (logika), `games3d.js` (tampilan 3D), `duel.js` (Mode Duel), `progres.js` (pangkat & misi) |
+| Isi game | `games.js` (logika), `balap.js` (Grand Prix), `games3d.js` (tampilan 3D), `duel.js` (Mode Duel), `progres.js` (pangkat & misi) |
 | Cerita misteri | `l13-bab.js` (Bab 1), `l13-bab23.js` (Bab 2–3), `l13-bab456.js` (Bab 4–6 + Ruang Rahasia), `l13-kasus-lift.js` (Kasus Lift Tengah Malam) |
 | Gambar karakter (pixel) | `sprites.js` (grid 12×12 huruf) |
 

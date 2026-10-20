@@ -66,7 +66,7 @@
         ["berkas", "<b>Stempel Kilat</b> (60 detik): pilih DISETUJUI, DITOLAK, atau NANTI AJA. Kalau ada Oyen tidur di atas berkas, <b>jangan dicap</b>."],
         ["saran", "<b>Tangkap Kertas Terbang</b> (45 detik): geser jari untuk memindahkan map. Hindari undangan rapat jam 4 sore."],
         ["gorengan", "<b>Ngemil Diam-diam di Rapat</b> (45 detik): tahan layar untuk ngemil, <b>lepas</b> saat Oyen menoleh."],
-        ["badak", "<b>Balap Troli Arsip</b> (±1 menit): troli melaju sendiri, <b>geser jari</b> kiri-kanan buat belok. Lawan Pak Satpam, Dimas, dan Kak Badak. Teh = turbo, lantai dipel = licin, berkas emas = bonus."],
+        ["badak", "<b>Grand Prix Kantor</b> (3 lap, 6 pembalap): pilih kendaraan (Troli, Motor Pak Satpam yang miring ala MotoGP, atau Kursi Putar) dan pembalap. Tahan ◀ ▶ untuk belok, tahan <b>DRIFT</b> sambil belok lalu lepas untuk mini turbo, ketuk <b>ITEM</b> untuk teh turbo, kulit pisang goreng, stempel kejar, atau payung. Berkas emas bikin makin kencang. Tahan DRIFT saat lampu ke-3 untuk start roket."],
         ["kura", "<b>Mode Duel</b> (kartu biru-oranye): dua pemain di satu HP, hadap-hadapan. Taruh HP di meja, Pemain 1 sisi bawah, Pemain 2 sisi atas. Turnamen 3 atau 5 ronde: Hoki Meja Rapat, Cap Duluan, Tarik Map, Kabel Kusut. Tidak ada teman? Lawan bot Pak Satpam."],
         ["oyen", "<b>Pangkat & Misi harian</b>: tiap game memberi XP untuk naik pangkat, dari Pegawai Magang sampai Legenda Kantor. Ada 3 misi baru tiap hari, klaim hadiahnya di papan misi."],
         ["badak", "<b>Tingkat kesulitan</b>: Santai, Normal, atau <b>Lembur</b> (semua lebih cepat, Poin Sabar x1.5). Di Stempel Kilat ada combo: tiap 5 cap benar berturut-turut dapat bonus."],

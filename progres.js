@@ -37,7 +37,7 @@
     { id: "kertas20", teks: "Tangkap 20 berkas dalam satu permainan Tangkap Kertas", target: 1, cek: (e) => e.game === "kertas" && (e.stat.tangkap || 0) >= 20 },
     { id: "kertasEmas", teks: "Tangkap 2 surat rahasia (kertas emas)", target: 2, tambah: (e) => (e.game === "kertas" ? e.stat.emas || 0 : 0) },
     { id: "ngemil30", teks: "Ngemil 30 kali dan ketahuan paling banyak sekali", target: 1, cek: (e) => e.game === "ngemil" && e.skor >= 30 && (e.stat.ketahuan || 0) <= 1 },
-    { id: "troliJuara", teks: "Finis posisi 1 di Balap Troli", target: 1, cek: (e) => e.game === "troli" && e.stat.finis === 1 },
+    { id: "troliJuara", teks: "Juara 1 di Grand Prix Kantor", target: 1, cek: (e) => e.game === "troli" && e.stat.finis === 1 },
     { id: "troliEmas", teks: "Ambil 4 berkas emas dalam satu balapan", target: 1, cek: (e) => e.game === "troli" && (e.stat.emas || 0) >= 4 },
     { id: "main3", teks: "Main 3 game apa saja", target: 3, tambah: (e) => (e.jenis === "solo" ? 1 : 0) },
     { id: "lembur", teks: "Selesaikan 1 game di tingkat Lembur", target: 1, cek: (e) => e.jenis === "solo" && e.tingkat === "lembur" },

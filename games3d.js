@@ -381,123 +381,170 @@
     };
   };
 
-  /* ---------- Troli: lintasan parkiran bawah tanah, kamera mengejar ---------- */
-  ADEGAN.troli = (api, kanvas2d, data) => {
-    const P = panggung(kanvas2d, { langit: "#4A4744", fov: 62, kabut: [10, 48] });
+  /* ---------- Grand Prix Kantor: sirkuit 3 lap, kamera mengejar ---------- */
+  ADEGAN.troli = (api, kanvas2d, sim) => {
+    const P = panggung(kanvas2d, { langit: "#BFD8E8", fov: 64, kabut: [36, 150] });
     const { adegan: A, kamera } = P;
-    const { PANJANG, tengah, lebar, benda, LAWAN } = data;
-    const S = 1 / 48;
-    const X = (px) => (px - api.W() / 2) * S, Z = (d) => -d * S;
-    // lantai luas
-    const lantai = new T.Mesh(new T.PlaneGeometry(40, PANJANG * S + 80), bahan("#8D8A84"));
-    lantai.rotation.x = -Math.PI / 2; lantai.position.set(0, -0.02, Z(PANJANG / 2)); A.add(lantai);
-    // jalan: pita mengikuti tikungan
-    function pita(dariKiri, keKanan, y, warna, langkah = 40, sampai = PANJANG + 900) {
-      const pos = [], idx = [];
-      let n = 0;
-      for (let dd = -500; dd <= sampai; dd += langkah) {
-        const c = tengah(dd), l = lebar(dd);
-        pos.push(X(c + dariKiri(l)), y, Z(dd), X(c + keKanan(l)), y, Z(dd));
-        if (n > 0) { const a = (n - 1) * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
-        n++;
+    const { pts, N, halfW } = sim.trek;
+    // rumput
+    let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+    for (const p of pts) { minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x); minZ = Math.min(minZ, p.z); maxZ = Math.max(maxZ, p.z); }
+    const cx = (minX + maxX) / 2, cz = (minZ + maxZ) / 2;
+    const rumput = new T.Mesh(new T.PlaneGeometry(600, 600), bahan("#7FA868"));
+    rumput.rotation.x = -Math.PI / 2; rumput.position.set(cx, -0.03, cz); A.add(rumput);
+    // pita mengikuti lintasan: dari jarak lateral a ke b, tinggi y (atau dinding tegak)
+    function pita(a, b, y, warnaFn, tegak = 0) {
+      const pos = [], war = [], idx = [];
+      const c = new T.Color();
+      for (let i = 0; i <= N; i++) {
+        const p = pts[i % N];
+        if (tegak) { pos.push(p.x + p.nx * a, 0, p.z + p.nz * a, p.x + p.nx * a, tegak, p.z + p.nz * a); }
+        else pos.push(p.x + p.nx * a, y, p.z + p.nz * a, p.x + p.nx * b, y, p.z + p.nz * b);
+        c.set(warnaFn(i)); war.push(c.r, c.g, c.b, c.r, c.g, c.b);
+        if (i > 0) { const k = (i - 1) * 2; idx.push(k, k + 1, k + 2, k + 1, k + 3, k + 2); }
       }
       const g = new T.BufferGeometry();
       g.setAttribute("position", new T.Float32BufferAttribute(pos, 3));
+      g.setAttribute("color", new T.Float32BufferAttribute(war, 3));
       g.setIndex(idx); g.computeVertexNormals();
-      const m = new T.Mesh(g, bahan(warna, { side: T.DoubleSide }));
+      const m = new T.Mesh(g, new T.MeshLambertMaterial({ vertexColors: true, side: T.DoubleSide }));
       A.add(m); return m;
     }
-    pita((l) => -l / 2, (l) => l / 2, 0, "#5C5A57");
-    pita((l) => -l / 2 - 7, (l) => -l / 2, 0.06, "#F2C14E");
-    pita((l) => l / 2, (l) => l / 2 + 7, 0.06, "#F2C14E");
-    // garis tengah putus-putus
-    const putih = bahan("#E9E2D0");
-    for (let dd = 0; dd < PANJANG + 400; dd += 80) {
-      const g = new T.Mesh(new T.BoxGeometry(0.08, 0.01, 40 * S), putih);
-      g.position.set(X(tengah(dd + 20)), 0.01, Z(dd + 20)); g.rotation.y = Math.atan2(X(tengah(dd + 40)) - X(tengah(dd)), 40 * S) ; A.add(g);
+    pita(-halfW, halfW, 0, () => "#5C5A57");
+    pita(-halfW - 1.1, -halfW, 0.02, (i) => (Math.floor(i / 5) % 2 ? "#FFFDF6" : "#B5443A"));
+    pita(halfW, halfW + 1.1, 0.02, (i) => (Math.floor(i / 5) % 2 ? "#FFFDF6" : "#B5443A"));
+    pita(-0.12, 0.12, 0.01, (i) => (Math.floor(i / 8) % 2 ? "#5C5A57" : "#E9E2D0"));
+    // pagar ban (dinding rendah warna-warni)
+    const BATAS = halfW + 4.6;
+    pita(-BATAS, 0, 0, (i) => ["#2B2A26", "#E05A4E", "#2B2A26", "#FFFDF6"][Math.floor(i / 3) % 4], 0.9);
+    pita(BATAS, 0, 0, (i) => ["#2B2A26", "#3E78C4", "#2B2A26", "#FFFDF6"][Math.floor(i / 3) % 4], 0.9);
+    // garis start/finis & gapura
+    const p0 = pts[0];
+    const kotakFinis = kanvasTekstur(256, 32, (g) => { for (let i = 0; i < 16; i++) for (let j = 0; j < 2; j++) { g.fillStyle = (i + j) % 2 ? "#2B2A26" : "#FFFDF6"; g.fillRect(i * 16, j * 16, 16, 16); } });
+    const finis = new T.Mesh(new T.PlaneGeometry(halfW * 2, 1.4), new T.MeshBasicMaterial({ map: kotakFinis }));
+    finis.rotation.set(-Math.PI / 2, 0, Math.atan2(-p0.nz, p0.nx)); finis.position.set(p0.x, 0.03, p0.z); A.add(finis);
+    const hadapDatang = Math.atan2(-p0.tx, -p0.tz);
+    [-1, 1].forEach((s2) => { const t = kotak(0.5, 6, 0.5, "#B9B4AA"); t.position.set(p0.x + p0.nx * s2 * (halfW + 1.6), 3, p0.z + p0.nz * s2 * (halfW + 1.6)); A.add(t); });
+    const spanduk = bidangTeks("KLP GRAND PRIX", halfW * 2 + 3.6, 1.4, { latar: "#B5443A", warna: "#FFFDF6" });
+    spanduk.position.set(p0.x, 5.6, p0.z); spanduk.rotation.y = hadapDatang; A.add(spanduk);
+    const spanduk2 = spanduk.clone(); spanduk2.rotation.y = hadapDatang + Math.PI; spanduk2.position.set(p0.x + p0.tx * 0.05, 5.6, p0.z + p0.tz * 0.05); A.add(spanduk2);
+    // tribun penonton di luar lurusan start
+    const sisiTribun = 1, pT = pts[N - 40];
+    const tribun = new T.Group(); A.add(tribun);
+    tribun.position.set(pT.x + pT.nx * sisiTribun * (BATAS + 4), 0, pT.z + pT.nz * sisiTribun * (BATAS + 4));
+    tribun.rotation.y = Math.atan2(-pT.tx, -pT.tz) + Math.PI / 2;
+    for (let k = 0; k < 3; k++) { const b = kotak(26, 1, 2, ["#9AA2AA", "#B9B4AA", "#CFC5AD"][k], 0.03); b.position.set(0, 0.5 + k, k * 2); tribun.add(b); }
+    ["kapibara", "gajah", "singa", "rakun", "berang", "hantu", "beruang", "kapibara"].forEach((sp, k) => { const p = papan(sp, 1.5); p.position.set(-10 + k * 2.9, 1.8 + (k % 3), (k % 3) * 2); p.userData.dasar = p.position.y; tribun.add(p); });
+    const penonton = tribun.children.filter((o) => o.isSprite);
+    // gedung kantor di tengah & pohon
+    const jauhDariTrek = (x, z, min) => { for (let i = 0; i < N; i += 4) { const p = pts[i]; if ((p.x - x) ** 2 + (p.z - z) ** 2 < min * min) return false; } return true; };
+    if (jauhDariTrek(cx, cz, 16)) {
+      const jendela = kanvasTekstur(128, 128, (g, w, h) => { g.fillStyle = "#E9E2D0"; g.fillRect(0, 0, w, h); g.fillStyle = "#7FB2D9"; for (let y = 10; y < h; y += 30) for (let x = 10; x < w; x += 30) g.fillRect(x, y, 18, 18); });
+      jendela.wrapS = jendela.wrapT = T.RepeatWrapping; jendela.repeat.set(3, 3);
+      const gedung = new T.Mesh(new T.BoxGeometry(18, 16, 12), new T.MeshLambertMaterial({ map: jendela }));
+      gedung.position.set(cx, 8, cz); garis(gedung, 0.12); A.add(gedung);
+      const papanNama = bidangTeks("KANTOR LAYANAN PERASAAN", 16, 1.6, { latar: "#2F4A6B", warna: "#FFFDF6" }); papanNama.position.set(cx, 14.5, cz + 6.05); A.add(papanNama);
     }
-    // pilar, plafon, lampu, tanda lantai
-    const plafon = new T.Mesh(new T.PlaneGeometry(40, PANJANG * S + 80), bahan("#6E6B66", { side: T.DoubleSide }));
-    plafon.rotation.x = Math.PI / 2; plafon.position.set(0, 3.4, Z(PANJANG / 2)); A.add(plafon);
-    const bahanLampu = new T.MeshBasicMaterial({ color: 0xFFF4C8 });
-    for (let k = 0; k * 400 < PANJANG + 800; k++) {
-      const dd = k * 400, c = tengah(dd), l = lebar(dd);
-      [-1, 1].forEach((sisi) => {
-        const p = kotak(0.42, 3.4, 0.42, "#B9B4AA");
-        p.position.set(X(c + sisi * (l / 2 + 30)), 1.7, Z(dd)); A.add(p);
-      });
-      const lampu = new T.Mesh(new T.BoxGeometry(1.6, 0.06, 0.24), bahanLampu); lampu.position.set(X(c), 3.36, Z(dd + 200)); A.add(lampu);
-      if (k % 4 === 0) {
-        const t = bidangTeks(`B${1 + k / 4}`, 0.7, 0.5, { latar: "#2F4A6B", warna: "#FFFDF6" });
-        t.position.set(X(c + l / 2 + 30), 2.3, Z(dd) + 0.22); A.add(t);
+    let ditanam = 0;
+    for (let k = 0; k < 400 && ditanam < 46; k++) {
+      const x = acak3(minX - 30, maxX + 30), z = acak3(minZ - 30, maxZ + 30);
+      if (!jauhDariTrek(x, z, BATAS + 3) || (Math.abs(x - cx) < 12 && Math.abs(z - cz) < 9)) continue;
+      const pohon = new T.Group();
+      const batang = silinder(0.25, 0.3, 1.4, "#8A5E3B", 6, 0); batang.position.y = 0.7; pohon.add(batang);
+      const daun = new T.Mesh(new T.ConeGeometry(1.4, 3, 7), bahan(ditanam % 3 ? "#4F6E5E" : "#5E8C6A")); daun.position.y = 2.9; pohon.add(garis(daun, 0.06));
+      pohon.position.set(x, 0, z); pohon.scale.setScalar(0.8 + (k % 5) * 0.12); A.add(pohon); ditanam++;
+    }
+    // panah turbo di aspal
+    const teksPanah = kanvasTekstur(64, 64, (g, w, h) => { g.fillStyle = "#F2C14E"; g.fillRect(0, 0, w, h); g.fillStyle = "#B5803A"; for (let k = 0; k < 2; k++) { g.beginPath(); g.moveTo(10, 36 - k * 22 + 18); g.lineTo(32, 14 - k * 22 + 18); g.lineTo(54, 36 - k * 22 + 18); g.lineTo(54, 46 - k * 22 + 18); g.lineTo(32, 24 - k * 22 + 18); g.lineTo(10, 46 - k * 22 + 18); g.fill(); } });
+    sim.pad.forEach((q) => {
+      const m = new T.Mesh(new T.PlaneGeometry(2.6, 3.4), new T.MeshBasicMaterial({ map: teksPanah }));
+      m.rotation.set(-Math.PI / 2, 0, Math.atan2(-Math.cos(q.a), -Math.sin(q.a)));
+      m.position.set(q.x, 0.035, q.z); A.add(m);
+    });
+    // kotak item "?"
+    const teksTanya = kanvasTekstur(64, 64, (g, w, h) => { g.fillStyle = "#7FC8F2"; g.fillRect(0, 0, w, h); g.strokeStyle = "#2B2A26"; g.lineWidth = 6; g.strokeRect(3, 3, w - 6, h - 6); g.fillStyle = "#FFFDF6"; g.font = 'bold 44px "Pixelify Sans", monospace'; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("?", w / 2, h / 2 + 3); });
+    const bahanTanya = new T.MeshLambertMaterial({ map: teksTanya, transparent: true, opacity: 0.92 });
+    const mKotak = sim.kotak.map((k) => { const m = new T.Mesh(new T.BoxGeometry(1.1, 1.1, 1.1), bahanTanya); m.position.set(k.x, 0.95, k.z); A.add(m); return m; });
+    const mKoin = sim.koin.map((c) => { const m = kotak(0.5, 0.68, 0.08, "#F2C14E", 0.03); m.position.set(c.x, 0.6, c.z); A.add(m); return m; });
+    // kendaraan
+    function buatKendaraan(r) {
+      const g = new T.Group(), badan = new T.Group(); g.add(badan);
+      const roda = [];
+      if (r.kendaraan === "motor") {
+        const b = kotak(1.5, 0.32, 0.34, r.warna); b.position.y = 0.6; badan.add(b);
+        const depan = kotak(0.5, 0.42, 0.42, r.warna); depan.position.set(0.55, 0.78, 0); depan.rotation.z = -0.4; badan.add(depan);
+        const kaca = kotak(0.08, 0.3, 0.36, "#9DB0BC", 0.02); kaca.position.set(0.72, 1.02, 0); kaca.rotation.z = -0.5; badan.add(kaca);
+        [0.72, -0.68].forEach((x) => { const w = new T.Mesh(new T.TorusGeometry(0.3, 0.1, 8, 16), bahan("#2B2A26")); w.position.set(x, 0.4, 0); badan.add(w); roda.push(w); });
+        const p = papan(r.sprite, 0.95); p.position.set(-0.05, 1.18, 0); badan.add(p);
+      } else if (r.kendaraan === "kursi") {
+        const dudukan = kotak(0.9, 0.18, 0.9, r.warna); dudukan.position.y = 0.72; badan.add(dudukan);
+        const sandaran = kotak(0.14, 0.85, 0.9, r.warna); sandaran.position.set(-0.45, 1.15, 0); badan.add(sandaran);
+        const tiang = silinder(0.07, 0.07, 0.5, "#3B4046", 8, 0); tiang.position.y = 0.4; badan.add(tiang);
+        for (let k = 0; k < 5; k++) { const kaki = kotak(0.6, 0.06, 0.08, "#3B4046", 0); const sud = (k * Math.PI * 2) / 5; kaki.position.set(Math.cos(sud) * 0.3, 0.16, Math.sin(sud) * 0.3); kaki.rotation.y = -sud; badan.add(kaki); const w = silinder(0.08, 0.08, 0.06, "#2B2A26", 8, 0); w.rotation.x = Math.PI / 2; w.position.set(Math.cos(sud) * 0.58, 0.08, Math.sin(sud) * 0.58); badan.add(w); }
+        const p = papan(r.sprite, 0.95); p.position.set(0.05, 1.3, 0); badan.add(p);
+      } else {
+        const b = kotak(1.5, 0.45, 1.0, r.warna); b.position.y = 0.45; badan.add(b);
+        const isi = kotak(0.5, 0.22, 0.7, "#FFFDF6", 0.02); isi.position.set(0.35, 0.78, 0); badan.add(isi);
+        const gagang = kotak(0.06, 0.06, 1.0, "#2B2A26", 0); gagang.position.set(-0.78, 0.98, 0); badan.add(gagang);
+        [[0.55, 0.42], [0.55, -0.42], [-0.55, 0.42], [-0.55, -0.42]].forEach(([x, z]) => { const w = silinder(0.17, 0.17, 0.12, "#2B2A26", 10, 0); w.rotation.x = Math.PI / 2; w.position.set(x, 0.17, z); badan.add(w); roda.push(w); });
+        const p = papan(r.sprite, 0.95); p.position.set(-0.25, 1.12, 0); badan.add(p);
       }
+      const by = bayangan(1.0); by.position.y = 0.04; g.add(by);
+      const gelembung = new T.Mesh(new T.SphereGeometry(1.45, 16, 12), new T.MeshBasicMaterial({ color: 0x7FC8F2, transparent: true, opacity: 0.28, depthWrite: false }));
+      gelembung.position.y = 0.8; g.add(gelembung);
+      const api2 = [0, 1].map((k) => { const m = new T.Mesh(new T.ConeGeometry(0.16, 0.7, 8), new T.MeshBasicMaterial({ color: 0xF2A14E })); m.rotation.z = Math.PI / 2; m.position.set(-0.95, 0.35, k ? 0.22 : -0.22); g.add(m); return m; });
+      const percik = [0, 1].map((k) => { const m = new T.Mesh(new T.BoxGeometry(0.16, 0.16, 0.16), new T.MeshBasicMaterial({ color: 0x7FC8F2 })); m.position.set(-0.7, 0.12, k ? 0.5 : -0.5); g.add(m); return m; });
+      if (!r.pemain) { const t = bidangTeks(r.nama, 1.3, 0.3, { latar: "#2B2A26", warna: "#FFFDF6" }); t.position.y = 2.15; t.userData.label = true; g.add(t); }
+      A.add(g);
+      return { g, badan, roda, gelembung, api: api2, percik };
     }
-    // garis finis & gapura
-    const kotakFinis = kanvasTekstur(256, 32, (g, w, h) => { for (let i = 0; i < 16; i++) for (let j = 0; j < 2; j++) { g.fillStyle = (i + j) % 2 ? "#2B2A26" : "#FFFDF6"; g.fillRect(i * 16, j * 16, 16, 16); } });
-    const cf = tengah(PANJANG), lf = lebar(PANJANG);
-    const finis = new T.Mesh(new T.PlaneGeometry(lf * S, 0.5), new T.MeshBasicMaterial({ map: kotakFinis }));
-    finis.rotation.x = -Math.PI / 2; finis.position.set(X(cf), 0.02, Z(PANJANG)); A.add(finis);
-    const spanduk = bidangTeks("FINIS · PINTU KELUAR", lf * S + 1, 0.6, { latar: "#B5443A", warna: "#FFFDF6" });
-    spanduk.position.set(X(cf), 2.6, Z(PANJANG)); A.add(spanduk);
-    // benda di lintasan
-    const MODEL = {
-      teh: () => papan("cangkir", 0.7), oyen: () => papan("oyen", 0.9), berkas: () => papan("berkas", 0.8),
-      emas: () => kotak(0.42, 0.56, 0.08, "#F2C14E"),
-      kardus: () => { const g = kotak(0.62, 0.5, 0.6, "#C9A06A"); const pita2 = kotak(0.64, 0.06, 0.62, "#A47E4D", 0); pita2.position.y = 0.05; g.add(pita2); return g; },
-      pel: () => { const m = new T.Mesh(new T.CircleGeometry(0.5, 20), new T.MeshBasicMaterial({ color: 0x9FC3E0, transparent: true, opacity: 0.75 })); m.rotation.x = -Math.PI / 2; m.scale.set(1, 0.6, 1); return m; },
-    };
-    const TINGGI = { teh: 0.38, oyen: 0.45, berkas: 0.42, emas: 0.4, kardus: 0.25, pel: 0.02 };
-    const mBenda = benda.map((b) => { const m = MODEL[b.jenis](); m.position.y = TINGGI[b.jenis]; A.add(m); return m; });
-    // troli
-    function troli(warna, sprite, label) {
-      const g = new T.Group();
-      const badan = kotak(0.62, 0.36, 0.9, warna); badan.position.y = 0.36; g.add(badan);
-      const isi = kotak(0.46, 0.14, 0.4, "#FFFDF6", 0.02); isi.position.set(0, 0.6, 0.18); g.add(isi);
-      const gagang = kotak(0.62, 0.06, 0.06, "#2B2A26", 0); gagang.position.set(0, 0.78, 0.46); g.add(gagang);
-      [[-0.26, -0.36], [0.26, -0.36], [-0.26, 0.36], [0.26, 0.36]].forEach(([x, z]) => { const r = silinder(0.08, 0.08, 0.06, "#2B2A26", 10, 0); r.rotation.z = Math.PI / 2; r.position.set(x, 0.1, z); g.add(r); });
-      if (sprite) { const p = papan(sprite, 0.8); p.position.set(0, 1.0, -0.1); g.add(p); }
-      else { const kep = kotak(0.34, 0.34, 0.34, "#F2C14E"); kep.position.set(0, 0.86, -0.12); g.add(kep); }
-      if (label) { const t = bidangTeks(label, 0.56, 0.15, { latar: "#2B2A26", warna: "#FFFDF6" }); t.position.set(0, sprite ? 1.5 : 1.14, 0); t.userData.label = true; g.add(t); }
-      const by = bayangan(0.6); by.position.y = 0.01; g.add(by);
-      A.add(g); return g;
-    }
-    const mLawan = LAWAN.map((l) => troli(l.warna, l.sprite, l.nama.split(" ").pop()));
-    const pemain = troli("#3E78C4", null, api.nama);
-    const percik = [0, 1, 2].map(() => { const m = new T.Mesh(new T.BoxGeometry(0.08, 0.08, 0.5), new T.MeshBasicMaterial({ color: 0xF2C14E })); A.add(m); return m; });
-    const label = [];
-    A.traverse((o) => { if (o.userData.label) label.push(o); });
-    let fov = 62;
+    const mobil = sim.pembalap.map(buatKendaraan);
+    const label = []; A.traverse((o) => { if (o.userData.label) label.push(o); });
+    // benda dinamis: kulit pisang & stempel
+    const kolamPisang = new Map(), kolamStempel = new Map();
+    const WARNA_MUATAN = [0xFFFDF6, 0x7FC8F2, 0xF2A14E, 0xC38AF2];
+    const kam = { x: 0, z: 0, ada: false };
     return {
       gambar(st, waktu) {
-        const { d, x, turbo, licin } = st;
-        benda.forEach((b, i) => {
-          const m = mBenda[i];
-          if (b.kena || Math.abs(b.d - d) > 2600) { m.visible = false; return; }
-          m.visible = true;
-          m.position.x = X(tengah(b.d) + b.off * lebar(b.d)); m.position.z = Z(b.d);
-          if (b.jenis === "emas") m.rotation.y = waktu * 3;
-          if (b.jenis === "kardus") m.rotation.y = 0.3;
+        mKotak.forEach((m, i) => { const k = st.kotak[i]; m.visible = k.aktif; m.rotation.y = waktu * 1.6 + i; m.rotation.x = 0.3; m.position.y = 0.95 + Math.sin(waktu * 3 + i) * 0.12; });
+        mKoin.forEach((m, i) => { m.visible = st.koin[i].aktif; m.rotation.y = waktu * 3 + i * 0.4; });
+        st.pembalap.forEach((r, i) => {
+          const m = mobil[i];
+          m.g.position.set(r.x, (r.loncat > 0 ? Math.sin((r.loncat / 0.18) * Math.PI) * 0.35 : 0), r.z);
+          m.g.rotation.y = -(r.a + r.putar + (r.drift ? r.driftArah * 0.42 : 0));
+          m.badan.rotation.x = r.kendaraan === "motor" ? r.miring * 0.55 : r.miring * 0.08;
+          m.roda.forEach((w) => { if (r.kendaraan === "motor") w.rotation.z = -r.roda * 3; else w.rotation.y = r.roda * 3; });
+          m.gelembung.visible = r.kebal > 0;
+          m.api.forEach((f) => { f.visible = r.turbo > 0; f.scale.set(1, 0.7 + Math.random() * 0.7, 1); });
+          const lv = r.drift ? (r.muatan >= 2.6 ? 3 : r.muatan >= 1.7 ? 2 : r.muatan >= 0.85 ? 1 : 0) : -1;
+          m.percik.forEach((p) => { p.visible = lv >= 1 || (lv === 0 && Math.random() < 0.4); if (p.visible) { p.material.color.setHex(WARNA_MUATAN[Math.max(0, lv)]); p.position.y = 0.1 + Math.random() * 0.25; } });
         });
-        LAWAN.forEach((l, i) => {
-          const m = mLawan[i];
-          m.position.set(X(tengah(l.d) + l.off + Math.sin(waktu * 1.3 + l.goyang) * 14), 0, Z(l.d));
-          m.rotation.y = Math.sin(waktu * 1.3 + l.goyang) * 0.12;
-        });
-        pemain.position.set(X(x), 0, Z(d));
-        pemain.rotation.y = licin > 0 ? Math.sin(waktu * 14) * 0.35 : (X(st.targetX) - X(x)) * -0.3;
-        percik.forEach((p, i) => { p.visible = turbo > 0; p.position.set(X(x) - 0.15 + i * 0.15, 0.25 + Math.random() * 0.2, Z(d) + 0.7 + Math.random() * 0.5); });
+        // kulit pisang
+        const adaP = new Set(st.pisang);
+        for (const b of st.pisang) { let m = kolamPisang.get(b); if (!m) { m = papan("gorengan", 0.9); A.add(m); kolamPisang.set(b, m); } m.position.set(b.x, 0.38, b.z); }
+        for (const [b, m] of kolamPisang) if (!adaP.has(b)) { A.remove(m); m.material.dispose(); kolamPisang.delete(b); }
+        const adaS = new Set(st.stempel);
+        for (const s2 of st.stempel) { let m = kolamStempel.get(s2); if (!m) { m = kotak(0.8, 0.5, 0.8, "#B5443A"); A.add(m); kolamStempel.set(s2, m); } m.position.set(s2.x, 0.7, s2.z); m.rotation.y = waktu * 12; }
+        for (const [s2, m] of kolamStempel) if (!adaS.has(s2)) { A.remove(m); kolamStempel.delete(s2); }
+        penonton.forEach((p, k) => { p.position.y = p.userData.dasar + Math.abs(Math.sin(waktu * 5 + k)) * 0.25; });
+        // kamera mengejar dari belakang pemain
+        const r = st.pemain, fx = Math.cos(r.a), fz = Math.sin(r.a);
+        const jauh = r.turbo > 0 ? 7.6 : 6.6;
+        const tx = r.x - fx * jauh, tz = r.z - fz * jauh;
+        if (!kam.ada) { kam.x = tx; kam.z = tz; kam.ada = true; }
+        kam.x = lerp(kam.x, tx, 0.14); kam.z = lerp(kam.z, tz, 0.14);
+        kamera.position.set(kam.x, st.fase === "lampu" ? 3.4 : 3.0, kam.z);
+        kamera.lookAt(r.x + fx * 6, 1.0, r.z + fz * 6);
+        kamera.rotateZ(-r.miring * (r.kendaraan === "motor" ? 0.16 : 0.05));
+        const fovT = r.turbo > 0 ? 74 : 64;
+        if (Math.abs(kamera.fov - fovT) > 0.1) { kamera.fov = lerp(kamera.fov, fovT, 0.08); kamera.updateProjectionMatrix(); }
         label.forEach((t) => t.quaternion.copy(kamera.quaternion));
-        // kamera mengejar dari belakang
-        const cMaju = tengah(d + 260);
-        kamera.position.set(lerp(kamera.position.x || X(x), X(x) * 0.7 + X(tengah(d)) * 0.3, 0.12), 2.5, Z(d) + 4.2);
-        kamera.lookAt(X(cMaju) * 0.6 + X(x) * 0.4, 0.3, Z(d + 320));
-        const fovTarget = 62 + (turbo > 0 ? 12 : 0);
-        if (Math.abs(fov - fovTarget) > 0.1) { fov = lerp(fov, fovTarget, 0.08); kamera.fov = fov; kamera.updateProjectionMatrix(); }
         P.render();
       },
       ukur: P.ukur, hapus: P.hapus,
     };
   };
+  const acak3 = (a, b) => a + Math.random() * (b - a);
 
   /* ---------- antarmuka untuk games.js ---------- */
   K.G3 = {
