@@ -82,6 +82,33 @@ Disusun dari pola main remaja 2025–2026: game berdua dengan teman jadi favorit
 - **Misi harian**: 3 misi per hari (salah satunya misi duel yang boleh dikerjakan lawan bot), hadiah Poin Sabar + XP, bonus kalau ketiganya beres. Ada juga hitungan hari beruntun.
 - **Tingkat kesulitan** di game solo: Santai, Normal, Lembur (semua lebih cepat, Poin Sabar x1.5). Stempel Kilat punya **combo**.
 
+### Main Berdua Online (dua HP)
+Main bareng teman, masing-masing di HP sendiri. Kartu **Main Berdua Online** ada paling atas di Ruang Istirahat.
+1. Satu orang mengisi nama, memilih karakter, lalu ketuk **Buat room**. Muncul **kode 5 huruf**, tautan undangan, dan tombol kirim lewat WhatsApp.
+2. Teman membuka situs yang sama, ketuk kartu Main Berdua Online, memasukkan kode, lalu **Gabung** (atau langsung membuka tautan undangan).
+3. Di lobi, dua kartu pemain muncul. Pembuat room memilih game (dan mode untuk dua game besar), lalu ketuk **Mulai**. Ada 8 **stiker** untuk saling sapa, di lobi maupun saat main (tombol **Stiker**).
+4. Selesai satu game, ketuk **Kembali ke lobi online** untuk main game lain tanpa membuat room baru.
+
+| Game online | Cara mainnya |
+|---|---|
+| Rally Online | Kok bolak-balik antar dua HP. Yang duluan 7 poin menang. |
+| Stempel Rebutan | Berkas yang sama muncul di dua HP. Yang benar duluan dapat poin. |
+| Rebutan Kertas | Dua map di satu lantai (biru dan oranye), rebutan kertas terbang. |
+| Ngemil Berdua | Satu rapat, satu Oyen. Siapa yang paling banyak ngemil tanpa ketahuan. |
+| Grand Prix Berdua | Balapan 3 lap bersama 4 bot. Item dan tabrakan saling kena. |
+| Legenda Lantai 2 | **Satu tim** (kalian + 1 bot lawan 3 bot) atau **saling lawan** (masing-masing dengan 2 bot). Pada saling lawan, layar tiap pemain diputar supaya markas sendiri selalu di bawah. |
+| Kantor Royale | **Duo satu regu** (tidak saling melukai, titik teman tampil di peta mini, menang kalau regu kalian yang terakhir) atau **saling lawan**. |
+
+Cara kerjanya: HP pembuat room menjalankan permainan, HP teman mengirim gerakan dan menerima gambaran keadaan beberapa kali per detik. Sambungan langsung antar-HP (WebRTC lewat PeerJS, `vendor/peerjs.min.js`), server PeerJS publik hanya dipakai untuk saling menemukan. Tidak ada akun dan tidak ada data yang disimpan di server.
+
+- Paling lancar kalau dua HP memakai **Wi-Fi yang sama**, atau satu HP menyalakan **hotspot** dan HP lain tersambung ke situ. Di sebagian jaringan seluler sambungan langsung bisa gagal.
+- Kalau sinyal hilang lebih dari 9 detik, permainan berhenti dengan pesan "sambungan terputus".
+- Pembuat room sedikit lebih unggul di game adu cepat (Stempel Rebutan), karena tidak ada jeda sinyal di HP-nya.
+- Untuk pengujian dengan server PeerJS sendiri: tambahkan `?peer=alamat:port` di URL.
+
+### Efek WOW
+Layar bergetar, kilatan warna, ledakan konfeti, tulisan besar ("COMBO x10", "40 PUKULAN!"), dan getar HP saat combo, KO, kena serang, atau menang. Getar HP bisa dimatikan lewat tombol **Getar HP saat main** di bawah daftar game. Kalau HP disetel "kurangi gerakan", efek layar dimatikan. Kodenya di `wow.js`.
+
 ### Legenda Lantai 2 & Kantor Royale (gaya Mobile Legends & Free Fire)
 Game ini dibuat dengan gameplay yang mirip, tapi nama, hero, dan gambarnya karya sendiri, bukan salinan. Mobile Legends dan Free Fire adalah merek milik pembuatnya masing-masing.
 
@@ -297,6 +324,7 @@ Semua teks ada di file JavaScript, jadi bisa diubah langsung lewat GitHub (buka 
 | Obrolan Pantry, kalimat "dengerin aja", gosip | `pantry-data.js` |
 | Barang koperasi & harga | `koperasi.js` (bagian `BARANG`) |
 | Isi game | `games.js` (logika), `balap.js` (Grand Prix), `arena.js` + `moba.js` + `royale.js` (Legenda Lantai 2 & Kantor Royale), `games3d.js` (tampilan 3D), `duel.js` (Mode Duel), `progres.js` (pangkat & misi) |
+| Main berdua online | `jaringan.js` (sambungan), `online.js` (lobi, stiker), `online-games.js` (4 game kecil versi online), `wow.js` (efek) |
 | Cerita misteri | `l13-bab.js` (Bab 1), `l13-bab23.js` (Bab 2–3), `l13-bab456.js` (Bab 4–6 + Ruang Rahasia), `l13-kasus-lift.js` (Kasus Lift Tengah Malam) |
 | Gambar karakter (pixel) | `sprites.js` (grid 12×12 huruf) |
 

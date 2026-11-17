@@ -91,13 +91,43 @@
     return dunia;
   }
 
+  // putar dunia 180° (untuk tamu di tim merah) dan tukar warna markas
+  function balikDunia(d, balik) {
+    if (!balik) return d;
+    const b = (o) => ({ ...o, x: -o.x, z: -o.z });
+    const tukar = { "#CFE0F5": "#F5D0CB", "#F5D0CB": "#CFE0F5" };
+    return {
+      ...d, rintangan: d.rintangan.map(b), lantai: d.lantai.map((l) => ({ ...b(l), warna: tukar[l.warna] || l.warna })),
+      hiasan: (d.hiasan || []).map((h) => ({ ...b(h), teks: h.teks === "TIM BIRU" ? "TIM MERAH" : h.teks === "TIM MERAH" ? "TIM BIRU" : h.teks, latar: h.latar === "#3E78C4" ? "#E05A4E" : h.latar === "#E05A4E" ? "#3E78C4" : h.latar })),
+    };
+  }
+
   /* =========================================================
      PERTANDINGAN
      ========================================================= */
-  function main(api) {
+  function mainOnline(api) {
+    const on = K.ONLINE_SAMBUNG(api);
+    if (on.host) return main(api, null, on);
+    let dalam = null, batal = false;
+    // kumpulkan semua "unit baru" sejak awal: snapshot bisa datang sebelum/di sela meta
+    const baru = [];
+    api.online.on("snap", (m) => { if (Array.isArray(m.s?.baru) && m.s.baru.length) baru.push(...m.s.baru); });
+    const minta = setInterval(() => api.online.kirim({ t: "mintaMeta" }), 700);
+    api.online.kirim({ t: "mintaMeta" });
+    api.online.on("mobaMeta", (m) => { if (dalam || batal) return; clearInterval(minta); dalam = main(api, { ...m, _baru: baru }, on); api.ukurUlang?.(); });
+    const tunggu = api.loop(() => { if (dalam) return; const c = api.ctx; c.fillStyle = "#5E7D52"; c.fillRect(0, 0, api.W(), api.H()); c.fillStyle = "#FFFDF6"; c.font = '16px "Pixelify Sans", monospace'; c.textAlign = "center"; c.fillText("Menunggu arena dari teman...", api.W() / 2, api.H() / 2); });
+    return () => { batal = true; clearInterval(minta); tunggu(); dalam?.(); };
+  }
+
+  function main(api, meta = null, on = null) {
+    if (api.online && !on) return mainOnline(api);
+    const tamu = !!meta, hostOnline = !!(on && on.host);
+    const modeLawan = (api.online?.opsi?.mode || "tim") === "lawan";
     const { ctx } = api;
     const AR = A();
-    const dunia = buatPeta();
+    // tamu di tim lawan: dunia diputar 180° dan warna tim ditukar supaya markas sendiri tetap di bawah
+    const balik = tamu && meta.balik;
+    const dunia = tamu ? balikDunia(meta.dunia, balik) : buatPeta();
     const kotak = dunia.rintangan.filter((b) => !b.tembus && !b.pohon);
     const semak = dunia.rintangan.filter((b) => b.semak);
     const pilihan = K.data.setelan.moba && HERO[K.data.setelan.moba] ? K.data.setelan.moba : "kura";
@@ -145,17 +175,25 @@
     }
 
     // tim: pemain + 2 teman bot vs 3 bot
-    const sisa = Object.keys(HERO).filter((k) => k !== pilihan).sort(() => Math.random() - 0.5);
-    const pemain = buatHero(pilihan, 1, true);
-    buatHero(sisa[0], 1, false); buatHero(sisa[1], 1, false);
-    buatHero(sisa[2], 2, false); buatHero(sisa[3], 2, false); buatHero(sisa[4], 2, false);
-    for (const t of [1, 2]) { const s = t === 1 ? 1 : -1; buatMenara(t, s * 40, "menara", 1800, 0); buatMenara(t, s * 62, "menara", 2100, 1); buatMenara(t, s * 80, "inti", 2700, 2); }
-    for (const s of [1, -1]) { buatMonster(18, s * 28, false); buatMonster(-19, s * 56, false); }
-    buatMonster(-17, 0, true);
+    let pemain, teman = null;
+    if (tamu) { pemain = { h: HERO[meta.hero], hero: meta.hero, pemain: true, cdSkill: [0, 0, 0], item: [], gold: 0, level: 1, kill: 0, matiN: 0, assist: 0, bangkit: 0, x: 0, z: 85, mati: false }; }
+    else {
+      const heroTeman = hostOnline && HERO[api.online.teman?.hero] && api.online.teman.hero !== pilihan ? api.online.teman.hero : null;
+      const sisa = Object.keys(HERO).filter((k) => k !== pilihan && k !== heroTeman).sort(() => Math.random() - 0.5);
+      pemain = buatHero(pilihan, 1, true);
+      if (hostOnline) {
+        const ht = heroTeman || sisa.shift();
+        if (modeLawan) { buatHero(sisa[0], 1, false); buatHero(sisa[1], 1, false); teman = buatHero(ht, 2, false); buatHero(sisa[2], 2, false); buatHero(sisa[3], 2, false); }
+        else { teman = buatHero(ht, 1, false); buatHero(sisa[0], 1, false); buatHero(sisa[1], 2, false); buatHero(sisa[2], 2, false); buatHero(sisa[3], 2, false); }
+        teman.remote = true; teman.nama = api.online.teman?.nama || "Teman"; teman.pulangSisa = 0;
+      } else { buatHero(sisa[0], 1, false); buatHero(sisa[1], 1, false); buatHero(sisa[2], 2, false); buatHero(sisa[3], 2, false); buatHero(sisa[4], 2, false); }
+    }
+    if (!tamu) for (const t of [1, 2]) { const s = t === 1 ? 1 : -1; buatMenara(t, s * 40, "menara", 1800, 0); buatMenara(t, s * 62, "menara", 2100, 1); buatMenara(t, s * 80, "inti", 2700, 2); }
+    if (!tamu) { for (const s of [1, -1]) { buatMonster(18, s * 28, false); buatMonster(-19, s * 56, false); } buatMonster(-17, 0, true); }
 
     /* ---------- kendali ---------- */
-    const h = HERO[pilihan];
-    const IKON = { badak: ["badak", "tempurung", "stiker"], kura: ["peluit", "tempurung", "senter"], kukang: ["tinta", "dokumen", "jam"], oyen: ["oyen", "kaus", "kunci"], marmut: ["berkas", "kaus", "dokumen"], kapibara: ["cangkir", "toples", "bantal"] }[pilihan];
+    const h = tamu ? HERO[meta.hero] : HERO[pilihan];
+    const IKON = { badak: ["badak", "tempurung", "stiker"], kura: ["peluit", "tempurung", "senter"], kukang: ["tinta", "dokumen", "jam"], oyen: ["oyen", "kaus", "kunci"], marmut: ["berkas", "kaus", "dokumen"], kapibara: ["cangkir", "toples", "bantal"] }[tamu ? meta.hero : pilihan];
     const kend = AR.kendali(api, [
       { id: "serang", dx: 58, dy: 66, r: 36, label: "SERANG", ikon: h.sprite, warna: "#F2C14E" },
       { id: "s1", dx: 128, dy: 44, r: 24, label: h.skill[0].nama.split(" ")[0], ikon: IKON[0] },
@@ -169,6 +207,7 @@
     const klikBar = (e) => {
       const b = e.target.closest("[data-m]");
       if (!b) return;
+      if (tamu && b.dataset.m !== "info") { on.ev({ a: b.dataset.m }); sfx("pilih"); return; }
       if (b.dataset.m === "beli") beli(pemain, true);
       else if (b.dataset.m === "pulang" && !pemain.mati) { pulang = 3; sfx("pilih"); }
       else if (b.dataset.m === "info") umum.umumkan(h.nama, h.skill.map((s) => s.nama).join(" · "), "#FFFDF6");
@@ -219,6 +258,7 @@
       u.hpMaks = Math.round(u.h.hp * (1 + (u.level - 1) * 0.09) + itemJumlah(u, "hp")); u.hp = u.hpMaks * r;
       u.atk = u.h.atk * (1 + (u.level - 1) * 0.07) + itemJumlah(u, "atk");
       if (u.pemain) { sfx("poin"); umpan.tambah(`Naik ke level ${u.level}`, "#F2C14E"); }
+      if (u.remote) kabar({ k: "umpan", t: `Naik ke level ${u.level}`, w: "#F2C14E", b: "poin" });
     }
     const itemJumlah = (u, k) => u.item.reduce((a, id) => a + (ITEM[id][k] || 0), 0);
     const KATA_BERUNTUN = { 2: "DOUBLE KILL!", 3: "TRIPLE KILL!", 4: "TAK TERHENTIKAN!", 5: "LEGENDARIS!" };
@@ -233,17 +273,22 @@
           beriGold(pembunuh, 220 + t.level * 15, 160 + t.level * 20);
           for (const [id, w] of t.pemukul) { const a = unit.find((v) => v.id === id); if (a && a !== pembunuh && a.tim === pembunuh.tim && waktu - w < 10) { a.assist++; beriGold(a, 90, 80); } }
           umpan.tambah(`${pembunuh.nama} ➜ ${t.nama}`, WARNA_TIM[pembunuh.tim]);
-          if (!takedownPertama) { takedownPertama = true; umum.umumkan("TAKEDOWN PERTAMA!", `${pembunuh.nama} membuka skor`, WARNA_TIM[pembunuh.tim]); }
-          else if (KATA_BERUNTUN[Math.min(5, pembunuh.beruntun)] && (pembunuh.pemain || pembunuh.beruntun >= 3)) umum.umumkan(KATA_BERUNTUN[Math.min(5, pembunuh.beruntun)], pembunuh.nama, WARNA_TIM[pembunuh.tim]);
+          kabar({ k: "umpan", t: `${pembunuh.nama} ➜ ${t.nama}`, tim: pembunuh.tim });
+          if (pembunuh.pemain || pembunuh.remote) { if (pembunuh.pemain) { K.WOW?.getar(1, 0.25); K.WOW?.hp(50); K.WOW?.kilat("rgba(242,193,78,.3)"); } else kabar({ k: "wow", jenis: "kill" }); }
+          if (!takedownPertama) { takedownPertama = true; umum.umumkan("TAKEDOWN PERTAMA!", `${pembunuh.nama} membuka skor`, WARNA_TIM[pembunuh.tim]); kabar({ k: "umum", a: "TAKEDOWN PERTAMA!", b: `${pembunuh.nama} membuka skor`, tim: pembunuh.tim }); }
+          else if (KATA_BERUNTUN[Math.min(5, pembunuh.beruntun)] && (pembunuh.pemain || pembunuh.remote || pembunuh.beruntun >= 3)) { umum.umumkan(KATA_BERUNTUN[Math.min(5, pembunuh.beruntun)], pembunuh.nama, WARNA_TIM[pembunuh.tim]); kabar({ k: "umum", a: KATA_BERUNTUN[Math.min(5, pembunuh.beruntun)], b: pembunuh.nama, tim: pembunuh.tim }); }
           if (pembunuh.pemain) sfx("menang");
         }
         t.pemukul.clear();
-        if (t.pemain) { sfx("salah"); umum.umumkan("Kamu tumbang", "Duduk sebentar di markas. Teh sudah disiapkan.", "#FF8A7A"); pulang = 0; }
+        if (t.pemain) { sfx("salah"); umum.umumkan("Kamu tumbang", "Duduk sebentar di markas. Teh sudah disiapkan.", "#FF8A7A"); pulang = 0; K.WOW?.getar(1.6, 0.4); K.WOW?.hp(150); K.WOW?.kilat("rgba(181,68,58,.45)", 400); }
+        if (t.remote) { t.pulangSisa = 0; kabar({ k: "tumbang" }); }
         efek.push({ x: t.x, z: t.z, r: 3, warna: "#FFFDF6", umur: 0, maks: 0.6 });
       } else if (t.bangunan) {
         menaraJatuh[t.tim]++;
         unit.filter((v) => v.h && v.tim !== t.tim).forEach((v) => beriGold(v, 250, 120));
         umpan.tambah(`Menara ${t.tim === 1 ? "biru" : "merah"} runtuh`, WARNA_TIM[t.tim === 1 ? 2 : 1]);
+        kabar({ k: "menara", tim: t.tim, inti: t.jenis === "inti" });
+        if (t.tim === 2) { K.WOW?.getar(1.2, 0.35); K.WOW?.hp(80); }
         efek.push({ x: t.x, z: t.z, r: 6, warna: "#F2C14E", umur: 0, maks: 1 });
         sfx("kaget");
         if (t.jenis === "inti") akhiri(t.tim === 1 ? 2 : 1);
@@ -253,7 +298,7 @@
         if (src.h || src.tim) {
           const tim = src.tim;
           unit.filter((v) => v.h && v.tim === tim && d2(v, t) < 300).forEach((v) => beriGold(v, t.bos ? 220 : 70, t.bos ? 200 : 70));
-          if (t.bos) { umum.umumkan("MESIN FOTOKOPI PURBA DIKALAHKAN", `Tim ${tim === 1 ? "biru" : "merah"} dapat Fotokopi Raksasa`, WARNA_TIM[tim]); buatMinion(tim, false, 1, true); }
+          if (t.bos) { umum.umumkan("MESIN FOTOKOPI PURBA DIKALAHKAN", `Tim ${tim === 1 ? "biru" : "merah"} dapat Fotokopi Raksasa`, WARNA_TIM[tim]); kabar({ k: "bos", tim }); buatMinion(tim, false, 1, true); }
         }
       } else if (t.minion) {
         const dekat = unit.filter((v) => v.h && v.tim !== t.tim && !v.mati && d2(v, t) < 110);
@@ -402,15 +447,110 @@
       selesai.alasan = alasan;
       const sebab = alasan === "waktu" ? (menang ? "Waktu habis, menara kita lebih banyak bertahan" : "Waktu habis, lawan unggul") : menang ? "Inti markas lawan runtuh" : "Inti markas kita runtuh";
       umum.umumkan(menang ? "KEMENANGAN" : "KEKALAHAN", sebab, menang ? "#7FD18B" : "#FF8A7A");
+      if (menang) { K.WOW?.hujan(); K.WOW?.hp(200); }
+      if (hostOnline) api.online.kirim({ t: "akhir", pemenang, alasan, mvp: selesai.mvp.id, hero: unit.filter((v) => v.h).map((v) => ({ id: v.id, nama: v.nama, tim: v.tim, k: v.kill, m: v.matiN, a: v.assist, skor: v.skor })), teman: { kill: teman.kill, mati: teman.matiN, assist: teman.assist }, menara: menaraJatuh });
     }
     function kirimHasil() {
       const menang = selesai.pemenang === 1, mvp = selesai.mvp === pemain;
       const skor = (menang ? 160 : 60) + pemain.kill * 12 + pemain.assist * 6 + menaraJatuh[2] * 8 + (mvp ? 25 : 0);
       api.catatStat("menang", menang ? 1 : 0); api.catatStat("kill", pemain.kill); api.catatStat("mvp", mvp ? 1 : 0);
-      api.selesai(skor, [menang ? "badak" : "kapibara", `${menang ? "KEMENANGAN" : "Kalah tipis"} · KDA ${pemain.kill}/${pemain.matiN}/${pemain.assist}${mvp ? " · MVP" : ""}. ${menang ? (selesai.alasan === "waktu" ? "Kak Badak: Menang angka. Menara kita lebih tahan banting." : "Kak Badak: Inti markas lawan runtuh. Saya mengizinkan semangat sebanyak-banyaknya.") : "Bu Ratna: Kalah itu bagian dari main. Tehnya masih hangat, mau ronde lagi?"}`]);
+      api.selesai(skor, [menang ? "badak" : "kapibara", `${menang ? "KEMENANGAN" : "Kalah tipis"} · KDA ${pemain.kill}/${pemain.matiN}/${pemain.assist}${mvp ? " · MVP" : ""}. ${menang ? (selesai.alasan === "waktu" ? "Kak Badak: Menang angka. Menara kita lebih tahan banting." : "Kak Badak: Inti markas lawan runtuh. Saya mengizinkan semangat sebanyak-banyaknya.") : "Bu Ratna: Kalah itu bagian dari main. Tehnya masih hangat, mau ronde lagi?"}`], api.online ? { menang, judul: `${menang ? "KEMENANGAN" : "KEKALAHAN"}${modeLawan ? " lawan teman" : " bareng teman"}` } : undefined);
     }
 
-    ctx.canvas._uji = { unit, pemain, akhiri: (t) => akhiri(t), get waktu() { return waktu; } };   // untuk pengujian otomatis
+    /* ---------- berdua online ---------- */
+    function kabar(m) { if (hostOnline) api.online.kirim({ t: "fx", ...m }); }
+    const r2 = (v) => Math.round(v * 100) / 100;
+    const terkirim = new Set();
+    if (hostOnline) api.online.on("mintaMeta", () => { terkirim.clear(); api.online.kirim({ t: "mobaMeta", dunia, balik: modeLawan, hero: teman.hero, id: teman.id }); });
+    function buatSnap() {
+      const baru = [];
+      for (const u of unit) if (!terkirim.has(u.id)) { terkirim.add(u.id); baru.push({ id: u.id, jenis: u.jenis === "pemain" ? "hero" : u.jenis, tim: u.tim, sprite: u.sprite, nama: u.nama, r: u.r, skala: u.skala, hero: u.hero, bangunan: !!u.bangunan, monster: !!u.monster, bos: !!u.bos, minion: !!u.minion, urut: u.urut }); }
+      return {
+        baru, w: r2(waktu), skor: skorTim,
+        u: unit.map((u) => [u.id, r2(u.x), r2(u.z), Math.round(u.hp), Math.round(u.hpMaks), u.mati ? 1 : 0, u.level || 0, u.perisaiSisa > 0 ? Math.round(u.perisai) : 0, u.gaib > 0 ? 1 : 0, u.pusing > 0 ? 1 : 0, u.lompat > 0 ? 1 : 0]),
+        p: proyektil.map((q) => [r2(q.x), r2(q.z), q.warna, q.r || 0.25, q.y ?? 1]),
+        e: efek.map((ef) => [r2(ef.x), r2(ef.z), ef.r, ef.warna, r2(ef.umur), ef.maks]),
+        me: { gold: Math.floor(teman.gold), level: teman.level, cd: teman.cdSkill.map(r2), kill: teman.kill, mati: teman.matiN, assist: teman.assist, bangkit: r2(teman.bangkit || 0), pulang: r2(teman.pulangSisa || 0), item: teman.item },
+      };
+    }
+    function kendaliTeman(dt) {
+      for (const ev of on.ambilPeristiwa()) {
+        if (teman.mati) continue;
+        if (ev.a === "s1" || ev.a === "s2" || ev.a === "ult") { if (pakaiSkill(teman, { s1: 0, s2: 1, ult: 2 }[ev.a])) teman.pulangSisa = 0; }
+        else if (ev.a === "serang") { const t = terdekat(teman, teman.jangkau + 1.4, (v) => v.h) || terdekat(teman, teman.jangkau + 1.4, lindung) || terdekat(teman, teman.jangkau + 1.4); if (t) serangDasar(teman, t); teman.pulangSisa = 0; }
+        else if (ev.a === "beli") { const n = teman.item.length; beli(teman, false); if (teman.item.length > n) kabar({ k: "umpan", t: `Membeli ${ITEM[teman.item[teman.item.length - 1]].nama}`, w: "#F2C14E", b: "poin" }); else kabar({ k: "bunyi", b: "salah" }); }
+        else if (ev.a === "pulang") teman.pulangSisa = 3;
+      }
+      const m = on.masukan;
+      if (teman.mati) return;
+      if (m.serang && teman.cdSerang <= 0) { const t = terdekat(teman, teman.jangkau + 1.2, (v) => v.h) || terdekat(teman, teman.jangkau + 1.2, lindung) || terdekat(teman, teman.jangkau + 1.2); if (t) serangDasar(teman, t); }
+      const gx = +m.gx || 0, gz = +m.gz || 0;
+      if ((gx || gz) && teman.pusing <= 0 && !teman.dash) { teman.x += gx * lajuEfektif(teman) * dt; teman.z += gz * lajuEfektif(teman) * dt; teman.hadap = Math.atan2(gz, gx); teman.pulangSisa = 0; }
+      if (teman.pulangSisa > 0) { teman.pulangSisa -= dt; if (teman.pulangSisa <= 0) { teman.x = 0; teman.z = MARKAS[teman.tim].z; kabar({ k: "bunyi", b: "tingtong" }); } }
+    }
+    // tamu: susun ulang unit dari kiriman tuan rumah
+    const peta = new Map(), pelTamu = [], efTamu = [];
+    const sgn = balik ? -1 : 1, timLokal = (t) => (balik && t ? 3 - t : t);
+    function terapkanSnap(dt) {
+      const sn = on.snap;
+      if (!sn) return;
+      const daftarBaru = meta._baru || sn.baru;
+      for (const b of daftarBaru) if (!peta.has(b.id)) {
+        const tim = timLokal(b.tim);
+        const o = { ...b, tim, warna: WARNA_TIM[tim], h: b.hero ? HERO[b.hero] : null, jenis: b.id === meta.id ? "pemain" : b.jenis, pemain: b.id === meta.id, x: 0, z: 0, hp: 1, hpMaks: 1, kill: 0, matiN: 0, assist: 0 };
+        peta.set(b.id, o);
+        if (o.pemain) { Object.assign(o, { cdSkill: [0, 0, 0], item: [], gold: 0, level: 1, bangkit: 0 }); pemain = o; }
+      }
+      if (meta._baru) meta._baru.length = 0;
+      unit.length = 0;
+      for (const d of sn.u) {
+        const o = peta.get(d[0]);
+        if (!o) continue;
+        const tx = d[1] * sgn, tz = d[2] * sgn, lompat = (o.x - tx) ** 2 + (o.z - tz) ** 2 > 36 || !o.siap;
+        o.x = lompat ? tx : o.x + (tx - o.x) * Math.min(1, dt * 15); o.z = lompat ? tz : o.z + (tz - o.z) * Math.min(1, dt * 15); o.siap = true;
+        o.hp = d[3]; o.hpMaks = d[4]; o.mati = !!d[5]; o.level = d[6]; o.perisai = d[7]; o.perisaiSisa = d[7] ? 1 : 0; o.gaib = d[8] ? 1 : 0; o.pusing = d[9] ? 1 : 0; o.lompat = d[10] ? 0.1 : 0;
+        unit.push(o);
+      }
+      proyektil.length = 0; sn.p.forEach((q, i) => { const o = pelTamu[i] || (pelTamu[i] = {}); o.x = q[0] * sgn; o.z = q[1] * sgn; o.warna = q[2]; o.r = q[3]; o.y = q[4]; proyektil.push(o); });
+      efek.length = 0; sn.e.forEach((q, i) => { const o = efTamu[i] || (efTamu[i] = {}); o.x = q[0] * sgn; o.z = q[1] * sgn; o.r = q[2]; o.warna = q[3]; o.umur = q[4]; o.maks = q[5]; efek.push(o); });
+      skorTim[1] = sn.skor[balik ? 2 : 1]; skorTim[2] = sn.skor[balik ? 1 : 2]; waktu = sn.w;
+      Object.assign(pemain, { gold: sn.me.gold, level: sn.me.level, cdSkill: sn.me.cd, kill: sn.me.kill, matiN: sn.me.mati, assist: sn.me.assist, bangkit: sn.me.bangkit, item: sn.me.item });
+      pulang = sn.me.pulang;
+      kend.cd = { s1: pemain.cdSkill[0], s2: pemain.cdSkill[1], ult: pemain.cdSkill[2], serang: 0 };
+      // kirim kemudi (dibalik lagi ke arah dunia tuan rumah)
+      on.kirimMasukan(dt, { gx: r2(kend.gerak.x * sgn), gz: r2(kend.gerak.z * sgn), serang: !!kend.tahan.serang });
+      for (const a of kend.ambil()) on.ev({ a });
+    }
+    if (tamu) {
+      const timTeks = (t) => (timLokal(t) === 1 ? "kita" : "lawan");
+      api.online.on("fx", (m) => {
+        if (m.b) sfx(m.b);
+        if (m.k === "umpan") umpan.tambah(m.t, m.tim ? WARNA_TIM[timLokal(m.tim)] : m.w);
+        else if (m.k === "umum") umum.umumkan(m.a, m.b, m.tim ? WARNA_TIM[timLokal(m.tim)] : "#F2C14E");
+        else if (m.k === "menara") { const kita = timLokal(m.tim) === 1; umum.umumkan(kita ? "MENARA KITA RUNTUH" : "MENARA LAWAN RUNTUH", "", kita ? "#FF8A7A" : "#7FD18B"); sfx("kaget"); if (!kita) { K.WOW?.getar(1.2, 0.35); K.WOW?.hp(80); } }
+        else if (m.k === "bos") umum.umumkan("MESIN FOTOKOPI PURBA DIKALAHKAN", `Tim ${timTeks(m.tim)} dapat Fotokopi Raksasa`, WARNA_TIM[timLokal(m.tim)]);
+        else if (m.k === "tumbang") { sfx("salah"); umum.umumkan("Kamu tumbang", "Duduk sebentar di markas. Teh sudah disiapkan.", "#FF8A7A"); K.WOW?.getar(1.6, 0.4); K.WOW?.hp(150); K.WOW?.kilat("rgba(181,68,58,.45)", 400); }
+        else if (m.k === "wow") { sfx("menang"); K.WOW?.getar(1, 0.25); K.WOW?.hp(50); K.WOW?.kilat("rgba(242,193,78,.3)"); }
+      });
+      api.online.on("akhir", (m) => {
+        const pemenangLokal = timLokal(m.pemenang);
+        for (const hh of m.hero) { const o = peta.get(hh.id); if (o) Object.assign(o, { kill: hh.k, matiN: hh.m, assist: hh.a, skor: hh.skor }); }
+        selesai = { pemenang: pemenangLokal, sisa: 4, mvp: peta.get(m.mvp), alasan: m.alasan, data: m };
+        const menang = pemenangLokal === 1;
+        sfx(menang ? "menang" : "salah");
+        umum.umumkan(menang ? "KEMENANGAN" : "KEKALAHAN", "", menang ? "#7FD18B" : "#FF8A7A");
+        if (menang) { K.WOW?.hujan(); K.WOW?.hp(200); }
+      });
+    }
+    function kirimHasilTamu() {
+      const menang = selesai.pemenang === 1, mvp = selesai.mvp === pemain;
+      const runtuh = selesai.data.menara[balik ? 1 : 2];
+      const skor = (menang ? 160 : 60) + pemain.kill * 12 + pemain.assist * 6 + runtuh * 8 + (mvp ? 25 : 0);
+      api.catatStat("menang", menang ? 1 : 0); api.catatStat("kill", pemain.kill);
+      api.selesai(skor, [menang ? "badak" : "kapibara", `${menang ? "KEMENANGAN" : "Kalah tipis"} · KDA ${pemain.kill}/${pemain.matiN}/${pemain.assist}${mvp ? " · MVP" : ""}.`], { menang, judul: `${menang ? "KEMENANGAN" : "KEKALAHAN"}${modeLawan ? " lawan teman" : " bareng teman"}` });
+    }
+
+    ctx.canvas._uji = { unit, get pemain() { return pemain; }, akhiri: (t) => akhiri(t), get waktu() { return waktu; } };   // untuk pengujian otomatis
 
     /* ---------- 3D ---------- */
     const d3 = api.buat3D(dunia);
@@ -422,7 +562,10 @@
     /* ---------- loop ---------- */
     const stop = api.loop((dt) => {
       waktu += dt;
-      if (!selesai) {
+      if (tamu) {
+        if (!selesai) terapkanSnap(dt);
+        else { selesai.sisa -= dt; if (selesai.sisa <= 0) { stop2(); kirimHasilTamu(); return; } }
+      } else if (!selesai) {
         // gelombang minion
         jedaGelombang -= dt;
         if (jedaGelombang <= 0) { gelombang++; jedaGelombang = 20; for (const t of [1, 2]) { buatMinion(t, false); buatMinion(t, false); buatMinion(t, true); if (waktu > 160) buatMinion(t, false, 2.2); }
@@ -443,6 +586,7 @@
           if (pulang > 0) { pulang -= dt; if (pulang <= 0) { pemain.x = 0; pemain.z = 85; sfx("tingtong"); } }
         }
         kend.cd = { s1: pemain.cdSkill[0], s2: pemain.cdSkill[1], ult: pemain.cdSkill[2], serang: 0 };
+        if (hostOnline) kendaliTeman(dt);
         // semua unit
         for (const u of unit) {
           if (u.mati) {
@@ -468,7 +612,7 @@
               u.x += u.dash.x * u.dash.laju * dt; u.z += u.dash.z * u.dash.laju * dt; u.dash.sisa -= dt;
               if (u.dash.kena) for (const v of unit) if (musuh(u, v) && !u.dash.kena.has(v) && d2(u, v) < (1.4 + (v.r || 0)) ** 2) { u.dash.kena.add(v); pukul(u, v, u.dash.dmg, { pusing: u.dash.pusing }); }
               if (u.dash.sisa <= 0) u.dash = null;
-            } else if (!u.pemain && u.pusing <= 0) {
+            } else if (!u.pemain && !u.remote && u.pusing <= 0) {
               const tujuan = otakHero(u, dt);
               gerakKe(u, tujuan, dt, tujuan && tujuan.hp !== undefined ? u.jangkau + (tujuan.r || 0) : 0.4);
               lepasMacet(u, dt);
@@ -521,6 +665,7 @@
         selesai.sisa -= dt;
         if (selesai.sisa <= 0) { stop2(); kirimHasil(); return; }
       }
+      if (hostOnline) on.kirimSnap(dt, buatSnap, 12);
       for (let i = efek.length - 1; i >= 0; i--) { efek[i].umur += dt; if (efek[i].umur > efek[i].maks) efek.splice(i, 1); }
       for (let i = angka.length - 1; i >= 0; i--) { angka[i].umur += dt; if (angka[i].umur > 0.9) angka.splice(i, 1); }
 

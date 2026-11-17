@@ -60,7 +60,7 @@
     },
     {
       id: "rehat", judul: "Ruang Istirahat (games)", sprite: "marmut", oleh: "Dimas",
-      buka: "SELAMAT DATANG DI LANTAI 2— eh, maaf. Di sini ada lima game, sekarang 3D. Semuanya singkat. Semuanya resmi.",
+      buka: "SELAMAT DATANG DI LANTAI 2— eh, maaf. Di sini ada tujuh game, sekarang 3D, dan bisa dimainkan berdua dari dua HP. Semuanya resmi.",
       langkah: [
         ["kura", "<b>Rally vs Pak Satpam</b>: ketuk layar saat kok masuk lingkaran. Makin pas, makin besar nilainya. Gagal 3 kali, selesai."],
         ["berkas", "<b>Stempel Kilat</b> (60 detik): pilih DISETUJUI, DITOLAK, atau NANTI AJA. Kalau ada Oyen tidur di atas berkas, <b>jangan dicap</b>."],
@@ -69,9 +69,12 @@
         ["badak", "<b>Grand Prix Kantor</b> (3 lap, 6 pembalap): pilih kendaraan (Troli, Motor Pak Satpam yang miring ala MotoGP, atau Kursi Putar) dan pembalap. Tahan ◀ ▶ untuk belok, tahan <b>DRIFT</b> sambil belok lalu lepas untuk mini turbo, ketuk <b>ITEM</b> untuk teh turbo, kulit pisang goreng, stempel kejar, atau payung. Berkas emas bikin makin kencang. Tahan DRIFT saat lampu ke-3 untuk start roket."],
         ["badak", "<b>Legenda Lantai 2</b> (arena hero 3v3): pilih hero (tank, fighter, mage, assassin, marksman, support). Joystick kiri untuk jalan, SERANG, dua skill, dan ULT. Gold dari minion & lawan untuk beli item (tombol Beli di bawah). Runtuhkan menara berurutan, lalu inti markas merah. Semak untuk bersembunyi, Mesin Fotokopi Purba di jungle memberi minion raksasa."],
         ["payung", "<b>Kantor Royale</b> (20 pemain): ketuk LONCAT dari pesawat kertas, turun pakai payung, buka peti. Tahan TEMBAK (bidik otomatis), GANTI senjata, TEH untuk pulih. Tetap di dalam zona aman yang menyusut. Senjatanya pistol air, ketapel, bola kertas, dan stempel: yang kalah basah kuyup lalu pulang."],
+        ["kapibara", "<b>Main Berdua Online</b> (kartu paling atas): main bareng teman di <b>HP masing-masing</b>. Satu orang ketuk <b>Buat room</b> lalu kirim kode 5 huruf (atau tautan WhatsApp). Teman ketuk <b>Gabung</b> dan memasukkan kodenya. Semua 7 game bisa: Rally Online, Stempel Rebutan, Rebutan Kertas, Ngemil Berdua, Grand Prix Berdua, Legenda Lantai 2 (satu tim atau saling lawan), dan Kantor Royale (duo satu regu atau saling lawan)."],
+        ["saran", "Di lobi online ada <b>stiker</b> untuk menyapa teman, dan tombol <b>Stiker</b> juga ada saat main. Pembuat room yang memilih game. Paling lancar kalau dua HP memakai Wi-Fi yang sama atau hotspot dari salah satu HP."],
         ["kura", "<b>Mode Duel</b> (kartu biru-oranye): dua pemain di satu HP, hadap-hadapan. Taruh HP di meja, Pemain 1 sisi bawah, Pemain 2 sisi atas. Turnamen 3 atau 5 ronde: Hoki Meja Rapat, Cap Duluan, Tarik Map, Kabel Kusut. Tidak ada teman? Lawan bot Pak Satpam."],
         ["oyen", "<b>Pangkat & Misi harian</b>: tiap game memberi XP untuk naik pangkat, dari Pegawai Magang sampai Legenda Kantor. Ada 3 misi baru tiap hari, klaim hadiahnya di papan misi."],
         ["badak", "<b>Tingkat kesulitan</b>: Santai, Normal, atau <b>Lembur</b> (semua lebih cepat, Poin Sabar x1.5). Di Stempel Kilat ada combo: tiap 5 cap benar berturut-turut dapat bonus."],
+        ["senter", "Ada efek <b>WOW</b>: layar bergetar, konfeti, tulisan besar, dan HP ikut bergetar saat combo, KO, atau menang. Getar HP bisa dimatikan lewat tombol <b>Getar HP saat main</b> di bawah daftar game. Kalau HP disetel \"kurangi gerakan\", efek layar ikut diperhalus."],
         ["kartu", "Sebelum main ada pilihan <b>Tampilan: 3D atau 2D klasik</b>. Kalau HP terasa berat atau panas, pilih 2D klasik. Skornya sama saja."],
         ["marmut", "Sebelum main, kamu boleh menumpuk berkas di kepala saya (beban pikiran). Kalau sesudah main berkurang, dapat bonus. *kepala saya kuat kok."],
         ["oyen", "Semua game memberi <b>Poin Sabar</b>. Rekor tersimpan. Papan Pegawai Teladan selalu dimenangkan kamu. Itu keputusan Kepala Bagian."],

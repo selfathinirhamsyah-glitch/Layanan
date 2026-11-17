@@ -1,0 +1,65 @@
+/* =========================================================
+   Main berdua online & efek WOW
+   ========================================================= */
+.kartu-online { background: linear-gradient(135deg, #3E78C4 0 45%, #7FD18B 45% 55%, #E58B3A 55% 100%); }
+
+/* lobi */
+.online { position: fixed; inset: 0; z-index: 72; background: #1C1F26; overflow-y: auto; }
+.online[hidden] { display: none; }
+.online-isi { position: relative; max-width: 520px; margin: 0 auto; min-height: 100%; padding: 18px 16px 34px; background: var(--paper); color: var(--ink); }
+.online-tutup { position: absolute; right: 12px; top: 12px; width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--ink); background: #FFFDF6; color: #2B2A26; font: inherit; font-size: 1.1rem; cursor: pointer; }
+.online-judul { font-family: var(--font-px); margin: 0 48px 6px 0; }
+.online-profil { border: 2px dashed var(--line); border-radius: var(--wobble-sm); padding: 10px 12px; margin: 12px 0; }
+.online-pilihan { display: grid; gap: 10px; margin: 14px 0; }
+.online-besar { min-height: 54px; font-size: 1.05rem; }
+.online-gabung { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.online-kode-input { font-family: var(--font-num); font-size: 1.8rem; letter-spacing: .3em; text-transform: uppercase; text-align: center; padding: 6px; border: 3px solid var(--ink); background: #FFFDF6; color: #2B2A26; min-width: 0; }
+.online-kode { font-size: 3.4rem; letter-spacing: .25em; text-align: center; margin: 12px 0; color: #3E78C4; background: #FFFDF6; border: 3px dashed #3E78C4; padding: 6px 0; }
+.online-status { text-align: center; font-family: var(--font-px); font-size: .9rem; color: var(--ink-soft); min-height: 1.2em; }
+.online-status.buruk { color: #B5443A; }
+.titik-tunggu { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #7FD18B; margin-right: 6px; animation: kedip 1s steps(2) infinite; }
+.online-tips summary { cursor: pointer; font-family: var(--font-px); font-size: .85rem; }
+.online-duo { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; margin: 10px 0 14px; }
+.od-pemain { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border: 3px solid #2B2A26; color: #FFFDF6; text-align: center; }
+.od-pemain .avatar { width: 56px; height: 56px; background: #FFFDF6; }
+.od-pemain b { font-family: var(--font-px); }
+.od-pemain small { font-size: .8rem; opacity: .9; }
+.od-pemain.biru { background: #3E78C4; }
+.od-pemain.oranye { background: #E58B3A; }
+.od-vs { font-family: var(--font-px); font-size: 1.4rem; color: #B5443A; }
+.online-emote { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.em-btn, .stiker-palet button { display: inline-flex; align-items: center; gap: 4px; font: inherit; font-family: var(--font-px); font-size: .78rem; padding: 4px 8px 4px 4px; background: #FFFDF6; color: #2B2A26; border: 2px solid #2B2A26; border-radius: 16px; cursor: pointer; }
+.em-btn:active, .stiker-palet button:active { transform: scale(.94); }
+.online-game { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.og-kartu { display: grid; grid-template-columns: 40px 1fr; gap: 2px 8px; align-items: center; text-align: left; font: inherit; color: var(--ink); padding: 8px; background: var(--paper); border: 2px solid var(--line); border-radius: var(--wobble-sm); cursor: pointer; }
+.og-kartu .avatar { grid-row: span 2; width: 40px; height: 40px; }
+.og-kartu strong { font-family: var(--font-px); font-size: .8rem; }
+.og-kartu small { font-size: .78rem; color: var(--ink-soft); line-height: 1.2; }
+.og-kartu.dipilih { border-color: var(--ink); background: var(--accent-wash); box-shadow: inset 0 0 0 2px #F2C14E; }
+.og-kartu:disabled { cursor: default; opacity: .75; }
+.og-kartu.dipilih:disabled { opacity: 1; }
+@media (max-width: 380px) { .online-game { grid-template-columns: 1fr; } }
+
+/* stiker di arena */
+.arena-stiker { --bg: #F2C14E !important; flex-shrink: 0; }
+.stiker-palet { position: absolute; top: 56px; right: 8px; z-index: 6; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 8px; background: rgba(20,20,24,.85); border: 2px solid #F0EADB; }
+.st-oleh { position: absolute; left: 8px; bottom: 6px; color: #FFFDF6; font-family: var(--font-px); font-size: .7rem; padding: 1px 6px; }
+
+/* efek WOW */
+.wow-lapis { position: fixed; inset: 0; z-index: 90; pointer-events: none; }
+.wow-kanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.wow-kilat { position: absolute; inset: 0; opacity: 0; }
+.wow-teks { position: absolute; left: 0; right: 0; top: 34%; text-align: center; opacity: 0; }
+.wow-teks b { display: block; font-family: var(--font-px); font-size: 2.4rem; -webkit-text-stroke: 2px #2B2A26; text-shadow: 3px 3px 0 #2B2A26; }
+.wow-teks small { display: inline-block; font-family: var(--font-px); color: #FFFDF6; background: rgba(20,20,24,.7); padding: 2px 10px; margin-top: 4px; }
+.wow-teks.muncul { animation: wowTeks 1.4s cubic-bezier(.2,.9,.3,1.3) both; }
+@keyframes wowTeks { 0% { opacity: 0; transform: scale(2.2) rotate(-6deg); } 15% { opacity: 1; transform: scale(.92) rotate(2deg); } 25% { transform: scale(1.05) rotate(-1deg); } 75% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1) translateY(-20px); } }
+.wow-emote { position: absolute; left: 0; right: 0; top: 18%; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.wow-gelembung { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px 4px 4px; background: #FFFDF6; color: #2B2A26; border: 3px solid #3E78C4; border-radius: 20px; font-family: var(--font-px); font-size: 1rem; animation: gelembung 2.6s ease both; box-shadow: 3px 3px 0 rgba(0,0,0,.3); }
+.wow-gelembung.teman { border-color: #E58B3A; }
+@keyframes gelembung { 0% { opacity: 0; transform: translateY(20px) scale(.6); } 12% { opacity: 1; transform: translateY(0) scale(1.1); } 20% { transform: scale(1); } 85% { opacity: 1; } 100% { opacity: 0; transform: translateY(-16px); } }
+@media (prefers-reduced-motion: reduce) { .wow-teks.muncul, .wow-gelembung { animation-duration: .01s; } .wow-teks.muncul { opacity: 1; } }
+
+/* sakelar getar HP di Ruang Istirahat */
+.istirahat-getar { margin: 14px 0 0; text-align: center; }
+.istirahat-getar .btn[aria-pressed="false"] { opacity: .75; }

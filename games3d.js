@@ -170,7 +170,7 @@
   const ADEGAN = {};
 
   /* ---------- Rally: lapangan dilihat dari belakang pemain ---------- */
-  ADEGAN.rally = (api, kanvas2d) => {
+  ADEGAN.rally = (api, kanvas2d, data) => {
     const P = panggung(kanvas2d, { langit: "#BFD8E8", fov: 52, kabut: [16, 34] });
     const { adegan: A, kamera } = P;
     const Z_JAUH = -8.6, Z_PUKUL = 2.6;
@@ -192,7 +192,7 @@
     ["kapibara", "marmut", "kukang"].forEach((s, i) => { const p = papan(s, 1.2); p.position.set(-5.2 + i * 0.1, 0.62, -6 + i * 2.4); A.add(p); });
     const oyen = papan("oyen", 1.3); oyen.position.set(5.2, 0.68, -4.5); A.add(oyen);
     // Pak Satpam
-    const satpam = papan("kura", 2.3); satpam.position.set(0, 1.18, Z_JAUH - 0.6); A.add(satpam);
+    const satpam = papan(data?.lawan || "kura", 2.3); satpam.position.set(0, 1.18, Z_JAUH - 0.6); A.add(satpam);
     const bySatpam = bayangan(0.9); bySatpam.position.set(0, 0.02, Z_JAUH - 0.6); A.add(bySatpam);
     // cincin zona pukul
     const cincin = new T.Mesh(new T.RingGeometry(0.62, 0.8, 32), new T.MeshBasicMaterial({ color: 0xFFFDF6, transparent: true, opacity: 0.85, side: T.DoubleSide }));
@@ -249,7 +249,7 @@
   };
 
   /* ---------- Kertas: ruangan kantor, kertas berputar di udara ---------- */
-  ADEGAN.kertas = (api, kanvas2d) => {
+  ADEGAN.kertas = (api, kanvas2d, data) => {
     const P = panggung(kanvas2d, { langit: "#F0EADB", fov: 40 });
     const { adegan: A, kamera } = P;
     const JARAK = 16;
@@ -299,6 +299,8 @@
       m.material.map = TEKS[jenis]; m.material.needsUpdate = true; m.visible = true;
       return m;
     }
+    let map2 = null;
+    void data;
     return {
       gambar(st, waktu) {
         const sk = s();
@@ -308,6 +310,10 @@
         baling.rotation.z = -waktu * 18;
         map.position.set(X(st.mapX) + (st.getar > 0 ? Math.sin(waktu * 80) * 0.15 : 0), Y(st.mapY) - 0.1, 0.4);
         map.scale.setScalar(sk / 0.032);
+        if (st.mapX2 != null) {
+          if (!map2) { map2 = map.clone(); map2.traverse((o) => { if (o.material && o.material.color && o.material.type !== "MeshBasicMaterial") { o.material = o.material.clone(); o.material.color.set("#E58B3A"); } }); A.add(map2); }
+          map2.position.set(X(st.mapX2), Y(st.mapY) - 0.1, 0.2); map2.scale.copy(map.scale);
+        }
         // sinkronkan kertas
         const lihat = new Set();
         for (const k of st.kertas) {
@@ -327,7 +333,7 @@
   };
 
   /* ---------- Ngemil: duduk di ruang rapat, Oyen presentasi ---------- */
-  ADEGAN.ngemil = (api, kanvas2d) => {
+  ADEGAN.ngemil = (api, kanvas2d, data) => {
     const P = panggung(kanvas2d, { langit: "#E9E2D0", fov: 68 });
     const { adegan: A, kamera } = P;
     const lantai = new T.Mesh(new T.PlaneGeometry(20, 20), bahan("#B9A27E")); lantai.rotation.x = -Math.PI / 2; A.add(lantai);
@@ -349,7 +355,7 @@
     // meja panjang, kursi, rekan rapat
     const meja = kotak(2.0, 0.14, 4.4, "#9C6B43"); meja.position.set(0, 0.8, 0); A.add(meja);
     [[-0.85, -2.0], [0.85, -2.0], [-0.85, 2.0], [0.85, 2.0]].forEach(([x, z]) => { const k = kotak(0.1, 0.8, 0.1, "#6B4A2E", 0); k.position.set(x, 0.4, z); A.add(k); });
-    const rekan = [["marmut", -1.4, -2.3], ["kukang", 1.4, -1.5], ["kapibara", -1.4, -0.7]].map(([sp, x, z]) => {
+    const rekan = [[data?.teman || "marmut", -1.4, -2.3], ["kukang", 1.4, -1.5], ["kapibara", -1.4, -0.7]].map(([sp, x, z]) => {
       const kursi = kotak(0.7, 0.8, 0.7, "#5D4E6E"); kursi.position.set(x, 0.4, z); A.add(kursi);
       const sandaran = kotak(0.7, 0.9, 0.12, "#5D4E6E"); sandaran.position.set(x + (x < 0 ? -0.3 : 0.3), 1.1, z); sandaran.rotation.y = Math.PI / 2; A.add(sandaran);
       const p = papan(sp, 1.0); p.position.set(x, 1.28, z); p.userData.dasar = 1.28; A.add(p);
@@ -374,7 +380,7 @@
         kamera.position.set(Math.sin(waktu * 0.6) * 0.08, pos.y + (makan ? Math.sin(waktu * 16) * 0.02 : 0), 3.7);
         kamera.lookAt(0, pos.ly, pos.lz);
         gorengan.forEach((g, i) => { g.scale.setScalar(i === 2 ? 0.3 * (1 - st.potongan * 0.28) : 0.3); });
-        rekan.forEach((p, i) => { p.position.y = p.userData.dasar + Math.abs(Math.sin(waktu * 1.4 + i)) * 0.04; });
+        rekan.forEach((p, i) => { p.position.y = p.userData.dasar + Math.abs(Math.sin(waktu * (i === 0 && st.temanMakan ? 14 : 1.4) + i)) * (i === 0 && st.temanMakan ? 0.09 : 0.04); });
         P.render();
       },
       ukur: P.ukur, hapus: P.hapus,

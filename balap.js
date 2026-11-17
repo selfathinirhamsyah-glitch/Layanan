@@ -86,7 +86,22 @@
   /* =========================================================
      PERMAINAN
      ========================================================= */
-  function main(api) {
+  // mode berdua online: tamu menunggu data susunan pembalap dari tuan rumah
+  function mainOnline(api) {
+    const on = K.ONLINE_SAMBUNG(api);
+    if (on.host) return main(api, null, on);
+    let berhentiDalam = null, batal = false;
+    const minta = setInterval(() => api.online.kirim({ t: "mintaMeta" }), 600);
+    api.online.kirim({ t: "mintaMeta" });
+    api.online.on("gpMeta", (m) => { if (berhentiDalam || batal) return; clearInterval(minta); berhentiDalam = main(api, m, on); api.ukurUlang?.(); });
+    const ctx = api.ctx;
+    const tunggu = api.loop(() => { if (berhentiDalam) return; ctx.fillStyle = "#4A4744"; ctx.fillRect(0, 0, api.W(), api.H()); ctx.fillStyle = "#FFFDF6"; ctx.font = '16px "Pixelify Sans", monospace'; ctx.textAlign = "center"; ctx.fillText("Menunggu data balapan dari teman...", api.W() / 2, api.H() / 2); });
+    return () => { batal = true; clearInterval(minta); tunggu(); berhentiDalam?.(); };
+  }
+
+  function main(api, meta = null, on = null) {
+    if (api.online && !on) return mainOnline(api);
+    const tamu = !!meta, hostOnline = !!(on && on.host);
     const { ctx } = api;
     const kanvas = ctx.canvas;
     const trek = buatTrek();
@@ -99,20 +114,32 @@
     const lawan = LAWAN.map((l) => ({ ...l }));
     const bentrok = lawan.findIndex((l) => l.sprite === pil.karakter);
     if (bentrok >= 0) Object.assign(lawan[bentrok], CADANGAN.find((c) => c.sprite !== pil.karakter));
-    const urutGrid = [lawan[0], lawan[1], lawan[2], lawan[3], { pemain: true }, lawan[4]];
-    const pembalap = urutGrid.map((l, i) => {
+    // berdua: teman menggantikan satu bot di posisi start ke-6
+    const prefTeman = api.online?.teman?.kendaraan && KENDARAAN[api.online.teman.kendaraan] ? api.online.teman.kendaraan : "troli";
+    if (hostOnline) { const st = api.online.teman?.sprite || "marmut"; const b2 = lawan.findIndex((l) => l.sprite === st); if (b2 >= 0 && b2 !== 4) Object.assign(lawan[b2], CADANGAN.find((c) => c.sprite !== st && c.sprite !== pil.karakter)); }
+    const urutGrid = [lawan[0], lawan[1], lawan[2], lawan[3], { pemain: true }, hostOnline ? { remote: true } : lawan[4]];
+    const pembalap = tamu ? meta.pembalap.map((m, i) => {
       const baris = Math.floor(i / 2), kolom = i % 2 ? 0.38 : -0.38;
       const t = titikDi(-8 - baris * 9, kolom);
-      const kend = l.pemain ? pil.kendaraan : l.kendaraan;
       return {
-        id: i, pemain: !!l.pemain, nama: l.pemain ? api.nama : l.nama, sprite: l.pemain ? pil.karakter : l.sprite,
-        warna: l.pemain ? "#3E78C4" : l.warna, kendaraan: kend, st: KENDARAAN[kend],
+        id: i, pemain: i === meta.saya, remote: i === meta.tuanRumah, nama: i === meta.saya ? api.nama : m.nama, sprite: m.sprite, warna: i === meta.saya ? "#3E78C4" : m.warna, kendaraan: m.kendaraan, st: KENDARAAN[m.kendaraan],
+        x: t.x, z: t.z, a: t.a, v: 0, idx: ((-8 - baris * 9) % N + N) % N, prog: -8 - baris * 9, lap: 0, item: null, roda: 0, putar: 0, spin: 0, kebal: 0, turbo: 0, koin: 0, koinTotal: 0, drift: 0, driftArah: 0, muatan: 0, miring: 0, finis: 0, mundur: 0,
+      };
+    }) : urutGrid.map((l, i) => {
+      const baris = Math.floor(i / 2), kolom = i % 2 ? 0.38 : -0.38;
+      const t = titikDi(-8 - baris * 9, kolom);
+      const kend = l.pemain ? pil.kendaraan : l.remote ? prefTeman : l.kendaraan;
+      return {
+        id: i, pemain: !!l.pemain, remote: !!l.remote, nama: l.pemain ? api.nama : l.remote ? (api.online.teman?.nama || "Teman") : l.nama, sprite: l.pemain ? pil.karakter : l.remote ? (api.online.teman?.sprite || "marmut") : l.sprite,
+        warna: l.pemain ? "#3E78C4" : l.remote ? "#E58B3A" : l.warna, kendaraan: kend, st: KENDARAAN[kend],
         x: t.x, z: t.z, a: t.a, v: 0, idx: ((-8 - baris * 9) % N + N) % N, prog: -8 - baris * 9, lap: 0,
         item: null, roda: 0, putar: 0, spin: 0, kebal: 0, turbo: 0, koin: 0, koinTotal: 0, drift: 0, driftArah: 0, muatan: 0, miring: 0,
         finis: 0, waktuFinis: 0, lajurAI: acak(-0.35, 0.35), skillAI: skill * acak(0.97, 1.02), jedaItem: acak(1, 3), mundur: 0,
       };
     });
     const pemain = pembalap.find((r) => r.pemain);
+    const teman = pembalap.find((r) => r.remote);
+    if (hostOnline) api.online.on("mintaMeta", () => api.online.kirim({ t: "gpMeta", saya: teman.id, tuanRumah: pemain.id, pembalap: pembalap.map((r) => ({ nama: r.pemain ? api.nama : r.nama, sprite: r.sprite, kendaraan: r.kendaraan, warna: r.pemain ? "#E58B3A" : r.warna })) }));
 
     // benda di lintasan
     const kotak = [];
@@ -143,6 +170,7 @@
         <button type="button" class="gp-btn gp-drift" data-k="drift" aria-label="Drift (tahan)">DRIFT</button>
       </div>`;
     const turun = (k) => {
+      if (tamu) { tekan[k] = true; on.ev({ a: "tekan", k, v: true }); if (k === "item") { tekan.item = false; } return; }
       if (k === "item") { pakaiItem(pemain); return; }
       tekan[k] = true;
       if (k === "drift") {
@@ -153,6 +181,7 @@
     const naik = (k) => {
       if (!(k in tekan)) return;
       tekan[k] = false;
+      if (tamu) { on.ev({ a: "tekan", k, v: false }); return; }
       if (k === "drift") lepasDrift(pemain);
     };
     const kendaliTombol = new Map();
@@ -179,18 +208,20 @@
       r.drift = 1; r.driftArah = arah; r.muatan = 0; r.loncat = 0.18;
       if (r.pemain) sfx("boing");
     }
+    function kabarTeman(r, teks, warna, bunyi) { if (hostOnline && r.remote) api.online.kirim({ t: "fx", k: "kilat", teks, warna, bunyi }); }
     function levelMuatan(m) { return m >= 2.6 ? 3 : m >= 1.7 ? 2 : m >= 0.85 ? 1 : 0; }
     function lepasDrift(r) {
       if (!r.drift) return;
       const lv = levelMuatan(r.muatan);
       r.drift = 0; r.muatan = 0;
-      if (lv) { r.turbo = Math.max(r.turbo, [0, 0.55, 0.95, 1.4][lv]); if (r.pemain) { sfx("poin"); api.tambah("miniturbo"); kilat(["", "MINI TURBO", "SUPER TURBO", "ULTRA TURBO"][lv], ["", "#7FC8F2", "#F2A14E", "#C38AF2"][lv]); } }
+      if (lv) { r.turbo = Math.max(r.turbo, [0, 0.55, 0.95, 1.4][lv]); kabarTeman(r, ["", "MINI TURBO", "SUPER TURBO", "ULTRA TURBO"][lv], ["", "#7FC8F2", "#F2A14E", "#C38AF2"][lv], "poin"); if (r.remote) r.miniturbo = (r.miniturbo || 0) + 1; if (r.pemain) { K.WOW?.getar(0.6 + lv * 0.3, 0.2); K.WOW?.hp(25 * lv); sfx("poin"); api.tambah("miniturbo"); kilat(["", "MINI TURBO", "SUPER TURBO", "ULTRA TURBO"][lv], ["", "#7FC8F2", "#F2A14E", "#C38AF2"][lv]); } }
     }
     function kena(r, sebab) {
       if (r.kebal > 0 || r.spin > 0) return;
       r.spin = 1.05; r.drift = 0; r.muatan = 0; r.turbo = 0;
       if (r.koin > 0) r.koin--;
-      if (r.pemain) { sfx("boing"); kilat(sebab === "stempel" ? "DICAP!" : "KEPLESET!", "#FFFDF6"); api.tambah("kena"); }
+      kabarTeman(r, sebab === "stempel" ? "DICAP!" : "KEPLESET!", "#FFFDF6", "boing");
+      if (r.pemain) { sfx("boing"); kilat(sebab === "stempel" ? "DICAP!" : "KEPLESET!", "#FFFDF6"); api.tambah("kena"); K.WOW?.getar(1.4, 0.35); K.WOW?.hp(120); K.WOW?.kilat("rgba(181,68,58,.35)"); }
     }
     function posisiDari(r) { return urutan().indexOf(r) + 1; }
     function urutan() {
@@ -283,7 +314,10 @@
           if (r.lap > LAP) {
             r.finis = ++sim.finisKe; r.waktuFinis = sim.waktu;
             if (r.pemain) selesaiPemain();
-          } else if (r.pemain && r.lap === LAP) { sfx("tingtong"); kilat("LAP TERAKHIR!", "#F2C14E"); api.info("Pak Singa: PERHATIAN. Lap terakhir. Pegangan yang kencang."); }
+            if (r.remote && hostOnline) { kabarTeman(r, r.finis === 1 ? "JUARA 1!" : `FINIS KE-${r.finis}`, r.finis === 1 ? "#F2C14E" : "#FFFDF6", "menang"); setTimeout(() => kirimAkhirTeman(), 3200); }
+          } else if (r.remote && r.lap === LAP) kabarTeman(r, "LAP TERAKHIR!", "#F2C14E", "tingtong");
+          else if (r.remote && r.lap > 1) kabarTeman(r, `LAP ${r.lap}/${LAP}`, "#FFFDF6", "klik");
+          else if (r.pemain && r.lap === LAP) { sfx("tingtong"); kilat("LAP TERAKHIR!", "#F2C14E"); api.info("Pak Singa: PERHATIAN. Lap terakhir. Pegangan yang kencang."); }
           else if (r.pemain && r.lap > 1) { sfx("klik"); kilat(`LAP ${r.lap}/${LAP}`, "#FFFDF6"); }
         }
       }
@@ -341,7 +375,55 @@
         ["kukang", "...kelima. ...saya sampai garis finis besok. ...santai saja."],
         ["oyen", "Keenam. Sirkuit ini milik saya. Anda tamu. Silakan coba lagi."]];
       const [sp, kata] = KOMENTAR[posisi];
-      api.selesai(skor, [sp, `Finis ke-${posisi} dari 6, ${pemain.koinTotal} berkas emas, ${api.stat.miniturbo || 0} mini turbo. ${kata}`]);
+      const posTeman = hostOnline ? (teman.finis || posisiDari(teman)) : 0;
+      api.selesai(skor, [sp, `Finis ke-${posisi} dari 6, ${pemain.koinTotal} berkas emas, ${api.stat.miniturbo || 0} mini turbo. ${kata}`], hostOnline ? { menang: posisi < posTeman, judul: `Kamu ke-${posisi} · teman ke-${posTeman}` } : undefined);
+    }
+
+    /* ---------- berdua online ---------- */
+    const tekanTeman = { kiri: false, kanan: false, drift: false };
+    const r2 = (v) => Math.round(v * 100) / 100;
+    function buatSnap() {
+      return {
+        r: pembalap.map((r) => [r2(r.x), r2(r.z), r2(r.a), r2(r.v), r2(r.putar), r.drift ? r.driftArah : 0, r2(r.miring), r.turbo > 0 ? 1 : 0, r.kebal > 0 ? 1 : 0, r.loncat > 0 ? 1 : 0, r2(r.roda), r.finis, r.lap, r.koin, r2(r.prog), r.spin > 0 ? 1 : 0]),
+        me: { item: teman.item, koinTotal: teman.koinTotal, muatan: r2(teman.muatan), mundur: teman.mundur, posisi: posisiDari(teman) },
+        k: kotak.map((b) => (b.aktif ? 1 : 0)).join(""), c: koin.map((b) => (b.aktif ? 1 : 0)).join(""),
+        p: pisang.map((b) => [r2(b.x), r2(b.z)]), s: stempel.map((b) => [r2(b.x), r2(b.z)]), f: sim.fase, l: r2(sim.lampu),
+      };
+    }
+    function kirimAkhirTeman() {
+      if (teman.akhirTerkirim) return;
+      teman.akhirTerkirim = true;
+      api.online.kirim({ t: "akhir", posisi: teman.finis || posisiDari(teman), koinTotal: teman.koinTotal, miniturbo: teman.miniturbo || 0, posisiTeman: pemain.finis || posisiDari(pemain) });
+    }
+    const pisangTamu = [], stempelTamu = [];
+    function terapkanSnap(dt) {
+      const sn = on.snap;
+      if (!sn) return;
+      const u = on.umurSnap;
+      sn.r.forEach((d, i) => {
+        const r = pembalap[i];
+        const tx = d[0] + Math.cos(d[2]) * d[3] * u, tz = d[1] + Math.sin(d[2]) * d[3] * u;
+        const lompat = (r.x - tx) ** 2 + (r.z - tz) ** 2 > 25;
+        r.x = lompat ? tx : r.x + (tx - r.x) * Math.min(1, dt * 14); r.z = lompat ? tz : r.z + (tz - r.z) * Math.min(1, dt * 14);
+        r.a = r.a + bungkus(d[2] - r.a) * Math.min(1, dt * 14); r.v = d[3]; r.putar = d[4]; r.drift = d[5] ? 1 : 0; r.driftArah = d[5]; r.miring = d[6];
+        r.turbo = d[7] ? 0.5 : 0; r.kebal = d[8] ? 0.5 : 0; r.loncat = d[9] ? 0.1 : 0; r.roda = d[10]; r.finis = d[11]; r.lap = d[12]; r.koin = d[13]; r.prog = d[14]; r.spin = d[15] ? 0.5 : 0;
+      });
+      Object.assign(pemain, { item: sn.me.item, koinTotal: sn.me.koinTotal, muatan: sn.me.muatan, mundur: sn.me.mundur });
+      sim.posisiSnap = sn.me.posisi;
+      [...sn.k].forEach((v, i) => { kotak[i].aktif = v === "1"; });
+      [...sn.c].forEach((v, i) => { koin[i].aktif = v === "1"; });
+      pisang.length = 0; sn.p.forEach(([x, z], i) => { const o = pisangTamu[i] || (pisangTamu[i] = {}); o.x = x; o.z = z; pisang.push(o); });
+      stempel.length = 0; sn.s.forEach(([x, z], i) => { const o = stempelTamu[i] || (stempelTamu[i] = {}); o.x = x; o.z = z; stempel.push(o); });
+      if (sim.fase === "lampu" && sn.f === "balap") sfx("tingtong");
+      sim.fase = sn.f; sim.lampu = sn.l;
+    }
+    if (tamu) {
+      api.online.on("fx", (m) => { if (m.k === "kilat") { kilat(m.teks, m.warna); if (m.bunyi) sfx(m.bunyi); if (m.teks === "KEPLESET!" || m.teks === "DICAP!") { K.WOW?.getar(1.4, 0.35); K.WOW?.hp(120); } else if (/TURBO|ROKET/.test(m.teks)) { K.WOW?.getar(0.8, 0.2); K.WOW?.hp(40); } } });
+      api.online.on("akhir", (m) => {
+        pemain.finis = m.posisi; akhir = { sisa: 3.2, posisi: m.posisi };
+        sfx(m.posisi === 1 ? "menang" : "tingtong");
+        setTimeout(() => { berhenti(); const skor = [0, 200, 150, 115, 90, 70, 55][m.posisi] + Math.min(20, m.koinTotal) * 6 + Math.min(15, m.miniturbo) * 4; api.selesai(skor, [m.posisi < m.posisiTeman ? "badak" : "kapibara", `Finis ke-${m.posisi} dari 6, ${m.koinTotal} berkas emas. ${m.posisi < m.posisiTeman ? "Kamu finis duluan dari teman!" : "Teman finis duluan. Rematch?"}`], { menang: m.posisi < m.posisiTeman, judul: `Kamu ke-${m.posisi} · teman ke-${m.posisiTeman}` }); }, 3200);
+      });
     }
 
     /* ---------- 3D bila tersedia ---------- */
@@ -351,13 +433,15 @@
     /* ---------- loop ---------- */
     const stop = api.loop((dt) => {
       sim.waktu += dt;
-      if (sim.fase === "lampu") {
+      if (tamu) { terapkanSnap(dt); on.kirimMasukan(dt, { kiri: !!tekan.kiri, kanan: !!tekan.kanan, drift: !!tekan.drift }); }
+      else if (sim.fase === "lampu") {
         const sebelum = Math.floor(sim.lampu);
         sim.lampu += dt;
         if (Math.floor(sim.lampu) > sebelum && sim.lampu < 3.05) sfx("klik");
         if (sim.lampu >= 3) {
           sim.fase = "balap"; sfx("tingtong");
-          if (roketSiap && tekan.drift && !mulaiDini) { pemain.turbo = 1.3; kilat("START ROKET!", "#F2C14E"); api.tambah("roket"); }
+          if (roketSiap && tekan.drift && !mulaiDini) { pemain.turbo = 1.3; kilat("START ROKET!", "#F2C14E"); api.tambah("roket"); K.WOW?.getar(1, 0.3); K.WOW?.hp(60); }
+          if (hostOnline && tekanTeman.drift) { teman.turbo = 1.3; kabarTeman(teman, "START ROKET!", "#F2C14E", "tingtong"); }
           else if (mulaiDini) { pemain.spin = 0.6; kilat("MESIN NGAMBEK", "#FFFDF6"); }
           pembalap.forEach((r) => { if (!r.pemain && Math.random() < 0.5) r.turbo = acak(0.3, 0.9); });
         }
@@ -367,6 +451,7 @@
           let belok = 0;
           if (r.finis) belok = otakAI(r, dt) * 0.8;
           else if (r.pemain) belok = (tekan.kanan ? 1 : 0) - (tekan.kiri ? 1 : 0);
+          else if (r.remote) { belok = (tekanTeman.kanan ? 1 : 0) - (tekanTeman.kiri ? 1 : 0); if (tekanTeman.drift && !r.drift && belok) mulaiDrift(r, belok); if (!tekanTeman.drift && r.drift) lepasDrift(r); }
           else belok = otakAI(r, dt);
           if (r.pemain && tekan.drift && !r.drift && belok) mulaiDrift(r, belok);
           gerak(r, belok, dt);
@@ -431,20 +516,25 @@
           }
           if (habis) stempel.splice(i, 1);
         }
-        if (akhir) { akhir.sisa -= dt; if (akhir.sisa <= 0) { akhir = null; berhenti(); kirimHasil(); return; } }
+        if (akhir) {
+          akhir.sisa -= dt;
+          if (akhir.sisa <= 0 && hostOnline && !teman.akhirTerkirim) { akhir.tunggu = (akhir.tunggu || 0) + dt; if (akhir.tunggu > 25) { if (!teman.finis) teman.finis = posisiDari(teman); kirimAkhirTeman(); } }
+          if (akhir.sisa <= 0 && (!hostOnline || teman.akhirTerkirim)) { akhir = null; berhenti(); kirimHasil(); return; }
+        }
         else if (!pemain.finis && (sim.waktu > 240 || (sim.finisKe >= 5 && sim.waktu - pembalap.reduce((m, r) => Math.max(m, r.waktuFinis), 0) > 20))) {
           pemain.finis = posisiDari(pemain); selesaiPemain();
         }
       }
+      if (hostOnline) { if (on.masukan.kiri !== undefined) { tekanTeman.kiri = on.masukan.kiri; tekanTeman.kanan = on.masukan.kanan; tekanTeman.drift = on.masukan.drift; } for (const ev of on.ambilPeristiwa()) if (ev.a === "tekan") { if (ev.k === "item") { if (ev.v) pakaiItem(teman); } else tekanTeman[ev.k] = !!ev.v; } on.kirimSnap(dt, buatSnap, 18); }
       for (let i = kilatan.length - 1; i >= 0; i--) { kilatan[i].umur += dt; if (kilatan[i].umur > 1.4) kilatan.splice(i, 1); }
-      sim.posisi = posisiDari(pemain);
+      sim.posisi = tamu && sim.posisiSnap ? sim.posisiSnap : posisiDari(pemain);
 
       // ===== gambar =====
       const W = api.W(), H = api.H();
       if (d3) { ctx.clearRect(0, 0, W, H); d3.gambar(sim, sim.waktu); }
       else gambar2D(W, H);
       gambarHUD(W, H);
-      document.getElementById("hudWaktu").textContent = `Posisi ${sim.posisi}/6 · Lap ${batas(pemain.lap, 1, LAP)}/${LAP}`;
+      document.getElementById("hudWaktu").textContent = `${sim.posisi}/6 · Lap ${batas(pemain.lap, 1, LAP)}`;
     });
     function cariIdxBenda(s) {
       let terbaik = s.idx, jarak = Infinity;
@@ -495,6 +585,7 @@
     };
     const IKON_ROLET = Object.keys(ITEM);
     function gambarHUD(W, H) {
+      if (akhir && akhir.sisa <= 0 && hostOnline && !teman.akhirTerkirim) teks("Menunggu teman finis...", W / 2, H * 0.4, 16, "#F2C14E");
       // kotak item
       ctx.fillStyle = "rgba(43,42,38,.78)"; ctx.fillRect(10, 10, 58, 58);
       ctx.strokeStyle = "#F2C14E"; ctx.lineWidth = 3; ctx.strokeRect(10, 10, 58, 58);

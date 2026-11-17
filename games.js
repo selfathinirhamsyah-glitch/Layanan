@@ -85,6 +85,12 @@
 
       ${K.progres ? K.progres.htmlPapan() : ""}
 
+      <button type="button" class="kartu-duel kartu-online" data-online>
+        <span class="kd-vs" aria-hidden="true"><span>${px("kapibara")}</span><b>+</b><span>${px("marmut")}</span></span>
+        <span class="kd-isi"><strong>Main Berdua Online · 2 HP</strong><small>Buat room, bagikan kode ke teman, main di HP masing-masing. Semua game bisa berdua, ada stiker juga.</small></span>
+        <span class="km-panah" aria-hidden="true">→</span>
+      </button>
+
       <button type="button" class="kartu-duel" data-duel>
         <span class="kd-vs" aria-hidden="true"><span>${px("kura")}</span><b>VS</b><span>${px("marmut")}</span></span>
         <span class="kd-isi"><strong>Mode Duel · 2 Pemain</strong><small>Satu HP, hadap-hadapan. Turnamen 3 atau 5 ronde: Hoki Meja Rapat, Cap Duluan, Tarik Map, Kabel Kusut. Tidak ada teman? Lawan bot Pak Satpam.</small></span>
@@ -115,7 +121,8 @@
             </div>
             <button class="btn primary small" type="button" data-main="${id}">Main</button>
           </article>`).join("")}
-      </div>`;
+      </div>
+      <p class="istirahat-getar"><button class="btn small" type="button" data-getar aria-pressed="${K.data.setelan.getar !== false}">Getar HP saat main: ${K.data.setelan.getar === false ? "mati" : "nyala"}</button></p>`;
     K.pasangSprite(r);
   }
   K.saatMasuk["s-istirahat"] = isiRuang;
@@ -124,6 +131,14 @@
     const b = e.target.closest("[data-main]");
     if (b) bukaArena(b.dataset.main);
     if (e.target.closest("[data-duel]")) K.bukaDuel?.();
+    if (e.target.closest("[data-online]")) K.bukaOnline?.();
+    const gt = e.target.closest("[data-getar]");
+    if (gt) {
+      K.data.setelan.getar = K.data.setelan.getar === false; K.simpan(); sfx("pilih");
+      const nyala = K.data.setelan.getar !== false;
+      gt.setAttribute("aria-pressed", nyala); gt.textContent = `Getar HP saat main: ${nyala ? "nyala" : "mati"}`;
+      if (nyala) K.WOW?.hp(60);
+    }
   });
 
   /* =========================================================
@@ -135,7 +150,7 @@
   const domGame = $("#arenaDom");
   const kontrol = $("#arenaKontrol");
   const panel = $("#arenaPanel");
-  let gameAktif = null, berhenti = null, bebanSebelum = 0, apiAktif = null;
+  let gameAktif = null, berhenti = null, bebanSebelum = 0, apiAktif = null, onlineAktif = null;
 
   function bukaArena(id) {
     gameAktif = id;
@@ -145,6 +160,7 @@
     tampilPanel("sebelum");
   }
   function tutupArena() {
+    if (onlineAktif) { if (berhenti) K.NET?.kirim({ t: "keluarGame" }); onlineAktif = null; aturHudOnline(false); }
     berhenti?.(); berhenti = null;
     arena.hidden = true;
     document.body.classList.remove("layar-penuh");
@@ -153,7 +169,9 @@
   }
   $("#arenaKeluar").addEventListener("click", () => {
     if (berhenti) { berhenti(); berhenti = null; memo("Dimas · Anak Magang", "KELUAR? Oke. Oke. Nggak apa-apa. *skornya tidak dihitung ya."); }
+    const tadiOnline = !!onlineAktif;
     tutupArena();
+    if (tadiOnline) K.kembaliLobiOnline?.();
   });
 
   // 3D: game kanvas pakai three.js (games3d.js), Stempel pakai CSS 3D
@@ -233,15 +251,15 @@
       <div class="ap-hasil">
         <p class="ap-skor-label">Skor</p>
         <p class="ap-skor mono">${skor}</p>
-        ${rekor ? `<p class="ap-rekor">Rekor baru. Dicatat di buku besar.</p>` : `<p class="muted small">Rekor: ${K.data.skor[gameAktif]}</p>`}
+        ${hasil.online ? `<p class="ap-rekor">${esc(hasil.online)}</p>` : rekor ? `<p class="ap-rekor">Rekor baru. Dicatat di buku besar.</p>` : `<p class="muted small">Rekor: ${K.data.skor[gameAktif]}</p>`}
         <p class="ap-poin">+${poin} Poin Sabar${tk === "lembur" ? " (Lembur x1.5)" : ""}</p>
         ${K.progres ? K.progres.htmlHasil(prog) : ""}
       </div>
       <div class="ap-kepala"><span class="avatar">${px(komentar[0])}</span><p>${esc(komentar[1])}</p></div>
       ${bebanSebelum > 0 ? `<div class="ap-bagian"><div id="bebanSesudah"></div><div class="actions"><button class="btn small" type="button" id="catatBeban">Catat beban sesudah main</button></div></div>` : ""}
       <div class="actions">
-        <button class="btn" type="button" id="mainLagi">Main lagi</button>
-        <button class="btn primary" type="button" id="selesaiMain">Kembali ke ruang istirahat</button>
+        ${hasil.online ? `<button class="btn primary" type="button" id="keLobiOnline">Kembali ke lobi online</button>` : `<button class="btn" type="button" id="mainLagi">Main lagi</button>
+        <button class="btn primary" type="button" id="selesaiMain">Kembali ke ruang istirahat</button>`}
       </div>`;
     if (bebanSebelum > 0) {
       const sesudah = K.skala.tumpukan($("#bebanSesudah"), { judul: "Beban pikiran sesudah main", awal: bebanSebelum });
@@ -260,11 +278,12 @@
         bebanSebelum = 0;
       });
     }
+    if (hasil.online) { $("#keLobiOnline").addEventListener("click", () => { onlineAktif = null; aturHudOnline(false); tutupArena(); K.kembaliLobiOnline?.(); }); return; }
     $("#mainLagi").addEventListener("click", () => tampilPanel("sebelum"));
     $("#selesaiMain").addEventListener("click", tutupArena);
   }
 
-  async function mulai(semangat) {
+  async function mulai(semangat, online = null) {
     panel.hidden = true;
     const g = GAMES[gameAktif];
     const pakaiDom = gameAktif === "stempel";
@@ -289,13 +308,25 @@
     hm.hidden = true;
     const api = buatApi(semangat, tiga);
     apiAktif = api;
-    const hentikan = MAIN[gameAktif](api);
+    api.ukurUlang = () => { if (apiAktif !== api) return; siapkanKanvas(); try { api.d3?.ukur(); } catch { /* tidak apa-apa */ } };
+    if (online) api.online = buatOnline(online);
+    const hentikan = (online && K.ONLINE_MAIN?.[gameAktif] ? K.ONLINE_MAIN[gameAktif] : MAIN[gameAktif])(api);
     // game yang memasang bar tombol sendiri mengecilkan panggung: ukur ulang kanvas
     if (kontrol.childElementCount) { siapkanKanvas(); try { api.d3?.ukur(); } catch { /* tidak apa-apa */ } }
-    berhenti = () => { hentikan(); api.d3?.hapus(); api.d3 = null; };
-    api.selesai = (skor, komentar) => {
+    berhenti = () => { hentikan(); api.online?.lepasSemua(); api.d3?.hapus(); api.d3 = null; };
+    api.selesai = (skor, komentar, catatanOnline) => {
       berhenti?.(); berhenti = null;
       const id = gameAktif;
+      if (api.online) {
+        const poin = K.tambahPoin(Math.round(Math.max(0, skor) / 5));
+        K.data.mainGame = (K.data.mainGame || 0) + 1; K.simpan();
+        K.catat(`game:${id}`, { skor }); K.catat("game"); K.catat("online");
+        const prog = K.progres ? K.progres.lapor({ jenis: "duel", game: id, skor, stat: api.stat, poin, pemenang: catatanOnline?.menang ? 1 : 2 }) : null;
+        sfx(catatanOnline?.menang ? "menang" : "poin");
+        if (catatanOnline?.menang) K.WOW?.hujan();
+        tampilPanel("sesudah", { skor, poin, rekor: false, komentar, prog, tk: "normal", online: catatanOnline?.judul || "Main berdua online" });
+        return;
+      }
       const rekor = skor > (K.data.skor[id] ?? -Infinity);
       if (rekor) K.data.skor[id] = skor;
       K.data.mainGame = (K.data.mainGame || 0) + 1;
@@ -310,6 +341,52 @@
       if (prog?.naikPangkat) setTimeout(() => K.progres.rayakanPangkat(prog.naikPangkat), 600);
     };
   }
+
+  /* ---------- main berdua online ---------- */
+  function buatOnline(o) {
+    const lepas = [];
+    return {
+      ...o, net: K.NET, host: o.peran === "host",
+      kirim: (m) => K.NET.kirim(m),
+      on(t, fn) { const f = K.NET.on(t, fn); lepas.push(f); return f; },
+      lepasSemua() { lepas.splice(0).forEach((f) => f()); },
+    };
+  }
+  function aturHudOnline(nyala) {
+    let b = $("#arenaStiker");
+    if (!nyala) { b?.remove(); $("#arenaStikerPalet")?.remove(); return; }
+    if (b) return;
+    b = document.createElement("button");
+    b.id = "arenaStiker"; b.type = "button"; b.className = "btn small arena-stiker"; b.textContent = "Stiker";
+    $("#arenaJudul").after(b);
+    b.addEventListener("click", () => {
+      let p = $("#arenaStikerPalet");
+      if (p) { p.remove(); return; }
+      p = document.createElement("div"); p.id = "arenaStikerPalet"; p.className = "stiker-palet";
+      p.innerHTML = (K.EMOTE || []).map(([t, sp], i) => `<button type="button" data-em="${i}"><span class="avatar avatar-sm">${px(sp)}</span>${esc(t)}</button>`).join("");
+      arena.appendChild(p);
+      p.addEventListener("click", (e) => { const x = e.target.closest("[data-em]"); if (x) { K.kirimEmote?.(Number(x.dataset.em)); p.remove(); } });
+    });
+  }
+  K.mulaiOnline = (id, online) => {
+    if (gameAktif) { berhenti?.(); berhenti = null; }
+    gameAktif = id; onlineAktif = online;
+    document.body.classList.add("layar-penuh");
+    arena.hidden = false;
+    $("#arenaJudul").textContent = (K.GAME_ONLINE?.[id]?.nama) || GAMES[id].nama;
+    aturHudOnline(true);
+    panel.hidden = true; kontrol.innerHTML = ""; domGame.innerHTML = "";
+    $("#hudSkor").textContent = "0"; $("#hudInfo").textContent = `Main bareng ${online.teman?.nama || "teman"}`; $("#hudWaktu").textContent = "";
+    mulai(0, online);
+  };
+  // teman keluar dari game atau sambungan putus
+  const akhiriOnlinePaksa = (alasan) => {
+    if (!onlineAktif || !berhenti) return;
+    berhenti(); berhenti = null;
+    tampilPanel("sesudah", { skor: 0, poin: 0, rekor: false, komentar: ["kura", `Siap. Permainan dihentikan: ${alasan}.`], tk: "normal", online: "Permainan berhenti" });
+  };
+  K.onlinePutus = () => akhiriOnlinePaksa("sambungan dengan teman terputus");
+  setTimeout(() => K.NET?.on("keluarGame", () => akhiriOnlinePaksa(`${K.NET.teman?.nama || "teman"} keluar dari permainan`)), 0);
 
   /* ---------- kanvas ---------- */
   let W = 360, H = 480, skala = 1;
@@ -418,6 +495,9 @@
       api.skor(skor);
       efek.push(kilat(jarak < 10 ? "SEMPURNA +2" : jarak < 26 ? "BAGUS +1" : "TIPIS +1", targetX, zonaY() - 50, jarak < 10 ? "#4F6E5E" : "#2F4A6B"));
       sfx("pukul");
+      K.WOW?.hp(nilai === 2 ? 25 : 12);
+      if (nilai === 2) { const q = K.WOW?.dariKanvas(api.ctx.canvas, targetX, zonaY() - 30); if (q) K.WOW.ledak(q.x, q.y, ["#7FD18B", "#FFFDF6", "#F2C14E"], 14, { kuat: 3 }); }
+      if (pukulan % 10 === 0) { K.WOW?.teks(`${pukulan} PUKULAN!`, "#F2C14E", "Rally-nya panjang. Pak Satpam mulai menonton."); K.WOW?.getar(0.6, 0.2); }
       if (KOMENTAR[pukulan]) { komentar = KOMENTAR[pukulan]; api.info(komentar); }
       dur = Math.max(0.55, dur * 0.965);
       fase = "balik"; t = 0;
@@ -432,7 +512,7 @@
       else if (fase === "lewat") {
         t += dt / dur;
         if (t > 0.18) {
-          nyawa--; sfx("salah");
+          nyawa--; sfx("salah"); K.WOW?.getar(1, 0.25); K.WOW?.hp(70);
           efek.push(kilat("LEWAT", targetX, zonaY(), "#B5443A"));
           api.info(pilih(["Siap. Kok keluar. Bukan salah Anda, anginnya dari AC.", "Siap. Lewat. Saya juga sering begitu, tapi tidak pernah mengaku.", "Siap. Kok-nya terlalu cepat. Akan saya tegur."]));
           if (nyawa <= 0) { fase = "selesai"; setTimeout(() => api.selesai(skor, ["kura", skor >= 20 ? "Siap. Saya akui kalah. Tolong jangan disebarkan." : skor >= 8 ? "Siap. Permainan Anda tercatat rapi. Saya pura-pura tidak capek." : "Siap. Pemanasan yang bagus. Rally sungguhan besok, kalau Anda mau."]), 500); }
@@ -517,13 +597,13 @@
       k.el.appendChild(stempel);
       sfx("stempel");
       if (k.jenis === "oyen") {
-        skor -= 3; salah++; combo = 0;
+        skor -= 3; salah++; combo = 0; K.WOW?.getar(0.8, 0.2); K.WOW?.hp(60);
         api.info("Oyen: Ditolak. Alasan: saya sedang tidur di situ.");
         sfx("meong");
       } else if (k.jenis === pilihan) {
         skor += 2; benar++; combo++;
         api.tambah("benar"); api.catatStat("comboMaks", Math.max(api.stat.comboMaks || 0, combo));
-        if (combo % 5 === 0) { skor += 3; sfx("poin"); api.info(`COMBO x${combo}! +3 bonus. Bu Ratna: Tangannya lagi enak ya.`); }
+        if (combo % 5 === 0) { skor += 3; sfx("poin"); K.WOW?.teks(`COMBO x${combo}`, combo >= 15 ? "#E58B3A" : "#F2C14E", combo >= 15 ? "Tangan stempel legendaris" : "+3 bonus"); K.WOW?.hp(40); const r = k.el.getBoundingClientRect?.(); if (r) K.WOW?.ledak(r.left + r.width / 2, r.top + r.height / 2, ["#F2C14E", "#3E78C4", "#FFFDF6"], 16); api.info(`COMBO x${combo}! +3 bonus. Bu Ratna: Tangannya lagi enak ya.`); }
         else api.info(combo >= 3 ? `Combo x${combo}` : pilih(["Bu Ratna: Pas ya.", "Mas Kukang: ...tepat.", "Dimas: BENAR— eh, benar.", ""]));
       } else {
         skor -= 1; salah++; combo = 0;
@@ -606,8 +686,8 @@
         if (k.x < 10 || k.x > W - 10) k.vx *= -0.6, k.x = batas(k.x, 10, W - 10);
         if (k.y > mapY() - 12 && k.y < mapY() + 14 && Math.abs(k.x - mapX) < 42) {
           kertas.splice(i, 1);
-          if (k.jenis === "rapat") { skor -= 2; getar = 0.3; efek.push(kilat("rapat 16.00 -2", k.x, k.y - 20, "#B5443A")); sfx("salah"); api.info("Undangan rapat jam 4 sore masuk map. Akan kami pura-pura tidak lihat."); }
-          else if (k.jenis === "emas") { skor += 3; api.tambah("emas"); api.tambah("tangkap"); efek.push(kilat("+3 surat rahasia", k.x, k.y - 20, "#9A7224")); sfx("poin"); api.info("Dapat surat dari Mesin Fotokopi untuk Printer. Isinya rahasia. +3"); K.catat("suratPrinter"); }
+          if (k.jenis === "rapat") { skor -= 2; getar = 0.3; K.WOW?.hp(60); K.WOW?.kilat("rgba(181,68,58,.25)"); efek.push(kilat("rapat 16.00 -2", k.x, k.y - 20, "#B5443A")); sfx("salah"); api.info("Undangan rapat jam 4 sore masuk map. Akan kami pura-pura tidak lihat."); }
+          else if (k.jenis === "emas") { skor += 3; { const q = K.WOW?.dariKanvas(api.ctx.canvas, k.x, k.y); if (q) K.WOW.ledak(q.x, q.y, ["#F2C14E", "#FFE08A", "#FFFDF6"], 22, { kuat: 4 }); K.WOW?.hp(40); } api.tambah("emas"); api.tambah("tangkap"); efek.push(kilat("+3 surat rahasia", k.x, k.y - 20, "#9A7224")); sfx("poin"); api.info("Dapat surat dari Mesin Fotokopi untuk Printer. Isinya rahasia. +3"); K.catat("suratPrinter"); }
           else { skor += 1; api.tambah("tangkap"); efek.push(kilat("+1", k.x, k.y - 20, "#2F4A6B")); sfx("kertas"); }
           api.skor(skor);
         } else if (k.y > H + 20) kertas.splice(i, 1);
@@ -684,7 +764,7 @@
       if (tahan && !harusLepas) {
         if (keadaan === "menoleh") {
           nyawa--; harusLepas = true; kedip = 0.5; api.tambah("ketahuan");
-          sfx("meong");
+          sfx("meong"); K.WOW?.getar(1.2, 0.3); K.WOW?.hp(90);
           efek.push(kilat("KETAHUAN", W / 2, H * 0.55, "#B5443A"));
           api.info(pilih(["Oyen: Gorengan disita. Untuk keperluan rapat.", "Oyen: ...Diketahui.", "Oyen: Mulutnya kenapa gerak-gerak?"]));
         } else {

@@ -24,6 +24,8 @@ Navigasi utama berupa **panel lift** di bawah layar dan denah gedung di Lobi.
 | 5 · Meja | Koleksi barang, rak barang langka, buku rekor, hapus data |
 | 13 · Rahasia | Terbuka setelah Misteri Lantai 13 selesai: SK Penjaga Lantai 13, toples koleksi, simpan hal kecil |
 
+**Main Berdua Online** (Lantai 2): dua HP, room dengan kode 5 huruf (atau tautan WhatsApp), lobi dengan stiker, dan ketujuh game bisa dimainkan berdua. Legenda Lantai 2 dan Kantor Royale bisa satu tim atau saling lawan. HP pembuat room menjalankan game, HP teman mengirim gerakan. Sambungan langsung WebRTC lewat PeerJS (`vendor/peerjs.min.js`, MIT), server PeerJS publik hanya untuk saling menemukan. File: `jaringan.js`, `online.js`, `online-games.js`, `online.css`. Efek "WOW" (getar layar, konfeti, tulisan besar, getar HP yang bisa dimatikan) ada di `wow.js`.
+
 **Mode Duel** (Lantai 2): 2 pemain satu HP, hadap-hadapan, 4 game (Hoki Meja Rapat, Cap Duluan, Tarik Map, Kabel Kusut), turnamen 3/5 ronde atau lawan bot. Ada juga pangkat, misi harian, dan tingkat Lembur (`duel.js`, `progres.js`).
 
 **Radio Kantor** (pojok kanan atas): kenop volume 5 tingkat, Tuas Mode Kaget, dan Saklar Lampu Lorong (seram-lucu / lebih tegang).
