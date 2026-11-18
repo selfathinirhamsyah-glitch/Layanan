@@ -82,6 +82,24 @@ Disusun dari pola main remaja 2025–2026: game berdua dengan teman jadi favorit
 - **Misi harian**: 3 misi per hari (salah satunya misi duel yang boleh dikerjakan lawan bot), hadiah Poin Sabar + XP, bonus kalau ketiganya beres. Ada juga hitungan hari beruntun.
 - **Tingkat kesulitan** di game solo: Santai, Normal, Lembur (semua lebih cepat, Poin Sabar x1.5). Stempel Kilat punya **combo**.
 
+### Atap Biru (Lantai A) · puzzle, renovasi, cerita
+Lantai baru di tombol lift **A**. Dibuat dari pola game yang paling bikin betah untuk umur 14–15: puzzle santai tapi ada sasaran, hasilnya terlihat (atap makin bagus), bebas berekspresi (gaya & baju), cerita bersambung, dan bisa dimainkan bareng teman.
+
+**Alurnya:** main puzzle → dapat bintang & koin → renovasi sudut atap (pilih gaya) → episode cerita baru terbuka → ulangi.
+
+- **Rapikan Atap** (puzzle cocok-tiga, level tanpa batas): geser satu benda ke sebelahnya. 4 sejajar = **Sapu** (satu baris/kolom), kotak 2×2 = **Pesawat Kertas** (terbang ke sasaran), bentuk L/T = **Ember Air** (3×3), 5 sejajar = **Bintang Biru** (semua benda sewarna). Dua benda khusus ditukar = efek gabungan. Rintangan: **debu** (di bawah benda) dan **kardus** (rusak oleh cocokan di sebelahnya). Sisa langkah di akhir berubah jadi "BONUS ATAP".
+- **Santai tapi menantang:** kalah tidak mengurangi apa pun; sekali per level ada +5 langkah gratis. Tingkat Santai/Lembur dari Ruang Istirahat ikut berlaku (±langkah). Diuji dengan bot otomatis: ±73% level dimenangkan bot yang hanya memilih langkah terbaik saat itu.
+- **Hadiah:** menang = 1 bintang + koin + sedikit Poin Sabar & XP (ikut misi "main 3 game"). Menang pertama tiap hari: bonus **Teh Pagi** (makin besar kalau naik atap berhari-hari berturut-turut).
+- **Renovasi:** 7 sudut, 23 tugas, total 45 bintang: Lantai & Pagar, Kebun Kecil, Pojok Baca, Panggung Kecil, Layar Tancap, Kedai Teh, Langit Malam. 12 tugas punya pilihan gaya dengan pratinjau langsung; gaya bisa diganti gratis kapan saja.
+- **Pemandangan** pixel art berubah sesuai renovasi dan **jam** (pagi, siang, sore, malam: lampu tali menyala, layar tancap memutar film). Pegawai muncul di sudut yang sudah beres, Oyen tidur di kasurnya.
+- **Cerita "Surat dari Atap"**: prolog + 7 episode. Surat-surat dari "R." yang dulu sering naik ke atap waktu umur 14. Ada pilihan menebak siapa R., dan di akhir kamu bisa menulis surat sendiri untuk kotak surat (tersimpan di HP saja). Isinya sengaja tidak menyuruh semangat; temanya: hal kecil yang diulang tiap hari.
+- **Lemari**: rambut (6 model), atasan (6), bawahan (4), sepatu (3), aksesori (6, termasuk headphone dan lightstick), 10 warna baju, 5 warna rambut, 4 warna kulit. Model dibeli pakai koin puzzle; **tidak ada gacha, tidak ada pembelian sungguhan**.
+- **Kartu pamer**: gambar PNG atap + karakter untuk dikirim (pakai menu bagikan HP kalau ada).
+- **Main berdua (dua HP)**: **Lomba Rapikan Atap** (papan sama persis dari benih yang sama, bilah kemajuan teman tampil di atas, yang beres duluan menang) dan **Main ke Atap** (lihat atap teman, kirim sampai 3 cap seperti "Keren!", dan 1 hadiah kecil yang langsung terpasang di atap teman).
+- **Main sehat:** setelah 25 menit main puzzle, Mas Kukang mengingatkan istirahat (tidak mengunci).
+
+File: `atap.js` (layar & online), `atap-puzzle.js` (mesin puzzle), `atap-gambar.js` (gambar piksel), `atap-data.js` (sudut, cerita, lemari), `atap.css`.
+
 ### Main Berdua Online (dua HP)
 Main bareng teman, masing-masing di HP sendiri. Kartu **Main Berdua Online** ada paling atas di Ruang Istirahat.
 1. Satu orang mengisi nama, memilih karakter, lalu ketuk **Buat room**. Muncul **kode 5 huruf**, tautan undangan, dan tombol kirim lewat WhatsApp.
@@ -97,6 +115,8 @@ Main bareng teman, masing-masing di HP sendiri. Kartu **Main Berdua Online** ada
 | Ngemil Berdua | Satu rapat, satu Oyen. Siapa yang paling banyak ngemil tanpa ketahuan. |
 | Grand Prix Berdua | Balapan 3 lap bersama 4 bot. Item dan tabrakan saling kena. |
 | Legenda Lantai 2 | **Satu tim** (kalian + 1 bot lawan 3 bot) atau **saling lawan** (masing-masing dengan 2 bot). Pada saling lawan, layar tiap pemain diputar supaya markas sendiri selalu di bawah. |
+| Lomba Rapikan Atap | Puzzle Atap Biru dengan papan yang sama persis. Siapa beres duluan, menang. |
+| Main ke Atap | Saling berkunjung ke Atap Biru, kasih cap dan kirim hadiah kecil. |
 | Kantor Royale | **Duo satu regu** (tidak saling melukai, titik teman tampil di peta mini, menang kalau regu kalian yang terakhir) atau **saling lawan**. |
 
 Cara kerjanya: HP pembuat room menjalankan permainan, HP teman mengirim gerakan dan menerima gambaran keadaan beberapa kali per detik. Sambungan langsung antar-HP (WebRTC lewat PeerJS, `vendor/peerjs.min.js`), server PeerJS publik hanya dipakai untuk saling menemukan. Tidak ada akun dan tidak ada data yang disimpan di server.
@@ -324,6 +344,7 @@ Semua teks ada di file JavaScript, jadi bisa diubah langsung lewat GitHub (buka 
 | Obrolan Pantry, kalimat "dengerin aja", gosip | `pantry-data.js` |
 | Barang koperasi & harga | `koperasi.js` (bagian `BARANG`) |
 | Isi game | `games.js` (logika), `balap.js` (Grand Prix), `arena.js` + `moba.js` + `royale.js` (Legenda Lantai 2 & Kantor Royale), `games3d.js` (tampilan 3D), `duel.js` (Mode Duel), `progres.js` (pangkat & misi) |
+| Atap Biru (puzzle, renovasi, cerita R., lemari) | `atap-data.js` (isi), `atap-puzzle.js`, `atap-gambar.js`, `atap.js` |
 | Main berdua online | `jaringan.js` (sambungan), `online.js` (lobi, stiker), `online-games.js` (4 game kecil versi online), `wow.js` (efek) |
 | Cerita misteri | `l13-bab.js` (Bab 1), `l13-bab23.js` (Bab 2–3), `l13-bab456.js` (Bab 4–6 + Ruang Rahasia), `l13-kasus-lift.js` (Kasus Lift Tengah Malam) |
 | Gambar karakter (pixel) | `sprites.js` (grid 12×12 huruf) |

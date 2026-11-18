@@ -52,6 +52,7 @@
 
   /* ---------- Lantai ---------- */
   const LANTAI = [
+    { no: "A", layar: "s-atap", nama: "Atap Biru", ket: "Puzzle, renovasi, surat misterius", sprite: "kotakSurat" },
     { no: "5", layar: "s-meja", nama: "Meja Kerja Mira", ket: "Koleksi & skor", sprite: "oyen" },
     { no: "4", layar: "s-koperasi", nama: "Koperasi Kantor", ket: "Belanja pakai Poin Sabar", sprite: "berang" },
     { no: "3", layar: "s-pantry", nama: "Pantry", ket: "Ngobrol & gosip", sprite: "kukang" },
@@ -158,7 +159,7 @@
     if (!dari || !ke_ || dari === ke_ || K.kurangiGerak) { ke(id); return; }
     sedangNaik = true;
     const pintu = $("#pintuLift");
-    const urut = ["L", "1", "2", "3", "4", "5", "13"];
+    const urut = ["L", "1", "2", "3", "4", "5", "A", "13"];
     $("#pintuLantai").textContent = `${urut.indexOf(ke_) > urut.indexOf(dari) ? "▲" : "▼"} ${ke_}`;
     pintu.hidden = false;
     pintu.classList.remove("buka"); void pintu.offsetWidth; pintu.classList.add("tutup");

@@ -22,7 +22,10 @@ Navigasi utama berupa **panel lift** di bawah layar dan denah gedung di Lobi.
 | 3 · Pantry | Obrolan bercabang dengan Bu Ratna, Pak Satpam, Dimas, Oyen, Mas Kukang (termasuk mode "dengerin aja") dan gosip kantor |
 | 4 · Koperasi | Belanja barang absurd pakai Poin Sabar, ditemani satu karakter, struk bisa diunduh |
 | 5 · Meja | Koleksi barang, rak barang langka, buku rekor, hapus data |
+| A · Atap | Atap Biru: puzzle Rapikan Atap, renovasi 7 sudut dengan pilihan gaya, cerita "Surat dari Atap", lemari baju, kartu pamer, main berdua |
 | 13 · Rahasia | Terbuka setelah Misteri Lantai 13 selesai: SK Penjaga Lantai 13, toples koleksi, simpan hal kecil |
+
+**Atap Biru** (Lantai A, tombol lift A): puzzle cocok-tiga "Rapikan Atap" (level tanpa batas, benda khusus, debu & kardus) → bintang & koin → renovasi 7 sudut atap dengan pilihan gaya → cerita bersambung "Surat dari Atap" (prolog + 7 episode, misteri siapa R.). Pemandangan pixel art berubah sesuai renovasi dan jam. Ada lemari baju karakter (tanpa gacha), kartu pamer PNG, bonus harian, pengingat istirahat, dan dua mode dua HP: Lomba Rapikan Atap & Main ke Atap. File: `atap*.js`, `atap.css`.
 
 **Main Berdua Online** (Lantai 2): dua HP, room dengan kode 5 huruf (atau tautan WhatsApp), lobi dengan stiker, dan ketujuh game bisa dimainkan berdua. Legenda Lantai 2 dan Kantor Royale bisa satu tim atau saling lawan. HP pembuat room menjalankan game, HP teman mengirim gerakan. Sambungan langsung WebRTC lewat PeerJS (`vendor/peerjs.min.js`, MIT), server PeerJS publik hanya untuk saling menemukan. File: `jaringan.js`, `online.js`, `online-games.js`, `online.css`. Efek "WOW" (getar layar, konfeti, tulisan besar, getar HP yang bisa dimatikan) ada di `wow.js`.
 

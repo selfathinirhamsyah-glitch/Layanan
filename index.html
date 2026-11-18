@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="mira.css">
   <link rel="stylesheet" href="duel.css">
   <link rel="stylesheet" href="online.css">
+  <link rel="stylesheet" href="atap.css">
   <link rel="stylesheet" href="panduan.css">
 </head>
 <body data-loket="umum">
@@ -505,6 +506,14 @@
       </div>
     </section>
 
+    <section class="screen" id="s-atap" data-loket="A" data-lantai="A" aria-labelledby="h-atap">
+      <div class="paper" id="ruangAtap">
+        <div class="form-head"><span class="loket-badge">Lantai A</span></div>
+        <h2 id="h-atap">Atap Biru</h2>
+        <p class="renovasi">Pintu atap sedang dibuka. Engselnya berderit sebelas tahun.</p>
+      </div>
+    </section>
+
     <!-- ============ SURAT ULANG TAHUN ============ -->
     <section class="screen" id="s-ultah" data-loket="A" data-lantai="L" aria-labelledby="h-ultah">
       <div class="paper" id="ruangUltah"></div>
@@ -549,6 +558,7 @@
   <button class="lift-btn" type="button" data-lantai="3" data-layar="s-pantry"><b>3</b><small>Pantry</small></button>
   <button class="lift-btn" type="button" data-lantai="4" data-layar="s-koperasi"><b>4</b><small>Kopkar</small></button>
   <button class="lift-btn" type="button" data-lantai="5" data-layar="s-meja"><b>5</b><small>Meja</small></button>
+  <button class="lift-btn lift-atap" type="button" data-lantai="A" data-layar="s-atap"><b>A</b><small>Atap</small></button>
   <button class="lift-btn lift-kosong" type="button" id="liftKosong" aria-label="Tombol tanpa angka"><b>▒</b><small>&nbsp;</small></button>
 </nav>
 <!-- Arena game (layar penuh) -->
@@ -712,6 +722,10 @@
 <script src="duel.js" defer></script>
 <script src="online-games.js" defer></script>
 <script src="online.js" defer></script>
+<script src="atap-data.js" defer></script>
+<script src="atap-gambar.js" defer></script>
+<script src="atap-puzzle.js" defer></script>
+<script src="atap.js" defer></script>
 <script src="pantry-data.js" defer></script>
 <script src="pantry.js" defer></script>
 <script src="koperasi.js" defer></script>

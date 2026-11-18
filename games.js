@@ -285,7 +285,7 @@
 
   async function mulai(semangat, online = null) {
     panel.hidden = true;
-    const g = GAMES[gameAktif];
+    const g = GAMES[gameAktif] || K.GAME_ONLINE?.[gameAktif] || {};
     const pakaiDom = gameAktif === "stempel";
     kanvas.hidden = pakaiDom; domGame.hidden = !pakaiDom;
     domGame.classList.toggle("tiga-d", pakaiDom && pakai3D());

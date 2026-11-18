@@ -777,6 +777,23 @@
         "kkkkkkkkkkkk",
       ],
     },
+    kotakSurat: { // kotak surat biru di atap
+      p: { k: K, b: "#3E78C4", B: "#7FC8F2", w: "#FFFDF6", y: "#F2C14E", g: "#8A8F96" },
+      g: [
+        "...kkkkkk...",
+        "..kBBBBBbk..",
+        ".kBbbbbbbbk.",
+        ".kbkkkkkkbk.",
+        ".kbkwwwwkbky",
+        ".kbkkkkkkbky",
+        ".kbbbbbbbbk.",
+        ".kbbbbbbbbk.",
+        ".kkkkkkkkkk.",
+        ".....kgk....",
+        ".....kgk....",
+        "....kkkkk...",
+      ],
+    },
   };
 
   const cache = {};
@@ -820,5 +837,5 @@
     return (cachePng[key] = c.toDataURL("image/png"));
   }
 
-  window.SPRITE = { svg, png };
+  window.SPRITE = { svg, png, data: (name) => S[name] || null };
 })();

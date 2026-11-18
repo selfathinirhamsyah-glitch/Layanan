@@ -25,7 +25,7 @@
       id: "lift", judul: "Lift & denah gedung", sprite: "kura", oleh: "Pak Satpam",
       buka: "Siap. Gedung ini punya enam lantai yang tercatat. Ke mana-mana pakai lift. Tangga sedang dipakai untuk merenung.",
       langkah: [
-        ["kura", "<b>L</b> Lobi · <b>1</b> Loket · <b>2</b> Rehat (games) · <b>3</b> Pantry · <b>4</b> Koperasi · <b>5</b> Meja Kerja kamu."],
+        ["kura", "<b>L</b> Lobi · <b>1</b> Loket · <b>2</b> Rehat (games) · <b>3</b> Pantry · <b>4</b> Koperasi · <b>5</b> Meja Kerja kamu · <b>A</b> Atap Biru."],
         ["dokumen", "Di lobi ada <b>denah gedung</b>. Ketuk lantainya untuk naik lift."],
         ["oyen", "Tombol lift yang tidak ada angkanya... belum ada lantainya. Laporan sudah saya kirim. Belum dijawab."],
         ["berkas", "Kotak merah kecil di tombol lift artinya ada yang baru di lantai itu, misalnya gosip baru."],
@@ -80,6 +80,23 @@
         ["oyen", "Semua game memberi <b>Poin Sabar</b>. Rekor tersimpan. Papan Pegawai Teladan selalu dimenangkan kamu. Itu keputusan Kepala Bagian."],
       ],
       catatan: "Kalau capek di tengah game, ketuk Keluar. Nggak ada yang marah. *saya juga sering keluar.",
+    },
+    {
+      id: "atap", judul: "Atap Biru (Lantai A)", sprite: "kotakSurat", oleh: "Bu Ratna",
+      buka: "Atap gedung sebelas tahun tidak dibuka. Sekarang kuncinya di kamu ya. Pelan-pelan saja dirapikannya.",
+      langkah: [
+        ["kotakSurat", "Naik lift ke tombol <b>A</b>. Di kotak surat biru ada surat dari seseorang bernama <b>R.</b> Siapa dia? Itu misterinya."],
+        ["tanaman1", "<b>Rapikan Atap</b> adalah puzzle: geser satu benda ke sebelahnya, tiga sejajar langsung beres. Penuhi sasaran di kiri atas sebelum langkah (kanan atas) habis."],
+        ["saran", "Benda khusus: <b>4 sejajar</b> jadi Sapu (satu baris), <b>kotak 2×2</b> jadi Pesawat Kertas, bentuk <b>L/T</b> jadi Ember Air, <b>5 sejajar</b> jadi Bintang Biru (semua benda sewarna). Ketuk dua kali untuk memakainya, atau geser."],
+        ["batu", "Debu hilang kalau ada cocokan di atasnya. Kardus rusak kalau ada cocokan di sebelahnya."],
+        ["kapibara", "Menang satu level = <b>1 bintang</b> + koin. Kalah tidak mengurangi apa pun, dan sekali per level ada <b>+5 langkah gratis</b>. Menang pertama tiap hari dapat bonus Teh Pagi."],
+        ["kura", "Bintang dipakai untuk <b>renovasi</b>: tujuh sudut (lantai, kebun, pojok baca, panggung, layar tancap, kedai teh, langit malam). Banyak tugas bisa pilih <b>gaya</b> sendiri, dengan pratinjau, dan bisa diganti lagi gratis."],
+        ["hantu", "Tiap sudut yang beres membuka <b>satu episode</b> cerita Surat dari Atap. Atapnya juga berubah sesuai jam: pagi, siang, sore, malam."],
+        ["kaus", "<b>Lemari</b>: atur rambut, baju, sepatu, aksesori, dan warnanya. Model baru dibeli pakai koin dari puzzle. Tidak ada undian, tidak ada uang sungguhan."],
+        ["kartu", "<b>Kartu pamer</b>: gambar atap kamu untuk disimpan atau dikirim ke teman."],
+        ["marmut", "<b>Main berdua</b> (dua HP): <b>Lomba Rapikan Atap</b> (papan sama persis, siapa beres duluan) dan <b>Main ke Atap</b> (saling berkunjung, kasih cap, kirim hadiah kecil yang langsung terpasang di atap teman)."],
+      ],
+      catatan: "Kalau sudah lama main, Mas Kukang akan mengingatkan istirahat. Atapnya tidak ke mana-mana kok.",
     },
     {
       id: "pantry", judul: "Pantry", sprite: "kukang", oleh: "Mas Kukang",
